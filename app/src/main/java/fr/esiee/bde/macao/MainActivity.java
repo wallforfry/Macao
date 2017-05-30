@@ -2,11 +2,14 @@ package fr.esiee.bde.macao;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -30,6 +33,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
@@ -41,7 +45,14 @@ public class MainActivity extends AppCompatActivity
     private ProgressDialog mProgressDialog;
 
     private boolean isSignedIn = false;
+
     private String username = "";
+    private String firstname = "";
+    private String lastname = "";
+    private String mail = "";
+
+    TextView nameDrawer;
+    TextView mailDrawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +76,13 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        nameDrawer = (TextView) headerView.findViewById(R.id.nameDrawer);
+        mailDrawer = (TextView) headerView.findViewById(R.id.mailDrawer);
+
         navigationView.setNavigationItemSelectedListener(this);
-
-
-        // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        //findViewById(R.id.disconnect_button).setOnClickListener(this);
-
-        mStatusTextView = (TextView) findViewById(R.id.status);
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -89,7 +97,15 @@ public class MainActivity extends AppCompatActivity
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        // Button listeners
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
+        //findViewById(R.id.disconnect_button).setOnClickListener(this);
+
+        mStatusTextView = (TextView) findViewById(R.id.status);
+
     }
+
 
     @Override
     public void onStart() {
@@ -118,17 +134,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        hideProgressDialog();
-    }
-
-    @Override
-    protected void onStop() {
+    public void onStop(){
         super.onStop();
         if (mProgressDialog != null) {
             mProgressDialog.dismiss();
         }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        hideProgressDialog();
     }
 
     @Override
@@ -166,11 +182,14 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        Fragment fragment = null;
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+            //fragment = new SignInFragment();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -183,6 +202,11 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.content_main, fragment);
+        transaction.commit();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -190,7 +214,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
+        switch (v.getId()){
             case R.id.sign_in_button:
                 signIn();
                 break;
@@ -202,18 +226,6 @@ public class MainActivity extends AppCompatActivity
                 break;*/
         }
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-    }
-
 
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -244,7 +256,7 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
+    public void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
@@ -256,6 +268,13 @@ public class MainActivity extends AppCompatActivity
             String lastname = email.substring(email.indexOf(".")+1, email.indexOf("@"));
             String username = lastname.substring(0, 7)+firstname.substring(0,1);
             this.username = username;
+            this.firstname = firstname;
+            this.lastname = lastname;
+            this.mail = email;
+            this.isSignedIn = true;
+
+            this.nameDrawer.setText(username);
+            this.mailDrawer.setText(mail);
 
             mStatusTextView.setText(username);
 
@@ -285,7 +304,6 @@ public class MainActivity extends AppCompatActivity
     private void updateUI(boolean signedIn) {
         this.isSignedIn = signedIn;
 
-
         if (signedIn) {
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
@@ -294,6 +312,16 @@ public class MainActivity extends AppCompatActivity
 
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
         }
     }
 
