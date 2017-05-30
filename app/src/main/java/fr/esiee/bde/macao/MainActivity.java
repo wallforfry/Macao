@@ -1,5 +1,6 @@
 package fr.esiee.bde.macao;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -32,16 +33,19 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import java.util.Objects;
+
+import fr.esiee.bde.macao.Fragments.CalendarFragment;
+import fr.esiee.bde.macao.Fragments.SignInFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleApiClient mGoogleApiClient;
-    private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
 
     private boolean isSignedIn = false;
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity
 
     TextView nameDrawer;
     TextView mailDrawer;
+
+    private Fragment currentFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +102,6 @@ public class MainActivity extends AppCompatActivity
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
-        // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        //findViewById(R.id.disconnect_button).setOnClickListener(this);
-
-        mStatusTextView = (TextView) findViewById(R.id.status);
 
     }
 
@@ -189,8 +188,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-            //fragment = new SignInFragment();
+            fragment = new CalendarFragment();
         } else if (id == R.id.nav_gallery) {
+            fragment = new SignInFragment();
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -201,6 +201,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
+
+        currentFragment = fragment;
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
@@ -215,24 +217,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.sign_in_button:
-                signIn();
+            default:
                 break;
-            case R.id.sign_out_button:
-                signOut();
-                break;
-            /*case R.id.disconnect_button:
-                revokeAccess();
-                break;*/
         }
     }
 
-    private void signIn() {
+    public void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void signOut() {
+    public void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -261,24 +256,30 @@ public class MainActivity extends AppCompatActivity
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getEmail()));
+            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getEmail()));
 
             String email = acct.getEmail();
-            String firstname = email.substring(0,email.indexOf("."));
-            String lastname = email.substring(email.indexOf(".")+1, email.indexOf("@"));
-            String username = lastname.substring(0, 7)+firstname.substring(0,1);
-            this.username = username;
-            this.firstname = firstname;
-            this.lastname = lastname;
-            this.mail = email;
-            this.isSignedIn = true;
 
-            this.nameDrawer.setText(username);
-            this.mailDrawer.setText(mail);
+            if(email.substring(email.indexOf("@")).equals("@edu.esiee.fr")){
+                String firstname = email.substring(0,email.indexOf("."));
+                String lastname = email.substring(email.indexOf(".")+1, email.indexOf("@"));
+                String username = lastname.substring(0, 7)+firstname.substring(0,1);
+                this.username = username;
+                this.firstname = firstname;
+                this.lastname = lastname;
+                this.mail = email;
+                this.isSignedIn = true;
 
-            mStatusTextView.setText(username);
+                this.nameDrawer.setText(username);
+                this.mailDrawer.setText(mail);
 
-            updateUI(true);
+                //mStatusTextView.setText(username);
+
+                updateUI(true);
+            }
+            else{
+                signOut();
+            }
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);
@@ -304,14 +305,8 @@ public class MainActivity extends AppCompatActivity
     private void updateUI(boolean signedIn) {
         this.isSignedIn = signedIn;
 
-        if (signedIn) {
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
-        } else {
-            mStatusTextView.setText(R.string.signed_out);
-
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+        if(currentFragment instanceof SignInFragment) {
+            ((SignInFragment) currentFragment).connectUser(signedIn);
         }
     }
 
@@ -330,5 +325,18 @@ public class MainActivity extends AppCompatActivity
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    public boolean isSignedIn() {
+        return isSignedIn;
+    }
+
+    public void setSignedIn(boolean signedIn) {
+        isSignedIn = signedIn;
     }
 }
