@@ -32,4 +32,6 @@
     <string name="actualiser">Actualiser</string>
     <string name="today">Aujourd\'hui</string>
     <string name="agenda">Agenda</string>
+    <string name="connexion">Connexion</string>
+    <string name="rooms">Salles libres</string>
 </resources>

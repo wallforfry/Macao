@@ -51,11 +51,12 @@ import java.net.URLConnection;
 import java.util.Objects;
 
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
+import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -216,6 +217,7 @@ public class MainActivity extends AppCompatActivity
             fragment = new SignInFragment();
 
         } else if (id == R.id.nav_slideshow) {
+            fragment = new RoomsFragment();
 
         } else if (id == R.id.nav_manage) {
 
