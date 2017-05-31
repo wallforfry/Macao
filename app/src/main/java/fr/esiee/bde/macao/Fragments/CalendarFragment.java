@@ -328,13 +328,13 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 // Pull out the first event on the public timeline
-                try {
-                    Log.d("OK", timeline.get(0).toString());
-                    getEvents(timeline);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                getEvents(timeline);
 
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                mListener.makeSnackBar("Veullez d'abord vous connecter au site du BDE");
             }
         });
     }
