@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import fr.esiee.bde.macao.DividerItemDecoration;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Rooms.Room;
@@ -94,6 +95,7 @@ public class RoomsFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
         getRooms(0);
