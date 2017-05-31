@@ -132,7 +132,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         // Set long press listener for empty view
         mWeekView.setEmptyViewLongPressListener(this);
 
-        //mWeekView.setWeekViewLoader(this);
+        mWeekView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
