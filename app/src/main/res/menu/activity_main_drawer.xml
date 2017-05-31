@@ -12,7 +12,7 @@
             android:title="@string/connexion" />
         <item
             android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_room_white_24dp"
             android:title="@string/rooms" />
         <item
             android:id="@+id/nav_manage"

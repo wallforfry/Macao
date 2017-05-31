@@ -1,4 +1,4 @@
-package fr.esiee.bde.macao;
+package fr.esiee.bde.macao.Rooms;
 
 /**
  * Created by Wallerand on 31/05/2017.
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import fr.esiee.bde.macao.R;
 
 public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.MyViewHolder> {
 

@@ -24,8 +24,8 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.R;
-import fr.esiee.bde.macao.Room;
-import fr.esiee.bde.macao.RoomAdapter;
+import fr.esiee.bde.macao.Rooms.Room;
+import fr.esiee.bde.macao.Rooms.RoomAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

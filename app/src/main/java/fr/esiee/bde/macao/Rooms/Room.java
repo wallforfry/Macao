@@ -1,4 +1,4 @@
-package fr.esiee.bde.macao;
+package fr.esiee.bde.macao.Rooms;
 
 /**
  * Created by Wallerand on 31/05/2017.
