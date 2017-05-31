@@ -34,4 +34,5 @@
     <string name="agenda">Agenda</string>
     <string name="connexion">Connexion</string>
     <string name="rooms">Salles libres</string>
+    <string name="evenements">Evenements</string>
 </resources>
