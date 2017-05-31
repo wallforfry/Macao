@@ -125,7 +125,6 @@ public class MainActivity extends AppCompatActivity
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
     }
 
 
@@ -153,6 +152,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
+        switchFragment(((Fragment) new CalendarFragment()));
     }
 
     @Override
@@ -225,16 +225,20 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        switchFragment(fragment);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void switchFragment(Fragment fragment){
         currentFragment = fragment;
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.content_main, fragment);
         transaction.commit();
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     @Override
