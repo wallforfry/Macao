@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -58,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     TextView nameDrawer;
     TextView mailDrawer;
 
+    private View mainView;
+
     private Fragment currentFragment = null;
 
     @Override
@@ -89,6 +92,8 @@ public class MainActivity extends AppCompatActivity
         mailDrawer = (TextView) headerView.findViewById(R.id.mailDrawer);
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        mainView = findViewById(R.id.content_main);
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -263,7 +268,13 @@ public class MainActivity extends AppCompatActivity
             if(email.substring(email.indexOf("@")).equals("@edu.esiee.fr")){
                 String firstname = email.substring(0,email.indexOf("."));
                 String lastname = email.substring(email.indexOf(".")+1, email.indexOf("@"));
-                String username = lastname.substring(0, 7)+firstname.substring(0,1);
+                String username;
+                if(lastname.length() >= 7) {
+                    username = lastname.substring(0, 7) + firstname.substring(0, 1);
+                }
+                else {
+                    username = lastname + firstname.substring(0, 1);
+                }
                 this.username = username;
                 this.firstname = firstname;
                 this.lastname = lastname;
@@ -332,11 +343,23 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void makeSnackBar(String text){
+        Snackbar snackbar = Snackbar
+                .make(mainView, text, Snackbar.LENGTH_LONG);
+
+        snackbar.show();
+    }
+
     public boolean isSignedIn() {
         return isSignedIn;
     }
 
     public void setSignedIn(boolean signedIn) {
         isSignedIn = signedIn;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }
