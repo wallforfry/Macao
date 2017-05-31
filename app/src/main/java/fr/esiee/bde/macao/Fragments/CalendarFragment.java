@@ -1,10 +1,13 @@
 package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,14 +22,30 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
+import com.alamkanak.weekview.WeekViewLoader;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
+import cz.msebera.android.httpclient.Header;
+import fr.esiee.bde.macao.HttpUtils;
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
+
+import static android.graphics.Color.parseColor;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +72,10 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     private static final int TYPE_WEEK_VIEW = 3;
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
     private WeekView mWeekView;
+
+    private View view;
+
+    private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -84,13 +107,15 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
+
+        getGroups();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_calendar, container, false);
+        view = inflater.inflate(R.layout.fragment_calendar, container, false);
         // Get a reference for the week view in the layout.
         mWeekView = (WeekView) view.findViewById(R.id.weekView);
 
@@ -107,9 +132,15 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         // Set long press listener for empty view
         mWeekView.setEmptyViewLongPressListener(this);
 
+        //mWeekView.setWeekViewLoader(this);
+
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
-        setupDateTimeInterpreter(false);
+        setupDateTimeInterpreter(true);
+
+        if(!((MainActivity) this.getActivity()).isSignedIn()){
+            ((OnFragmentInteractionListener) this.getActivity()).makeSnackBar("Veuillez vous connecter");
+        }
 
         return view;
     }
@@ -188,6 +219,9 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                     mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
                 }
                 return true;
+            case R.id.action_update_events:
+                this.getGroups();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -204,7 +238,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             public String interpretDate(Calendar date) {
                 SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
                 String weekday = weekdayNameFormat.format(date.getTime());
-                SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
+                SimpleDateFormat format = new SimpleDateFormat(" d/M", Locale.getDefault());
 
                 // All android api level do not have a standard way of getting the first letter of
                 // the week day name. Hence we get the first char programmatically.
@@ -216,7 +250,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
             @Override
             public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                //return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                return hour +"h";
             }
         });
     }
@@ -244,19 +279,140 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         return mWeekView;
     }
 
-    MonthLoader.MonthChangeListener mMonthChangeListener = new MonthLoader.MonthChangeListener() {
-        @Override
-        public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
-            // Populate the week view with some events.
-            //List<WeekViewEvent> events = getEvents(newYear, newMonth);
-            List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
-            return events;
-        }
-    };
-
     @Override
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
-        return ((List<WeekViewEvent>) new ArrayList<WeekViewEvent>());
+
+        // Populate the week view with some events.
+
+    /*
+        startTime = Calendar.getInstance();
+        startTime.set(Calendar.DAY_OF_MONTH, startTime.getActualMaximum(Calendar.DAY_OF_MONTH));
+        startTime.set(Calendar.HOUR_OF_DAY, 15);
+        startTime.set(Calendar.MINUTE, 0);
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.YEAR, newYear);
+        endTime = (Calendar) startTime.clone();
+        endTime.add(Calendar.HOUR_OF_DAY, 3);
+        event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
+        event.setColor(getResources().getColor(R.color.colorPrimary));
+        events.add(event);
+     */
+
+        List<WeekViewEvent> matchedEvents = new ArrayList<WeekViewEvent>();
+        for (WeekViewEvent event : events) {
+            if (eventMatches(event, newYear, newMonth)) {
+                matchedEvents.add(event);
+            }
+        }
+        return  matchedEvents;
+
+    }
+
+    private void getGroups(){
+        RequestParams rp = new RequestParams();
+        //rp.add("username", "aaa"); rp.add("password", "aaa@123");
+
+        HttpUtils.getByUrl("https://bde.esiee.fr/agenda/groups/"+((MainActivity) this.getActivity()).getUsername()+".json", rp, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
+                Log.d("asd", "---------------- this is response : " + response);
+                try {
+                    JSONObject serverResp = new JSONObject(response.toString());
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                // Pull out the first event on the public timeline
+                try {
+                    Log.d("OK", timeline.get(0).toString());
+                    getEvents(timeline);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
+    private void getEvents(JSONArray groups){
+        RequestParams rp = new RequestParams();
+        rp.add("groups", groups.toString());
+
+        HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // If the response is JSONObject instead of expected JSONArray
+                Log.d("asd", "---------------- this is response : " + response);
+                try {
+                    JSONObject serverResp = new JSONObject(response.toString());
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                // Pull out the first event on the public timeline
+                try {
+                    events.clear();
+
+                    for(int i = 0; i < timeline.length(); i++) {
+                        JSONObject obj = (JSONObject) timeline.get(i);
+                        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
+                        dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        Date start = dateformat.parse(obj.get("start").toString());
+                        Date end = dateformat.parse(obj.get("end").toString());
+
+                        String title = obj.get("name")+"\n"+obj.get("rooms")+"\n"+obj.get("prof")+"\n"+obj.get("unite");
+
+                        Log.d("Start", obj.get("start").toString()+ " "+start.getDate()+" "+ start.getMonth()+" "+ start.getYear() +" "+start.getHours()+" "+start.getMinutes());
+                        Calendar startTime = Calendar.getInstance();
+                        startTime.set(Calendar.DAY_OF_MONTH, start.getDate());
+                        startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
+                        startTime.set(Calendar.MINUTE, start.getMinutes());
+                        startTime.set(Calendar.MONTH, start.getMonth());
+                        startTime.set(Calendar.YEAR, 2017);
+                        Calendar endTime = (Calendar) startTime.clone();
+                        endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
+                        endTime.set(Calendar.MINUTE, end.getMinutes()-1);
+                        endTime.set(Calendar.MONTH, end.getMonth());
+                        endTime.set(Calendar.YEAR, 2017);
+                        WeekViewEvent event = new WeekViewEvent(i, title, startTime, endTime);
+                        if(obj.get("name").toString().contains("CTRL")){
+                            event.setColor(parseColor("#e74c3c"));
+                        }
+                        else if(obj.get("name").toString().contains("TD")){
+                            event.setColor(parseColor("#27ae60"));
+                        }
+                        else if(obj.get("name").toString().contains("PERS")){
+                            event.setColor(parseColor("#95a5a6"));
+                        }
+                        else if(obj.get("name").toString().contains("TP")){
+                            event.setColor(parseColor("#27ae60"));
+                        }
+                        else {
+                            event.setColor(parseColor("#35a9fb"));
+                        }
+
+                        events.add(event);
+
+                    }
+                } catch (JSONException | ParseException e) {
+                    e.printStackTrace();
+                }
+                mWeekView.notifyDatasetChanged();
+            }
+        });
+    }
+
+    private boolean eventMatches(WeekViewEvent event, int year, int month) {
+        return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
     }
 
     /**
@@ -272,5 +428,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void makeSnackBar(String text);
     }
 }

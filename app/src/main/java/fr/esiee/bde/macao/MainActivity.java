@@ -3,7 +3,12 @@ package fr.esiee.bde.macao;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -22,6 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -33,7 +40,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Objects;
 
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
@@ -58,6 +72,8 @@ public class MainActivity extends AppCompatActivity
 
     TextView nameDrawer;
     TextView mailDrawer;
+    ImageView pictureDrawer;
+    ImageView backgroundDrawer;
 
     private View mainView;
 
@@ -90,6 +106,8 @@ public class MainActivity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         nameDrawer = (TextView) headerView.findViewById(R.id.nameDrawer);
         mailDrawer = (TextView) headerView.findViewById(R.id.mailDrawer);
+        pictureDrawer = (ImageView) headerView.findViewById(R.id.imageDrawer);
+        backgroundDrawer = (ImageView) headerView.findViewById(R.id.backgroundDrawer);
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -238,6 +256,8 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onResult(Status status) {
                         // [START_EXCLUDE]
+                        nameDrawer.setText("Macao");
+                        mailDrawer.setText("");
                         updateUI(false);
                         // [END_EXCLUDE]
                     }
@@ -283,6 +303,7 @@ public class MainActivity extends AppCompatActivity
 
                 this.nameDrawer.setText(username);
                 this.mailDrawer.setText(mail);
+                Picasso.with(this).load(acct.getPhotoUrl().toString()).into(pictureDrawer);
 
                 //mStatusTextView.setText(username);
 
@@ -290,6 +311,7 @@ public class MainActivity extends AppCompatActivity
             }
             else{
                 signOut();
+                makeSnackBar("Veuillez vous connecter avec un compte ESIEE");
             }
         } else {
             // Signed out, show unauthenticated UI.
