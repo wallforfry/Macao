@@ -35,6 +35,7 @@ import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
 
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
+import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity
             fragment = new RoomsFragment();
 
         } else if (id == R.id.nav_manage) {
+            fragment = new EventsFragment();
 
         } else if (id == R.id.nav_share) {
 
