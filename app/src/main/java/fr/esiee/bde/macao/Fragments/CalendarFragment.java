@@ -407,6 +407,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                     e.printStackTrace();
                 }
                 mWeekView.notifyDatasetChanged();
+                mListener.makeSnackBar("Agenda à jour");
             }
         });
     }
