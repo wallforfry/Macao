@@ -11,8 +11,9 @@
         android:layout_height="wrap_content"
         android:text="Mon Compte"
         android:textSize="30sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="140dp" />
+        android:layout_marginTop="77dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"

@@ -41,7 +41,7 @@ import fr.esiee.bde.macao.Fragments.SignInFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener, EventsFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity
     private View mainView;
 
     private Fragment currentFragment = null;
+
+    private Bundle savedInstanceState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +113,8 @@ public class MainActivity extends AppCompatActivity
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+        this.savedInstanceState = savedInstanceState;
     }
 
 
@@ -138,7 +142,20 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
-        switchFragment(((Fragment) new CalendarFragment()));
+        if (savedInstanceState == null) {
+            // The Activity is NOT being re-created so we can instantiate a new Fragment
+            // and add it to the Activity
+            Fragment fragment = new CalendarFragment();
+
+            switchFragment(fragment);
+
+        } else {
+            // The Activity IS being re-created so we don't need to instantiate the Fragment or add it,
+            // but if we need a reference to it, we can use the tag we passed to .replace
+            Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
+            switchFragment(fragment);
+        }
+        //switchFragment(((Fragment) new CalendarFragment()));
     }
 
     @Override
@@ -225,7 +242,7 @@ public class MainActivity extends AppCompatActivity
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.content_main, fragment);
+        transaction.replace(R.id.content_main, fragment, "FragmentSaved");
         transaction.commit();
     }
 
