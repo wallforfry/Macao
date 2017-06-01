@@ -15,16 +15,16 @@
     <item
         android:id="@+id/action_day_view"
         android:orderInCategory="100"
-        android:title="Day View"
+        android:title="@string/day_view"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_three_day_view"
         android:orderInCategory="100"
-        android:title="Three day"
+        android:title="@string/three_day"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_week_view"
         android:orderInCategory="100"
-        android:title="Week View"
+        android:title="@string/week_view"
         app:showAsAction="never" />
 </menu>

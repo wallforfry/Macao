@@ -32,8 +32,27 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.client.ClientProtocolException;
+import cz.msebera.android.httpclient.client.HttpClient;
+import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
+import cz.msebera.android.httpclient.client.methods.HttpPost;
+import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
+import cz.msebera.android.httpclient.util.EntityUtils;
+import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
@@ -41,7 +60,7 @@ import fr.esiee.bde.macao.Fragments.SignInFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener, EventsFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener, EventsFragment.OnFragmentInteractionListener, AnnalesFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -55,6 +74,7 @@ public class MainActivity extends AppCompatActivity
     private String firstname = "";
     private String lastname = "";
     private String mail = "";
+    private String idToken = "";
 
     TextView nameDrawer;
     TextView mailDrawer;
@@ -75,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -225,7 +246,7 @@ public class MainActivity extends AppCompatActivity
             fragment = new EventsFragment();
 
         } else if (id == R.id.nav_share) {
-
+            //fragment = new AnnalesFragment();
         } else if (id == R.id.nav_send) {
 
         }
@@ -293,6 +314,14 @@ public class MainActivity extends AppCompatActivity
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getEmail()));
 
             String email = acct.getEmail();
+            //Log.d("MAIN", acct.getServerAuthCode());
+            //String token = acct.getIdToken();
+            //Log.d("MAIN", token);
+            //this.idToken = acct.getIdToken();
+            this.idToken = acct.getId();
+            /*GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.annales_client_id))
+                    .build();*/
 
             if(email.substring(email.indexOf("@")).equals("@edu.esiee.fr")){
                 String firstname = email.substring(0,email.indexOf("."));
@@ -312,7 +341,17 @@ public class MainActivity extends AppCompatActivity
 
                 this.nameDrawer.setText(username);
                 this.mailDrawer.setText(mail);
-                Picasso.with(this).load(acct.getPhotoUrl().toString()).into(pictureDrawer);
+                Uri uri = acct.getPhotoUrl();
+                String pictureUrl = null;
+                if(uri != null) {
+                    pictureUrl = uri.toString();
+                }
+                if (pictureUrl != null){
+                    Picasso.with(this).load(pictureUrl).into(pictureDrawer);
+                }
+                else{
+                    pictureDrawer.setImageResource(R.mipmap.ic_launcher);
+                }
 
                 //mStatusTextView.setText(username);
 
@@ -392,5 +431,9 @@ public class MainActivity extends AppCompatActivity
 
     public String getUsername() {
         return username;
+    }
+
+    public String getIdToken() {
+        return idToken;
     }
 }

@@ -7,10 +7,6 @@
             android:icon="@drawable/ic_date_range_white_24dp"
             android:title="@string/agenda" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_account_circle_white_24dp"
-            android:title="@string/connexion" />
-        <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_room_white_24dp"
             android:title="@string/rooms" />
@@ -18,9 +14,15 @@
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_event_white_24dp"
             android:title="@string/evenements" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/ic_account_circle_white_24dp"
+            android:title="@string/connexion" />
+
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Communicate"
+        android:visible="false">
         <menu>
             <item
                 android:id="@+id/nav_share"
