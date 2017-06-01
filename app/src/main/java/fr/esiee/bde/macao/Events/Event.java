@@ -1,12 +1,11 @@
-package fr.esiee.bde.macao.events;
+package fr.esiee.bde.macao.Events;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.TimeZone;
+
 /**
  * Created by Wallerand on 01/06/2017.
  */

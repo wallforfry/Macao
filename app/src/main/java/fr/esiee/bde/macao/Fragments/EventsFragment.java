@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +25,8 @@ import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.DividerItemDecoration;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.R;
-import fr.esiee.bde.macao.Rooms.Room;
-import fr.esiee.bde.macao.Rooms.RoomAdapter;
-import fr.esiee.bde.macao.events.Event;
-import fr.esiee.bde.macao.events.EventAdapter;
+import fr.esiee.bde.macao.Events.Event;
+import fr.esiee.bde.macao.Events.EventAdapter;
 
 /**
  * A simple {@link Fragment} subclass.

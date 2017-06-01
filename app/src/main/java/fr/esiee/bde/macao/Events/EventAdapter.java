@@ -1,4 +1,4 @@
-package fr.esiee.bde.macao.events;
+package fr.esiee.bde.macao.Events;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,8 +9,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import fr.esiee.bde.macao.R;
-import fr.esiee.bde.macao.Rooms.Room;
-import fr.esiee.bde.macao.Rooms.RoomAdapter;
 
 /**
  * Created by Wallerand on 01/06/2017.
