@@ -4,11 +4,32 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+import fr.esiee.bde.macao.DividerItemDecoration;
+import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.R;
+import fr.esiee.bde.macao.Rooms.Room;
+import fr.esiee.bde.macao.Rooms.RoomAdapter;
+import fr.esiee.bde.macao.events.Event;
+import fr.esiee.bde.macao.events.EventAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +50,10 @@ public class EventsFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private List<Event> eventsList = new ArrayList<Event>();
+    private RecyclerView recyclerView;
+    private EventAdapter mAdapter;
 
     public EventsFragment() {
         // Required empty public constructor
@@ -65,7 +90,20 @@ public class EventsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_events, container, false);
+        View view = inflater.inflate(R.layout.fragment_events, container, false);
+
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_events);
+
+        mAdapter = new EventAdapter(eventsList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        recyclerView.setAdapter(mAdapter);
+
+        getEvents();
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -92,6 +130,51 @@ public class EventsFragment extends Fragment {
         mListener = null;
     }
 
+    private void getEvents(){
+        RequestParams rp = new RequestParams();
+
+        HttpUtils.getByUrl("https://bde.esiee.fr/api/posts.json", rp, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject timeline) {
+                // Pull out the first event on the public timeline
+                eventsList.clear();
+                JSONArray events = null;
+                try {
+                    events = (JSONArray) timeline.get("entries");
+
+                    for(int i = 0; i < events.length(); i++) {
+                        Event event = new Event();
+                        JSONObject newsObject = (JSONObject) events.get(i);
+                        try {
+                            JSONObject jsonObject = (JSONObject) newsObject.get("event");
+                            event.setTitle(String.valueOf(jsonObject.get("title")));
+                            event.setStart(String.valueOf(jsonObject.get("start")));
+                            event.setEnd(String.valueOf(jsonObject.get("end")));
+                            try {
+                                event.setPlace(String.valueOf(jsonObject.get("place")));
+                            } catch (JSONException e){
+                                e.printStackTrace();
+                            }
+                            eventsList.add(event);
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mAdapter.notifyDataSetChanged();
+                mListener.makeSnackBar("Events à jour");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                mListener.makeSnackBar("Oups...");
+            }
+        });
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -105,5 +188,6 @@ public class EventsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+        void makeSnackBar(String text);
     }
 }
