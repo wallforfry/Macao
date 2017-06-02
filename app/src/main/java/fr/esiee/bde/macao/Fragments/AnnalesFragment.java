@@ -219,7 +219,6 @@ public class AnnalesFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject timeline) {
                 // Pull out the first event on the public timeline
-                mListener.makeSnackBar("SUCCES OBJECT");
                 try {
                     annalesToken = String.valueOf(timeline.get("access_token"));
                     searchAnnale("habib");
