@@ -50,6 +50,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -468,6 +469,16 @@ public class MainActivity extends AppCompatActivity
     public void makeSnackBar(String text){
         Snackbar snackbar = Snackbar
                 .make(mainView, text, Snackbar.LENGTH_LONG);
+
+        if(Objects.equals(text, "Connectez vous d'abord")){
+            snackbar.setAction("Ici", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bde.esiee.fr/aurion/agenda"));
+                    startActivity(browserIntent);
+                }
+            });
+        }
 
         snackbar.show();
     }

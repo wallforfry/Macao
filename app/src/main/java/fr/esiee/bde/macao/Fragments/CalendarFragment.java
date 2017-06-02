@@ -30,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -311,8 +312,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     private void getGroups(){
         RequestParams rp = new RequestParams();
         //rp.add("username", "aaa"); rp.add("password", "aaa@123");
-
-        HttpUtils.getByUrl("https://bde.esiee.fr/agenda/groups/"+((MainActivity) this.getActivity()).getUsername()+".json", rp, new JsonHttpResponseHandler() {
+        String username = ((MainActivity) this.getActivity()).getUsername();
+        HttpUtils.getByUrl("https://bde.esiee.fr/agenda/groups/" + username + ".json", rp, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // If the response is JSONObject instead of expected JSONArray
@@ -334,7 +335,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                mListener.makeSnackBar("Veullez d'abord vous connecter au site du BDE");
+                mListener.makeSnackBar("Connectez vous d'abord");
             }
         });
     }
