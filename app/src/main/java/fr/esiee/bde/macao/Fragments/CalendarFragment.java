@@ -335,7 +335,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                mListener.makeSnackBar("Connectez vous d'abord");
+                mListener.makeSnackBar("Connectez vous d'abord sur le site");
             }
         });
     }

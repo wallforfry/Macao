@@ -263,11 +263,16 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
             fragment = new AnnalesFragment();
         } else if (id == R.id.nav_send) {
-
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                    "mailto","wallerand.delevacq@edu.esiee.fr", null));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut Wallerand,\n\nJ'ai remarqué un bug dans l'application :\n\n");
+            startActivity(Intent.createChooser(emailIntent, "Send email..."));
         }
 
-        switchFragment(fragment);
-
+        if(fragment != null) {
+            switchFragment(fragment);
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -470,7 +475,7 @@ public class MainActivity extends AppCompatActivity
         Snackbar snackbar = Snackbar
                 .make(mainView, text, Snackbar.LENGTH_LONG);
 
-        if(Objects.equals(text, "Connectez vous d'abord")){
+        if(text.equals("Connectez vous d'abord sur le site")){
             snackbar.setAction("Ici", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
