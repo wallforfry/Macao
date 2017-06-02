@@ -6,6 +6,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import cz.msebera.android.httpclient.Header;
+
 /**
  * Created by Wallerand on 31/05/2017.
  */
@@ -24,6 +29,16 @@ public class HttpUtils {
     }
 
     public static void getByUrl(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.get(url, params, responseHandler);
+    }
+
+    public static void getByUrl(String url, HashMap<String, String> headers, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        for(Map.Entry<String, String> entry : headers.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            client.addHeader(key, value);
+        }
         client.get(url, params, responseHandler);
     }
 

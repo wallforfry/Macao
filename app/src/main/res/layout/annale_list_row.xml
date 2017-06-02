@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/annale_card_view"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="4dp"
+    android:layout_marginBottom="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:minHeight="65dp">
+    <!-- Content -->
+        <TextView
+            android:id="@+id/annale_subject"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Algèbre Linéaire"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/annale_teacher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_below="@+id/annale_subject"
+            android:text="Habib" />
+
+        <TextView
+            android:id="@+id/annale_unit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_below="@+id/annale_teacher"
+            android:text="SFM-1105"/>
+
+        <TextView
+            android:id="@+id/annale_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/annale_unit"
+            android:text="2015"
+            android:textSize="14sp" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

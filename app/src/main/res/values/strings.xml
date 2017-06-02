@@ -41,4 +41,5 @@
     <string name="day_view">Jour</string>
     <string name="three_day">3 Jours</string>
     <string name="week_view">Semaine</string>
+    <string name="annales">Annales</string>
 </resources>

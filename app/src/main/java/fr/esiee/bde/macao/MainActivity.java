@@ -1,5 +1,11 @@
 package fr.esiee.bde.macao;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,9 +34,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -42,6 +50,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpResponse;
@@ -75,6 +85,8 @@ public class MainActivity extends AppCompatActivity
     private String lastname = "";
     private String mail = "";
     private String idToken = "";
+    private String id = "";
+    private String authCode = "";
 
     TextView nameDrawer;
     TextView mailDrawer;
@@ -126,6 +138,8 @@ public class MainActivity extends AppCompatActivity
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                //.requestIdToken(getString(R.string.annales_client_id))
+                //.requestServerAuthCode("557464199167-4lbgvd3o6c6qjtqitqf1h8vkl9017csl.apps.googleusercontent.com", false)
                 .build();
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -246,7 +260,7 @@ public class MainActivity extends AppCompatActivity
             fragment = new EventsFragment();
 
         } else if (id == R.id.nav_share) {
-            //fragment = new AnnalesFragment();
+            fragment = new AnnalesFragment();
         } else if (id == R.id.nav_send) {
 
         }
@@ -317,20 +331,29 @@ public class MainActivity extends AppCompatActivity
             //Log.d("MAIN", acct.getServerAuthCode());
             //String token = acct.getIdToken();
             //Log.d("MAIN", token);
-            //this.idToken = acct.getIdToken();
-            this.idToken = acct.getId();
-            /*GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(getString(R.string.annales_client_id))
-                    .build();*/
+            this.idToken = acct.getIdToken();
+            this.id = acct.getId();
+            //this.authCode = acct.getServerAuthCode();
 
-            if(email.substring(email.indexOf("@")).equals("@edu.esiee.fr")){
-                String firstname = email.substring(0,email.indexOf("."));
-                String lastname = email.substring(email.indexOf(".")+1, email.indexOf("@"));
+            AccountManager am = AccountManager.get(this);
+            Bundle options = new Bundle();
+
+            am.getAuthToken(
+                    acct.getAccount(),                     // Account retrieved using getAccountsByType()
+                    "Manage your tasks",            // Auth scope
+                    options,                        // Authenticator-specific options
+                    this,                           // Your activity
+                    new OnTokenAcquired(),          // Callback called when a token is successfully acquired
+                    null);    // Callback called if an error occurs
+
+
+            if (email.substring(email.indexOf("@")).equals("@edu.esiee.fr")) {
+                String firstname = email.substring(0, email.indexOf("."));
+                String lastname = email.substring(email.indexOf(".") + 1, email.indexOf("@"));
                 String username;
-                if(lastname.length() >= 7) {
+                if (lastname.length() >= 7) {
                     username = lastname.substring(0, 7) + firstname.substring(0, 1);
-                }
-                else {
+                } else {
                     username = lastname + firstname.substring(0, 1);
                 }
                 this.username = username;
@@ -343,21 +366,19 @@ public class MainActivity extends AppCompatActivity
                 this.mailDrawer.setText(mail);
                 Uri uri = acct.getPhotoUrl();
                 String pictureUrl = null;
-                if(uri != null) {
+                if (uri != null) {
                     pictureUrl = uri.toString();
                 }
-                if (pictureUrl != null){
+                if (pictureUrl != null) {
                     Picasso.with(this).load(pictureUrl).into(pictureDrawer);
-                }
-                else{
+                } else {
                     pictureDrawer.setImageResource(R.mipmap.ic_launcher);
                 }
 
                 //mStatusTextView.setText(username);
 
                 updateUI(true);
-            }
-            else{
+            } else {
                 signOut();
                 makeSnackBar("Veuillez vous connecter avec un compte ESIEE");
             }
@@ -365,6 +386,36 @@ public class MainActivity extends AppCompatActivity
             // Signed out, show unauthenticated UI.
             updateUI(false);
         }
+    }
+
+    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
+        @Override
+        public void run(AccountManagerFuture<Bundle> result) {
+            // Get the result of the operation from the AccountManagerFuture.
+            Bundle bundle = null;
+            try {
+                bundle = result.getResult();
+            } catch (OperationCanceledException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (AuthenticatorException e) {
+                e.printStackTrace();
+            }
+
+            // The token is a named value in the bundle. The name of the value
+            // is stored in the constant AccountManager.KEY_AUTHTOKEN.
+            idToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+            Log.d("IDDDD", idToken);
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getAuthCode() {
+        return authCode;
     }
 
     private void showProgressDialog() {
@@ -436,4 +487,5 @@ public class MainActivity extends AppCompatActivity
     public String getIdToken() {
         return idToken;
     }
+
 }
