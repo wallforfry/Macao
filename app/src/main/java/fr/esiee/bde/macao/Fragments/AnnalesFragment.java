@@ -290,12 +290,10 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                     JSONArray files = (JSONArray) document.get("files");
                     JSONObject file = (JSONObject) files.get(0);
                     String url = "https://docs.google.com/gview?url=https://bde.esiee.fr"+file.get("download_path")+"&embedded=true";
-                    Log.d("PATH", url);
                     displayAnnale(url);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.d("ANNALE S", String.valueOf(timeline));
             }
 
             @Override
