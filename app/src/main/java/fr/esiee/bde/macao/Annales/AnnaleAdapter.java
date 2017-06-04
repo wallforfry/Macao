@@ -1,10 +1,12 @@
 package fr.esiee.bde.macao.Annales;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import fr.esiee.bde.macao.R;
 
 public class AnnaleAdapter extends RecyclerView.Adapter<AnnaleAdapter.MyViewHolder> {
     private List<Annale> annalesList;
+    private OnItemClickListener mListener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener{
         public TextView subject, teacher, unit, year;
@@ -34,7 +37,8 @@ public class AnnaleAdapter extends RecyclerView.Adapter<AnnaleAdapter.MyViewHold
 
         @Override
         public void onClick(View v) {
-            AnnalesFragment.fetchAnnale(annale.getId());
+            //AnnalesFragment.fetchAnnale(annale.getId());
+            mListener.fetchAnnale(annale.getId());
         }
 
         public void setAnnale(Annale annale) {
@@ -42,9 +46,13 @@ public class AnnaleAdapter extends RecyclerView.Adapter<AnnaleAdapter.MyViewHold
         }
     }
 
+    public interface OnItemClickListener {
+        void fetchAnnale(int id);
+    }
 
-    public AnnaleAdapter(List<Annale> annalesList) {
+    public AnnaleAdapter(List<Annale> annalesList, OnItemClickListener listener) {
         this.annalesList = annalesList;
+        this.mListener = listener;
     }
 
     @Override
@@ -68,4 +76,5 @@ public class AnnaleAdapter extends RecyclerView.Adapter<AnnaleAdapter.MyViewHold
     public int getItemCount() {
         return annalesList.size();
     }
+
 }

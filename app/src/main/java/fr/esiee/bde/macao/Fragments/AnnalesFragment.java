@@ -46,7 +46,7 @@ import fr.esiee.bde.macao.R;
  * Use the {@link AnnalesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AnnalesFragment extends Fragment {
+public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -64,8 +64,8 @@ public class AnnalesFragment extends Fragment {
     private static String annalesToken;
 
     private MaterialSearchView searchView;
-    private static WebView webView;
-    private static MenuItem back;
+    private WebView webView;
+    private MenuItem back;
 
     public AnnalesFragment() {
         // Required empty public constructor
@@ -108,7 +108,7 @@ public class AnnalesFragment extends Fragment {
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_annales);
 
-        mAdapter = new AnnaleAdapter(annalesList);
+        mAdapter = new AnnaleAdapter(annalesList, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -274,7 +274,7 @@ public class AnnalesFragment extends Fragment {
         });
     }
 
-    public static void fetchAnnale(int id){
+    public void fetchAnnale(int id){
         RequestParams rp = new RequestParams();
         HashMap<String, String> header = new HashMap<String, String>();
         header.put("Accept", "application/json");
@@ -305,7 +305,7 @@ public class AnnalesFragment extends Fragment {
         });
     }
 
-    private static void displayAnnale(String url){
+    private void displayAnnale(String url){
         webView.loadUrl(url);
         webView.setVisibility(View.VISIBLE);
         back.setVisible(true);
