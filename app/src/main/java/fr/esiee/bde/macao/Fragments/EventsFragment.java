@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.lusfold.spinnerloading.SpinnerLoading;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.json.JSONArray;
@@ -57,6 +58,8 @@ public class EventsFragment extends Fragment {
     private List<Event> eventsList = new ArrayList<Event>();
     private RecyclerView recyclerView;
     private EventAdapter mAdapter;
+
+    private SpinnerLoading loader;
 
     public EventsFragment() {
         // Required empty public constructor
@@ -114,6 +117,12 @@ public class EventsFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
+
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+        loader.setVisibility(View.VISIBLE);
 
         getEvents();
 
@@ -183,11 +192,13 @@ public class EventsFragment extends Fragment {
                 }
                 mAdapter.notifyDataSetChanged();
                 mListener.makeSnackBar("Events à jour");
+                loader.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 mListener.makeSnackBar("Oups...");
+                loader.setVisibility(View.GONE);
             }
         });
     }

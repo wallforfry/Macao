@@ -19,6 +19,7 @@ import android.webkit.WebViewClient;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.lusfold.spinnerloading.SpinnerLoading;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.json.JSONArray;
@@ -66,6 +67,8 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private MaterialSearchView searchView;
     private WebView webView;
     private MenuItem back;
+
+    private SpinnerLoading loader;
 
     public AnnalesFragment() {
         // Required empty public constructor
@@ -159,6 +162,12 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
             }
         });
 
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+        loader.setVisibility(View.VISIBLE);
+
         annalesSignin();
 
         return view;
@@ -235,6 +244,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     }
 
     public void searchAnnale(String search){
+        loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
         HashMap<String, String> header = new HashMap<String, String>();
         header.put("Accept", "application/json");
@@ -265,6 +275,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                     e.printStackTrace();
                 }
                 Log.d("ANNALE S", String.valueOf(timeline));
+                loader.setVisibility(View.GONE);
             }
 
             @Override
@@ -275,6 +286,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     }
 
     public void fetchAnnale(int id){
+        loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
         HashMap<String, String> header = new HashMap<String, String>();
         header.put("Accept", "application/json");
@@ -291,6 +303,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                     JSONObject file = (JSONObject) files.get(0);
                     String url = "https://docs.google.com/gview?url=https://bde.esiee.fr"+file.get("download_path")+"&embedded=true";
                     displayAnnale(url);
+                    loader.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

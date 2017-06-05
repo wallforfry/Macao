@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +52,8 @@ public class RoomsFragment extends Fragment {
     private List<Room> roomsList = new ArrayList<Room>();
     private RecyclerView recyclerView;
     private RoomAdapter mAdapter;
+
+    private SpinnerLoading loader;
 
     public RoomsFragment() {
         // Required empty public constructor
@@ -97,6 +100,12 @@ public class RoomsFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
+
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+        loader.setVisibility(View.VISIBLE);
 
         getRooms(0);
 
@@ -210,8 +219,9 @@ public class RoomsFragment extends Fragment {
                 roomsList.add(epi5);
 
                 mAdapter.notifyDataSetChanged();
-
                 Log.d("ROOM", "SIZE : "+String.valueOf(roomsList.size()));
+                loader.setVisibility(View.GONE);
+
             }
 
             @Override

@@ -25,6 +25,7 @@ import com.alamkanak.weekview.WeekViewEvent;
 import com.alamkanak.weekview.WeekViewLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,6 +76,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     private WeekView mWeekView;
 
     private View view;
+    private SpinnerLoading loader;
 
     private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
 
@@ -108,8 +110,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
-
-        getGroups();
     }
 
     @Override
@@ -142,6 +142,14 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         if(!((MainActivity) this.getActivity()).isSignedIn()){
             ((OnFragmentInteractionListener) this.getActivity()).makeSnackBar("Veuillez vous connecter");
         }
+
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+        loader.setVisibility(View.VISIBLE);
+
+        getGroups();
 
         return view;
     }
@@ -310,6 +318,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     }
 
     private void getGroups(){
+        loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
         //rp.add("username", "aaa"); rp.add("password", "aaa@123");
         String username = ((MainActivity) this.getActivity()).getUsername();
@@ -409,6 +418,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 mWeekView.notifyDatasetChanged();
                 mListener.makeSnackBar("Agenda à jour");
+                loader.setVisibility(View.GONE);
             }
         });
     }
