@@ -58,7 +58,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/event_image"
-            android:layout_marginTop="5dp"
             android:layout_centerHorizontal="true">
             <TextView
                 android:id="@+id/event_day"
@@ -71,7 +70,6 @@
                 android:textAlignment="center"
                 android:layout_width="48dp"
                 android:layout_height="17dp"
-                android:layout_marginRight="5dp"
                 android:layout_alignParentLeft="true" />
 
             <TextView
@@ -80,7 +78,6 @@
                 android:text="1"
                 android:textAlignment="center"
                 android:textSize="18sp"
-                android:layout_marginRight="5dp"
                 android:layout_width="48dp"
                 android:layout_height="20dp" />
 
@@ -94,26 +91,31 @@
                 android:textAlignment="center"
                 android:id="@+id/event_month"/>
 
-            <TextView
-                android:id="@+id/event_title"
-                android:layout_width="match_parent"
+            <RelativeLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/event_day"
                 android:layout_toEndOf="@+id/event_day"
                 android:layout_toRightOf="@+id/event_day"
-                android:text="Résultats des élections"
-                android:textSize="24sp" />
+                android:padding="8dp">
 
-            <TextView
-                android:id="@+id/event_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:layout_below="@+id/event_title"
-                android:layout_toRightOf="@+id/event_day"
-                android:text="Le 1 Janvier de 17h00 à 17h15"
-                android:layout_toEndOf="@+id/event_day" />
+                <TextView
+                    android:id="@+id/event_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Résultats des élections"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
 
+                <TextView
+                    android:id="@+id/event_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:layout_below="@+id/event_title"
+                    android:text="Le 1 Janvier de 17h00 à 17h15" />
+
+            </RelativeLayout>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
