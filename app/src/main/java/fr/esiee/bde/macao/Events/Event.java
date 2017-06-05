@@ -11,17 +11,10 @@ import java.util.Locale;
  */
 
 public class Event {
-    private String title, start, end, place;
+    private String title, start, end, place = "", image, content, slug, publicationDate;
 
     public Event(){
 
-    }
-
-    public Event(String title, String start, String end, String place){
-        this.title = title;
-        this.start = start;
-        this.end = end;
-        this.place = place;
     }
 
     public String getTitle() {
@@ -165,5 +158,53 @@ public class Event {
 
     public void setPlace(String place) {
         this.place = place;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getUrl() {
+        String url = "https://bde.esiee.fr/news/";
+
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
+        Date date = null;
+        try {
+            date = dateformat.parse(this.publicationDate);
+            url += String.valueOf(date.getYear()+1900)+"/"+String.valueOf(date.getMonth()+1)+"/"+String.valueOf(date.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+        url += "/"+this.slug;
+        return url;
+    }
+
+    public String getPublicationDate() {
+        return publicationDate;
+    }
+
+    public void setPublicationDate(String publicationDate) {
+        this.publicationDate = publicationDate;
     }
 }

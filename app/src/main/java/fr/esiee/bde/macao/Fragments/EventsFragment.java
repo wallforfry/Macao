@@ -95,7 +95,7 @@ public class EventsFragment extends Fragment {
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_events);
 
-        mAdapter = new EventAdapter(eventsList);
+        mAdapter = new EventAdapter(eventsList, this.getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -152,6 +152,9 @@ public class EventsFragment extends Fragment {
                             event.setTitle(String.valueOf(jsonObject.get("title")));
                             event.setStart(String.valueOf(jsonObject.get("start")));
                             event.setEnd(String.valueOf(jsonObject.get("end")));
+                            event.setImage(String.valueOf(((JSONObject) newsObject.get("photo")).get("url_thumbnail")));
+                            event.setPublicationDate(String.valueOf(newsObject.get("created_at")));
+                            event.setSlug(String.valueOf(newsObject.get("slug")));
                             try {
                                 event.setPlace(String.valueOf(jsonObject.get("place")));
                             } catch (JSONException e){

@@ -378,12 +378,12 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                         startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
                         startTime.set(Calendar.MINUTE, start.getMinutes());
                         startTime.set(Calendar.MONTH, start.getMonth());
-                        startTime.set(Calendar.YEAR, 2017);
+                        startTime.set(Calendar.YEAR, start.getYear()+1900);
                         Calendar endTime = (Calendar) startTime.clone();
                         endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
                         endTime.set(Calendar.MINUTE, end.getMinutes()-1);
                         endTime.set(Calendar.MONTH, end.getMonth());
-                        endTime.set(Calendar.YEAR, 2017);
+                        endTime.set(Calendar.YEAR, start.getYear()+1900);
                         WeekViewEvent event = new WeekViewEvent(i, title, startTime, endTime);
                         if(obj.get("name").toString().contains("CTRL")){
                             event.setColor(parseColor("#e74c3c"));

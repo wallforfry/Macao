@@ -37,7 +37,6 @@ public class AnnaleAdapter extends RecyclerView.Adapter<AnnaleAdapter.MyViewHold
 
         @Override
         public void onClick(View v) {
-            //AnnalesFragment.fetchAnnale(annale.getId());
             mListener.fetchAnnale(annale.getId());
         }
 
