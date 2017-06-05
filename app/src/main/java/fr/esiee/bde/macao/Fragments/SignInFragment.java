@@ -9,13 +9,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.lusfold.spinnerloading.SpinnerLoading;
+
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SignInFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link SignInFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -34,6 +37,8 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
 
     private TextView mStatusTextView;
     private View view;
+
+    private SpinnerLoading loader;
 
     public SignInFragment() {
         // Required empty public constructor
@@ -79,6 +84,12 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
 
         mStatusTextView = (TextView) view.findViewById(R.id.status);
 
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+        loader.setVisibility(View.VISIBLE);
+
         this.connectUser(((MainActivity) this.getActivity()).isSignedIn());
 
         return view;
@@ -122,20 +133,6 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
                 break;*/
         }
     }
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 
 
     public void connectUser(boolean signedIn){
@@ -146,5 +143,6 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
             view.findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             view.findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
+        loader.setVisibility(View.GONE);
     }
 }

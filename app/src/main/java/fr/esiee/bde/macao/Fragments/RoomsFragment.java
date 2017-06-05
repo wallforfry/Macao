@@ -25,6 +25,7 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.DividerItemDecoration;
 import fr.esiee.bde.macao.HttpUtils;
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Rooms.Room;
 import fr.esiee.bde.macao.Rooms.RoomAdapter;
@@ -32,7 +33,7 @@ import fr.esiee.bde.macao.Rooms.RoomAdapter;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link RoomsFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link RoomsFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -229,10 +230,5 @@ public class RoomsFragment extends Fragment {
                 mListener.makeSnackBar("Oups...");
             }
         });
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
-        void makeSnackBar(String text);
     }
 }

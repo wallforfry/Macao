@@ -36,13 +36,14 @@ import fr.esiee.bde.macao.Annales.AnnaleAdapter;
 import fr.esiee.bde.macao.DividerItemDecoration;
 import fr.esiee.bde.macao.Events.EventAdapter;
 import fr.esiee.bde.macao.HttpUtils;
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link AnnalesFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link AnnalesFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -161,12 +162,6 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                         "})()");
             }
         });
-
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
-        loader.setVisibility(View.VISIBLE);
 
         annalesSignin();
 
@@ -327,19 +322,4 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
         back.setVisible(false);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-        void makeSnackBar(String text);
-    }
 }

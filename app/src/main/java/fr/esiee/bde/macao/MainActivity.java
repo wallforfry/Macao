@@ -1,6 +1,5 @@
 package fr.esiee.bde.macao;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
@@ -34,44 +33,24 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.client.ClientProtocolException;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
-import cz.msebera.android.httpclient.message.BasicNameValuePair;
-import cz.msebera.android.httpclient.util.EntityUtils;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, CalendarFragment.OnFragmentInteractionListener, SignInFragment.OnFragmentInteractionListener, RoomsFragment.OnFragmentInteractionListener, EventsFragment.OnFragmentInteractionListener, AnnalesFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, OnFragmentInteractionListener{
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -152,7 +131,6 @@ public class MainActivity extends AppCompatActivity
 
         this.savedInstanceState = savedInstanceState;
     }
-
 
     @Override
     public void onStart() {
@@ -443,8 +421,13 @@ public class MainActivity extends AppCompatActivity
     private void updateUI(boolean signedIn) {
         this.isSignedIn = signedIn;
 
+        Log.d("LOK", "1");
         if(currentFragment instanceof SignInFragment) {
             ((SignInFragment) currentFragment).connectUser(signedIn);
+        }
+        else if(currentFragment instanceof CalendarFragment) {
+            ((CalendarFragment) currentFragment).onSignedIn();
+            Log.d("LOK", "2");
         }
     }
 
@@ -503,5 +486,5 @@ public class MainActivity extends AppCompatActivity
     public String getIdToken() {
         return idToken;
     }
-
 }
+

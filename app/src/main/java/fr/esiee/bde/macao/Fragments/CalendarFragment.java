@@ -1,11 +1,9 @@
 package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,7 +20,6 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.alamkanak.weekview.WeekViewLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.lusfold.spinnerloading.SpinnerLoading;
@@ -31,8 +28,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Time;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,6 +39,7 @@ import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.HttpUtils;
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
@@ -52,7 +48,7 @@ import static android.graphics.Color.parseColor;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link CalendarFragment.OnFragmentInteractionListener} interface
+ * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link CalendarFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -139,10 +135,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         // the week view. This is optional.
         setupDateTimeInterpreter(true);
 
-        if(!((MainActivity) this.getActivity()).isSignedIn()){
-            ((OnFragmentInteractionListener) this.getActivity()).makeSnackBar("Veuillez vous connecter");
-        }
-
         loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
@@ -150,9 +142,19 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         loader.setVisibility(View.VISIBLE);
 
         getGroups();
-
         return view;
     }
+
+    public void onSignedIn(){
+        /*if(!((MainActivity) this.getActivity()).isSignedIn()){
+            ((OnFragmentInteractionListener) this.getActivity()).makeSnackBar("Veuillez vous connecter");
+            loader.setVisibility(View.GONE);
+        //}*/
+        Log.d("LOG", "3");
+        getGroups();
+        loader.setVisibility(View.GONE);
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -317,7 +319,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
     }
 
-    private void getGroups(){
+    public void getGroups(){
         loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
         //rp.add("username", "aaa"); rp.add("password", "aaa@123");
@@ -427,20 +429,5 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         //noinspection WrongConstant
         return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-        void makeSnackBar(String text);
-    }
 }
+
