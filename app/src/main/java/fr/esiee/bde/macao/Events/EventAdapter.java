@@ -92,7 +92,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder
             holder.place_layout.setVisibility(View.GONE);
         }
         holder.setUrl(event.getUrl());
-        Picasso.with(context).load(event.getImage()).centerCrop().into(holder.image);
+        Picasso.with(context).load(event.getImage()).fit().into(holder.image);
     }
 
     @Override
