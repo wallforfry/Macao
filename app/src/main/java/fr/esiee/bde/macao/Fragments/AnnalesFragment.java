@@ -163,6 +163,12 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
             }
         });
 
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+        loader.setVisibility(View.VISIBLE);
+
         annalesSignin();
 
         return view;
