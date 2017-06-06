@@ -7,6 +7,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -79,10 +80,16 @@ public class MainActivity extends AppCompatActivity
 
     private Bundle savedInstanceState;
 
+    private SQLiteDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DataBaseHelper dbHelper= new DataBaseHelper(this);
+        database = dbHelper.getWritableDatabase();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -485,6 +492,10 @@ public class MainActivity extends AppCompatActivity
 
     public String getIdToken() {
         return idToken;
+    }
+
+    public SQLiteDatabase getDatabase(){
+        return this.database;
     }
 }
 

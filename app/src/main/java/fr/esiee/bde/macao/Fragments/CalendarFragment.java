@@ -1,6 +1,8 @@
 package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,12 +40,14 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
+import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 import static android.graphics.Color.parseColor;
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -139,9 +143,12 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
         loader.setItemCount(8);
-        loader.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.INVISIBLE);
 
+        //getGroups();
+        retrieveEvents();
         getGroups();
+
         return view;
     }
 
@@ -347,6 +354,14 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 mListener.makeSnackBar("Connectez vous d'abord sur le site");
+                loader.setVisibility(View.GONE);
+            }
+
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                loader.setVisibility(View.GONE);
             }
         });
     }
@@ -372,59 +387,89 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 // Pull out the first event on the public timeline
                 try {
-                    events.clear();
-
+                    cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).delete(CalendarEvent.class, null);
                     for(int i = 0; i < timeline.length(); i++) {
                         JSONObject obj = (JSONObject) timeline.get(i);
                         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
                         dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        Date start = dateformat.parse(obj.get("start").toString());
-                        Date end = dateformat.parse(obj.get("end").toString());
+                        String start = obj.get("start").toString();
+                        String end = obj.get("end").toString();
 
                         String title = obj.get("name")+"\n"+obj.get("rooms")+"\n"+obj.get("prof")+"\n"+obj.get("unite");
+                        String name = obj.get("name").toString();
+                        WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
+                        CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
 
-                        Log.d("Start", obj.get("start").toString()+ " "+start.getDate()+" "+ start.getMonth()+" "+ start.getYear() +" "+start.getHours()+" "+start.getMinutes());
-                        Calendar startTime = Calendar.getInstance();
-                        startTime.set(Calendar.DAY_OF_MONTH, start.getDate());
-                        startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
-                        startTime.set(Calendar.MINUTE, start.getMinutes());
-                        startTime.set(Calendar.MONTH, start.getMonth());
-                        startTime.set(Calendar.YEAR, start.getYear()+1900);
-                        Calendar endTime = (Calendar) startTime.clone();
-                        endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
-                        endTime.set(Calendar.MINUTE, end.getMinutes()-1);
-                        endTime.set(Calendar.MONTH, end.getMonth());
-                        endTime.set(Calendar.YEAR, start.getYear()+1900);
-                        WeekViewEvent event = new WeekViewEvent(i, title, startTime, endTime);
-                        if(obj.get("name").toString().contains("CTRL")){
-                            event.setColor(parseColor("#e74c3c"));
-                        }
-                        else if(obj.get("name").toString().contains("TD")){
-                            event.setColor(parseColor("#27ae60"));
-                        }
-                        else if(obj.get("name").toString().contains("PERS")){
-                            event.setColor(parseColor("#95a5a6"));
-                        }
-                        else if(obj.get("name").toString().contains("TP")){
-                            event.setColor(parseColor("#27ae60"));
-                        }
-                        else {
-                            event.setColor(parseColor("#35a9fb"));
-                        }
-
-                        events.add(event);
+                        //events.add(event);
+                        cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).put(calendarEvent);
 
                     }
-                } catch (JSONException | ParseException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                mWeekView.notifyDatasetChanged();
+                retrieveEvents();
                 mListener.makeSnackBar("Agenda à jour");
                 loader.setVisibility(View.GONE);
             }
         });
     }
 
+    private void retrieveEvents(){
+        events.clear();
+        //CalendarEvent calendarEvent = cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).query(CalendarEvent.class).get();
+        Cursor cursor = cupboard().withDatabase(((MainActivity) this.getActivity()).getDatabase()).query(CalendarEvent.class).getCursor();
+        // or we can iterate all results
+        Iterable<CalendarEvent> itr = cupboard().withCursor(cursor).iterate(CalendarEvent.class);
+        for (CalendarEvent calendarEvent: itr) {
+            // do something with book
+            WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
+            events.add(event);
+        }
+        mWeekView.notifyDatasetChanged();
+    }
+
+    private WeekViewEvent createWeekViewEvent(int id, String title, String startString, String endString, String name){
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
+        dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date start = null;
+        Date end = null;
+        try {
+            start = dateformat.parse(startString);
+            end = dateformat.parse(endString);
+
+            Calendar startTime = Calendar.getInstance();
+            startTime.set(Calendar.DAY_OF_MONTH, start.getDate());
+            startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
+            startTime.set(Calendar.MINUTE, start.getMinutes());
+            startTime.set(Calendar.MONTH, start.getMonth());
+            startTime.set(Calendar.YEAR, start.getYear()+1900);
+            Calendar endTime = (Calendar) startTime.clone();
+            endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
+            endTime.set(Calendar.MINUTE, end.getMinutes()-1);
+            endTime.set(Calendar.MONTH, end.getMonth());
+            endTime.set(Calendar.YEAR, start.getYear()+1900);
+            WeekViewEvent event = new WeekViewEvent(id, title, startTime, endTime);
+            if(name.contains("CTRL")){
+                event.setColor(parseColor("#e74c3c"));
+            }
+            else if(name.contains("TD")){
+                event.setColor(parseColor("#27ae60"));
+            }
+            else if(name.contains("PERS")){
+                event.setColor(parseColor("#95a5a6"));
+            }
+            else if(name.contains("TP")){
+                event.setColor(parseColor("#27ae60"));
+            }
+            else {
+                event.setColor(parseColor("#35a9fb"));
+            }
+            return event;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
         //noinspection WrongConstant
         return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
