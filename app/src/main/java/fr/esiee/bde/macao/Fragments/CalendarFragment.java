@@ -147,7 +147,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
         //getGroups();
         retrieveEvents();
-        getGroups();
+        getEvents();
 
         return view;
     }
@@ -158,7 +158,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             loader.setVisibility(View.GONE);
         //}*/
         Log.d("LOG", "3");
-        getGroups();
+        getEvents();
         loader.setVisibility(View.GONE);
     }
 
@@ -238,7 +238,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 return true;
             case R.id.action_update_events:
-                this.getGroups();
+                this.getEvents();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -347,7 +347,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 // Pull out the first event on the public timeline
-                getEvents(timeline);
+                //getEvents(timeline);
 
             }
 
@@ -366,9 +366,11 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         });
     }
 
-    private void getEvents(JSONArray groups){
+    private void getEvents(){
+        loader.setVisibility(View.VISIBLE);
+        String mail = ((MainActivity) this.getActivity()).getMail();
         RequestParams rp = new RequestParams();
-        rp.add("groups", groups.toString());
+        rp.add("mail", mail);
 
         HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
             @Override

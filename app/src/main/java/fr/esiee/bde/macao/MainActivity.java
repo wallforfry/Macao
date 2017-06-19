@@ -494,6 +494,10 @@ public class MainActivity extends AppCompatActivity
         return idToken;
     }
 
+    public String getMail() {
+        return mail;
+    }
+
     public SQLiteDatabase getDatabase(){
         return this.database;
     }
