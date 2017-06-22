@@ -293,6 +293,13 @@ public class MainActivity extends AppCompatActivity
                         // [START_EXCLUDE]
                         nameDrawer.setText("Macao");
                         mailDrawer.setText("");
+                        username = "";
+                        firstname = "";
+                        lastname = "";
+                        mail = "";
+                        id = "";
+                        idToken = "";
+                        authCode = "";
                         updateUI(false);
                         // [END_EXCLUDE]
                     }
