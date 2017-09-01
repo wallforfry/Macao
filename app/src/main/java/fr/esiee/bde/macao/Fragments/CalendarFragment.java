@@ -147,7 +147,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
         //getGroups();
         retrieveEvents();
-        getGroups();
+        getEvents();
 
         return view;
     }
@@ -158,7 +158,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             loader.setVisibility(View.GONE);
         //}*/
         Log.d("LOG", "3");
-        getGroups();
+        getEvents();
         loader.setVisibility(View.GONE);
     }
 
@@ -238,7 +238,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 return true;
             case R.id.action_update_events:
-                this.getGroups();
+                this.getEvents();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -347,7 +347,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 // Pull out the first event on the public timeline
-                getEvents(timeline);
+                //getEvents(timeline);
 
             }
 
@@ -366,52 +366,60 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         });
     }
 
-    private void getEvents(JSONArray groups){
-        RequestParams rp = new RequestParams();
-        rp.add("groups", groups.toString());
+    private void getEvents(){
+        loader.setVisibility(View.VISIBLE);
+        if(!((MainActivity) this.getActivity()).isSignedIn()){
+            mListener.makeSnackBar("Veuillez vous connecter");
+            loader.setVisibility(View.GONE);
+        }
+        else {
+            String mail = ((MainActivity) this.getActivity()).getMail();
+            RequestParams rp = new RequestParams();
+            rp.add("mail", mail);
 
-        HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
-                Log.d("asd", "---------------- this is response : " + response);
-                try {
-                    JSONObject serverResp = new JSONObject(response.toString());
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                // Pull out the first event on the public timeline
-                try {
-                    cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).delete(CalendarEvent.class, null);
-                    for(int i = 0; i < timeline.length(); i++) {
-                        JSONObject obj = (JSONObject) timeline.get(i);
-                        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-                        dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        String start = obj.get("start").toString();
-                        String end = obj.get("end").toString();
-
-                        String title = obj.get("name")+"\n"+obj.get("rooms")+"\n"+obj.get("prof")+"\n"+obj.get("unite");
-                        String name = obj.get("name").toString();
-                        WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
-                        CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
-
-                        //events.add(event);
-                        cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).put(calendarEvent);
-
+            HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    // If the response is JSONObject instead of expected JSONArray
+                    Log.d("asd", "---------------- this is response : " + response);
+                    try {
+                        JSONObject serverResp = new JSONObject(response.toString());
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-                retrieveEvents();
-                mListener.makeSnackBar("Agenda à jour");
-                loader.setVisibility(View.GONE);
-            }
-        });
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                    // Pull out the first event on the public timeline
+                    try {
+                        cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).delete(CalendarEvent.class, null);
+                        for (int i = 0; i < timeline.length(); i++) {
+                            JSONObject obj = (JSONObject) timeline.get(i);
+                            SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
+                            dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                            String start = obj.get("start").toString();
+                            String end = obj.get("end").toString();
+
+                            String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
+                            String name = obj.get("name").toString();
+                            WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
+                            CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
+
+                            //events.add(event);
+                            cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).put(calendarEvent);
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    retrieveEvents();
+                    mListener.makeSnackBar("Agenda à jour");
+                    loader.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     private void retrieveEvents(){
@@ -453,7 +461,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 event.setColor(parseColor("#e74c3c"));
             }
             else if(name.contains("TD")){
-                event.setColor(parseColor("#27ae60"));
+                event.setColor(parseColor("#f39c12"));
             }
             else if(name.contains("PERS")){
                 event.setColor(parseColor("#95a5a6"));
