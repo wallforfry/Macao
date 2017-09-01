@@ -250,8 +250,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                     "mailto","wallerand.delevacq@edu.esiee.fr", null));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut Wallerand,\n\nJ'ai remarqué un bug dans l'application :\n\n");
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
+            emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
             startActivity(Intent.createChooser(emailIntent, "Send email..."));
         }
 
