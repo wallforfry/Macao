@@ -35,6 +35,7 @@
     <string name="connexion">Connexion</string>
     <string name="rooms">Salles libres</string>
     <string name="evenements">Evenements</string>
+    <string name="jobs">Jobs</string>
 
     <string name="annales_client_id">2_4r1x05vo8oiswwgwk8okcgwo8s0o40c4cskkok8wwcs8k4woc4</string>
     <string name="annales_secret">25yyrbggzi9wg0wgskgc004wko8w0k0oowcg8kcsckgog80wkw</string>

@@ -45,6 +45,7 @@ import java.io.IOException;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
+import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
@@ -241,6 +242,9 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_slideshow) {
             fragment = new RoomsFragment();
+
+        } else if (id == R.id.nav_jobs) {
+            fragment = new JobsFragment();
 
         } else if (id == R.id.nav_manage) {
             fragment = new EventsFragment();

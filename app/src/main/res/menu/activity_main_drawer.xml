@@ -12,6 +12,10 @@
                     android:id="@+id/nav_manage"
                     android:icon="@drawable/ic_event_white_24dp"
                     android:title="@string/evenements" />
+                <item
+                    android:id="@+id/nav_jobs"
+                    android:icon="@drawable/ic_work_black_24dp"
+                    android:title="@string/jobs" />
             </group>
         </menu>
     </item>
