@@ -2,6 +2,7 @@ package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -116,7 +117,13 @@ public class JobsFragment extends Fragment {
         }
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL) {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                // Do not draw the divider
+            }
+        });
         recyclerView.setAdapter(mAdapter);
 
         loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
