@@ -120,12 +120,11 @@ public class JobsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL) {
             @Override
-            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            public void onDraw(Canvas canvas, RecyclerView parent, RecyclerView.State state) {
                 // Do not draw the divider
             }
         });
         recyclerView.setAdapter(mAdapter);
-
         loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
         loader.setPaintMode(1);
         loader.setCircleRadius(20);

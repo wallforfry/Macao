@@ -23,6 +23,7 @@
     android:paddingRight="6dp"
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
+    android:layout_margin="2dp"
     card_view:cardCornerRadius="4dp"
     android:layout_marginBottom="10dp">
 
@@ -37,7 +38,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:paddingTop="8dp"
             android:text="Category du job"
             tools:background="@color/colorPrimary"
             android:textColor="@color/cardview_light_background"
@@ -49,7 +50,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:paddingBottom="8dp"
             android:text="Titre du job"
             tools:background="@color/colorPrimary"
             android:textColor="@color/cardview_light_background"
