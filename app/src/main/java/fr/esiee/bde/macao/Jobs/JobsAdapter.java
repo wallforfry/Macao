@@ -98,11 +98,14 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
         }
 
         holder.name.setText(job.getName());
-        holder.email.setText(job.getEmail());
 
-        SpannableString content = new SpannableString(job.getTelephone());
-        content.setSpan(new UnderlineSpan(), 0, job.getTelephone().length(), 0);
-        holder.telephone.setText(content);
+        SpannableString contentEmail = new SpannableString(job.getEmail());
+        contentEmail.setSpan(new UnderlineSpan(), 0, job.getEmail().length(), 0);
+        holder.email.setText(contentEmail);
+
+        SpannableString contentTelephone = new SpannableString(job.getTelephone());
+        contentTelephone.setSpan(new UnderlineSpan(), 0, job.getTelephone().length(), 0);
+        holder.telephone.setText(contentTelephone);
 
         holder.layout_telephone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +119,16 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
                 else {
                     context.startActivity(intent);
                 }
+            }
+        });
+
+        holder.layout_email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto",job.getEmail(), null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, job.getName());
+                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
             }
         });
 
