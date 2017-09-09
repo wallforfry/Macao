@@ -141,6 +141,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="06666666666"
+            android:textColor="#2196F3"
             android:layout_toRightOf="@+id/job_image_telephone"
             android:id="@+id/job_telephone"/>
     </RelativeLayout>

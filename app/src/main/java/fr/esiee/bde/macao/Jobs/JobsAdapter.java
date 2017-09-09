@@ -4,11 +4,18 @@ package fr.esiee.bde.macao.Jobs;
  * Created by Wallerand on 31/05/2017.
  */
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +29,7 @@ import fr.esiee.bde.macao.R;
 public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> {
 
     private List<Jobs> jobsList;
+    private Context context;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView category;
@@ -53,6 +61,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
 
     public JobsAdapter(List<Jobs> jobsList, Context context) {
         this.jobsList = jobsList;
+        this.context = context;
     }
 
     @Override
@@ -65,7 +74,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Jobs job = jobsList.get(position);
+        final Jobs job = jobsList.get(position);
 
         holder.layout_color.setBackgroundColor(Color.parseColor(job.getColor()));
 
@@ -73,24 +82,46 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
         holder.title.setText(job.getTitle());
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            holder.content.setText(Html.fromHtml(String.valueOf(job.getContent()),Html.FROM_HTML_MODE_LEGACY));
+            holder.content.setText(Html.fromHtml(String.valueOf(job.getContent()), Html.FROM_HTML_MODE_LEGACY));
         } else {
             holder.content.setText(Html.fromHtml(String.valueOf(job.getContent())));
         }
 
-        if(job.getName().equals("null")){
+        if (job.getName().equals("null")) {
             holder.layout_name.setVisibility(View.GONE);
         }
-        if(job.getEmail().equals("null")){
+        if (job.getEmail().equals("null")) {
             holder.layout_email.setVisibility(View.GONE);
         }
-        if(job.getTelephone().equals("null")){
+        if (job.getTelephone().equals("null")) {
             holder.layout_telephone.setVisibility(View.GONE);
         }
 
         holder.name.setText(job.getName());
         holder.email.setText(job.getEmail());
-        holder.telephone.setText(job.getTelephone());
+
+        SpannableString content = new SpannableString(job.getTelephone());
+        content.setSpan(new UnderlineSpan(), 0, job.getTelephone().length(), 0);
+        holder.telephone.setText(content);
+
+        holder.layout_telephone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String number = job.getTelephone();
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + number));
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+
+                }
+                else {
+                    context.startActivity(intent);
+                }
+            }
+        });
+
+
+
+
     }
 
     @Override
