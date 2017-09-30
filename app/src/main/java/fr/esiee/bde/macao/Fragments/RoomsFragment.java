@@ -9,6 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,6 +22,7 @@ import com.lusfold.spinnerloading.SpinnerLoading;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +89,7 @@ public class RoomsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -106,7 +111,6 @@ public class RoomsFragment extends Fragment {
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
         loader.setItemCount(8);
-        loader.setVisibility(View.VISIBLE);
 
         getRooms(0);
 
@@ -137,7 +141,8 @@ public class RoomsFragment extends Fragment {
         mListener = null;
     }
 
-    private void getRooms(int time){
+    private void getRooms(int time) {
+        loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
 
         HttpUtils.getByUrl("https://bde.esiee.fr/api/calendar/rooms", rp, new JsonHttpResponseHandler() {
@@ -153,56 +158,50 @@ public class RoomsFragment extends Fragment {
                 Room epi4 = new Room("", 4);
                 Room epi5 = new Room("", 5);
 
-                for(int i = 0; i < timeline.length(); i++) {
-                    Log.d("ROOM", "Add "+String.valueOf(i));
+                for (int i = 0; i < timeline.length(); i++) {
+                    //Log.d("ROOM", "Add " + String.valueOf(i));
                     try {
-                        int epi = Integer.parseInt(String.valueOf(timeline.get(i)).substring(0,1));
-                        switch (epi){
+                        int epi = Integer.parseInt(String.valueOf(timeline.get(i)).substring(0, 1));
+                        switch (epi) {
                             case 0:
-                                if(autre.getRooms().length() == 0){
+                                if (autre.getRooms().length() == 0) {
                                     autre.setRooms(String.valueOf(timeline.get(i)));
-                                }
-                                else {
+                                } else {
                                     autre.setRooms(autre.getRooms() + ", " + String.valueOf(timeline.get(i)));
                                 }
                                 break;
                             case 1:
-                                if(epi1.getRooms().length() == 0){
+                                if (epi1.getRooms().length() == 0) {
                                     epi1.setRooms(String.valueOf(timeline.get(i)));
-                                }
-                                else {
+                                } else {
                                     epi1.setRooms(epi1.getRooms() + ", " + String.valueOf(timeline.get(i)));
                                 }
                                 break;
                             case 2:
-                                if(epi2.getRooms().length() == 0){
+                                if (epi2.getRooms().length() == 0) {
                                     epi2.setRooms(String.valueOf(timeline.get(i)));
-                                }
-                                else {
+                                } else {
                                     epi2.setRooms(epi2.getRooms() + ", " + String.valueOf(timeline.get(i)));
                                 }
                                 break;
                             case 3:
-                                if(epi3.getRooms().length() == 0){
+                                if (epi3.getRooms().length() == 0) {
                                     epi3.setRooms(String.valueOf(timeline.get(i)));
-                                }
-                                else {
+                                } else {
                                     epi3.setRooms(epi3.getRooms() + ", " + String.valueOf(timeline.get(i)));
                                 }
                                 break;
                             case 4:
-                                if(epi4.getRooms().length() == 0){
+                                if (epi4.getRooms().length() == 0) {
                                     epi4.setRooms(String.valueOf(timeline.get(i)));
-                                }
-                                else {
+                                } else {
                                     epi4.setRooms(epi4.getRooms() + ", " + String.valueOf(timeline.get(i)));
                                 }
                                 break;
                             case 5:
-                                if(epi5.getRooms().length() == 0){
+                                if (epi5.getRooms().length() == 0) {
                                     epi5.setRooms(String.valueOf(timeline.get(i)));
-                                }
-                                else {
+                                } else {
                                     epi5.setRooms(epi5.getRooms() + ", " + String.valueOf(timeline.get(i)));
                                 }
                                 break;
@@ -220,7 +219,7 @@ public class RoomsFragment extends Fragment {
                 roomsList.add(epi5);
 
                 mAdapter.notifyDataSetChanged();
-                Log.d("ROOM", "SIZE : "+String.valueOf(roomsList.size()));
+                //Log.d("ROOM", "SIZE : " + String.valueOf(roomsList.size()));
                 loader.setVisibility(View.GONE);
 
             }
@@ -230,5 +229,23 @@ public class RoomsFragment extends Fragment {
                 mListener.makeSnackBar("Oups...");
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.rooms, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_update_rooms:
+                getRooms(0);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
