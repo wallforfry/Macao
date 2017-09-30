@@ -6,12 +6,13 @@
         android:orderInCategory="100"
         android:title="@string/today"
         android:icon="@drawable/ic_today_white_24dp"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_update_events"
         android:orderInCategory="100"
         android:title="@string/actualiser"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_refresh_white_24dp"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_day_view"
         android:orderInCategory="100"
