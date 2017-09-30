@@ -41,6 +41,7 @@ import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
+import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
@@ -80,6 +81,9 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
     private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
 
+    private DataBaseHelper dbHelper;
+    private SQLiteDatabase database;
+
     public CalendarFragment() {
         // Required empty public constructor
     }
@@ -110,6 +114,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
+        dbHelper =  new DataBaseHelper(this.getContext());
+        database = dbHelper.getWritableDatabase();
     }
 
     @Override
@@ -394,7 +400,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                     // Pull out the first event on the public timeline
                     try {
-                        cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).delete(CalendarEvent.class, null);
+                        cupboard().withDatabase(database).delete(CalendarEvent.class, null);
                         for (int i = 0; i < timeline.length(); i++) {
                             JSONObject obj = (JSONObject) timeline.get(i);
                             SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
@@ -408,14 +414,14 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                             CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
 
                             //events.add(event);
-                            cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).put(calendarEvent);
+                            cupboard().withDatabase(database).put(calendarEvent);
 
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     retrieveEvents();
-                    mListener.makeSnackBar("Agenda à jour");
+                    //mListener.makeSnackBar("Agenda à jour");
                     loader.setVisibility(View.GONE);
                 }
             });
@@ -424,8 +430,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
     private void retrieveEvents(){
         events.clear();
-        //CalendarEvent calendarEvent = cupboard().withDatabase(((MainActivity) getActivity()).getDatabase()).query(CalendarEvent.class).get();
-        Cursor cursor = cupboard().withDatabase(((MainActivity) this.getActivity()).getDatabase()).query(CalendarEvent.class).getCursor();
+        //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
+        Cursor cursor = cupboard().withDatabase(database).query(CalendarEvent.class).getCursor();
         // or we can iterate all results
         Iterable<CalendarEvent> itr = cupboard().withCursor(cursor).iterate(CalendarEvent.class);
         for (CalendarEvent calendarEvent: itr) {
