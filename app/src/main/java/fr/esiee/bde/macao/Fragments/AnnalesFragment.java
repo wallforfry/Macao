@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.lusfold.spinnerloading.SpinnerLoading;
@@ -39,6 +41,7 @@ import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,6 +71,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private MaterialSearchView searchView;
     private WebView webView;
     private MenuItem back;
+    private PDFView pdfView;
 
     private SpinnerLoading loader;
 
@@ -146,6 +150,9 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                 //Do some magic
             }
         });
+
+        //pdfView = new PDFView(this.getActivity().getApplicationContext(), null);
+        pdfView = (PDFView) view.findViewById(R.id.annales_pdfview);
 
         webView = (WebView) view.findViewById(R.id.annales_webview);
         //webView.setWebViewClient(new annalesWebView());
@@ -302,7 +309,8 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                     JSONObject document = (JSONObject) timeline.get("document");
                     JSONArray files = (JSONArray) document.get("files");
                     JSONObject file = (JSONObject) files.get(0);
-                    String url = "https://docs.google.com/gview?url=https://bde.esiee.fr"+file.get("download_path")+"&embedded=true";
+                    String url = "https://bde.esiee.fr"+file.get("download_path");
+                    //displayAnnalePDFView(url);
                     displayAnnale(url);
                     loader.setVisibility(View.GONE);
                 } catch (JSONException e) {
@@ -318,10 +326,20 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     }
 
     private void displayAnnale(String url){
-        webView.loadUrl(url);
+        webView.loadUrl("https://docs.google.com/gview?url="+url+"&embedded=true");
         webView.setVisibility(View.VISIBLE);
         back.setVisible(true);
     }
+
+    /*private void displayAnnalePDFView(String url){
+        pdfView.fromUri(Uri.parse(url)).load();
+        /*pdfView.fromUri(Uri.parse(url))
+                .defaultPage(1)
+                .enableAnnotationRendering(true)
+                .spacing(10) // in dp
+                .load();
+        pdfView.setVisibility(View.VISIBLE);
+    }*/
 
     private void hideAnnale(){
         webView.setVisibility(View.GONE);
