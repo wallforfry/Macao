@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -24,6 +25,7 @@ import org.json.JSONException;
 
 import java.io.Console;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -60,6 +62,9 @@ public class RoomsFragment extends Fragment {
 
     private SpinnerLoading loader;
 
+    private TextView currentDisplayedTime;
+    private int time;
+
     public RoomsFragment() {
         // Required empty public constructor
     }
@@ -90,6 +95,8 @@ public class RoomsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
+        Calendar rightNow = Calendar.getInstance();
+        time = rightNow.get(Calendar.HOUR_OF_DAY);
     }
 
     @Override
@@ -97,6 +104,8 @@ public class RoomsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_rooms, container, false);
+
+        currentDisplayedTime = (TextView) view.findViewById(R.id.rooms_current_time);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_rooms);
 
@@ -112,7 +121,7 @@ public class RoomsFragment extends Fragment {
         loader.setCircleRadius(20);
         loader.setItemCount(8);
 
-        getRooms(0);
+        getRooms(time);
 
         return view;
     }
@@ -145,7 +154,7 @@ public class RoomsFragment extends Fragment {
         loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
 
-        HttpUtils.getByUrl("https://bde.esiee.fr/api/calendar/rooms", rp, new JsonHttpResponseHandler() {
+        HttpUtils.getByUrl("https://bde.esiee.fr/api/calendar/rooms/"+time+"h00", rp, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
@@ -229,6 +238,8 @@ public class RoomsFragment extends Fragment {
                 mListener.makeSnackBar("Oups...");
             }
         });
+
+        currentDisplayedTime.setText("Salles libres à "+time+"h");
     }
 
     @Override
@@ -242,7 +253,20 @@ public class RoomsFragment extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_update_rooms:
-                getRooms(0);
+                time = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+                getRooms(time);
+                return true;
+            case R.id.action_rooms_plus_hour:
+                if(time < 23) {
+                    time++;
+                }
+                getRooms(time);
+                return true;
+            case R.id.action_rooms_minus_hour:
+                if(time > 0) {
+                    time--;
+                }
+                getRooms(time);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
