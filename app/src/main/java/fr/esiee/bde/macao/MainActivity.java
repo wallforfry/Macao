@@ -47,6 +47,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.lusfold.spinnerloading.SpinnerLoading;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -170,7 +171,6 @@ public class MainActivity extends AppCompatActivity
                 .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
                 .check();
 
-
         this.savedInstanceState = savedInstanceState;
     }
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
-        if (savedInstanceState == null) {
+        /*if (savedInstanceState == null) {
             // The Activity is NOT being re-created so we can instantiate a new Fragment
             // and add it to the Activity
             Fragment fragment = new CalendarFragment();
@@ -210,8 +210,15 @@ public class MainActivity extends AppCompatActivity
             // but if we need a reference to it, we can use the tag we passed to .replace
             Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
             switchFragment(fragment);
-        }
-        //switchFragment(((Fragment) new CalendarFragment()));
+        }*/
+        /*if(currentFragment == null){
+            switchFragment((Fragment) new CalendarFragment());
+        }*/
+        /*else{
+            Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
+            switchFragment(fragment);
+        }*/
+        switchFragment(((Fragment) new CalendarFragment()));
     }
 
     @Override
