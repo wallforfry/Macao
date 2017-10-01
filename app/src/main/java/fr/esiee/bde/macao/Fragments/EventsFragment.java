@@ -9,6 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -172,16 +173,17 @@ public class EventsFragment extends Fragment {
                         JSONObject newsObject = (JSONObject) events.get(i);
                         try {
                             JSONObject jsonObject = (JSONObject) newsObject.get("event");
+                            Log.d("EVENT BDE", String.valueOf(jsonObject.get("title")));
                             event.setTitle(String.valueOf(jsonObject.get("title")));
                             event.setStart(String.valueOf(jsonObject.get("start")));
                             event.setEnd(String.valueOf(jsonObject.get("end")));
-                            event.setImage(String.valueOf(((JSONObject) newsObject.get("photo")).get("url_thumbnail")));
+                            if(newsObject.has("photo")) {
+                                event.setImage(String.valueOf(((JSONObject) newsObject.get("photo")).get("url_thumbnail")));
+                            }
                             event.setPublicationDate(String.valueOf(newsObject.get("created_at")));
                             event.setSlug(String.valueOf(newsObject.get("slug")));
-                            try {
+                            if(jsonObject.has("place")) {
                                 event.setPlace(String.valueOf(jsonObject.get("place")));
-                            } catch (JSONException e){
-                                e.printStackTrace();
                             }
                             eventsList.add(event);
                         } catch (JSONException e){

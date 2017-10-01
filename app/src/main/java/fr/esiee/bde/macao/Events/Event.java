@@ -11,7 +11,7 @@ import java.util.Locale;
  */
 
 public class Event {
-    private String title, start, end, place = "", image, content, slug, publicationDate;
+    private String title, start, end, place = "", image = "https://bde.esiee.fr/bundles/applicationbde/img/couverture.png", content, slug, publicationDate;
 
     public Event(){
 
