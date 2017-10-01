@@ -400,22 +400,24 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                     // Pull out the first event on the public timeline
                     try {
-                        cupboard().withDatabase(database).delete(CalendarEvent.class, null);
-                        for (int i = 0; i < timeline.length(); i++) {
-                            JSONObject obj = (JSONObject) timeline.get(i);
-                            SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-                            dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                            String start = obj.get("start").toString();
-                            String end = obj.get("end").toString();
+                        if(!((JSONObject) timeline.get(0)).has("error")) {
+                            cupboard().withDatabase(database).delete(CalendarEvent.class, null);
+                            for (int i = 0; i < timeline.length(); i++) {
+                                JSONObject obj = (JSONObject) timeline.get(i);
+                                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
+                                dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                String start = obj.get("start").toString();
+                                String end = obj.get("end").toString();
 
-                            String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
-                            String name = obj.get("name").toString();
-                            WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
-                            CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
+                                String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
+                                String name = obj.get("name").toString();
+                                WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
+                                CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
 
-                            //events.add(event);
-                            cupboard().withDatabase(database).put(calendarEvent);
+                                //events.add(event);
+                                cupboard().withDatabase(database).put(calendarEvent);
 
+                            }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
