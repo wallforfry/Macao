@@ -149,7 +149,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
         loader.setItemCount(8);
-        loader.setVisibility(View.INVISIBLE);
+        loader.setVisibility(View.GONE);
 
         //getGroups();
         retrieveEvents();
@@ -488,7 +488,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     }
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
         //noinspection WrongConstant
-        return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
+        return event != null && ((event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1));
     }
 }
 
