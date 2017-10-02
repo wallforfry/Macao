@@ -16,6 +16,10 @@
                     android:id="@+id/nav_jobs"
                     android:icon="@drawable/ic_work_black_24dp"
                     android:title="@string/jobs" />
+                <item
+                    android:id="@+id/nav_clubs"
+                    android:icon="@drawable/ic_group_white_24dp"
+                    android:title="Les Clubs" />
             </group>
         </menu>
     </item>

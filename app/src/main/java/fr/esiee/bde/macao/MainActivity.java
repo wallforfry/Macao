@@ -55,6 +55,7 @@ import java.util.ArrayList;
 
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
+import fr.esiee.bde.macao.Fragments.ClubsFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
@@ -292,6 +293,8 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
             fragment = new AnnalesFragment();
+        } else if (id == R.id.nav_clubs) {
+            fragment = new ClubsFragment();
         } else if (id == R.id.nav_send) {
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                     "mailto","wallerand.delevacq@edu.esiee.fr", null));
