@@ -164,6 +164,48 @@ public class ClubsFragment extends Fragment {
                 clubsList.clear();
                 JSONArray events = null;
                 try {
+                    events = (JSONArray) timeline.get("Associations");
+
+                    for(int i = 0; i < events.length(); i++) {
+                        Club club = new Club();
+                        JSONObject clubObject = (JSONObject) events.get(i);
+                        try {
+                            Log.d("CLUBS BDE", String.valueOf(clubObject.get("title")));
+                            club.setTitle(String.valueOf(clubObject.get("title")));
+                            club.setId((Integer) clubObject.get("id"));
+                            club.setShortcode(String.valueOf(clubObject.get("shortcode")));
+                            club.setContent(String.valueOf(clubObject.get("abstract")));
+                            club.setEmail(String.valueOf(clubObject.get("email")));
+                            if(clubObject.has("logo_url")) {
+                                club.setImage(String.valueOf(clubObject.get("logo_url")));
+                            }
+                            clubsList.add(club);
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    events = (JSONArray) timeline.get("Clubs du BDS");
+
+                    for(int i = 0; i < events.length(); i++) {
+                        Club club = new Club();
+                        JSONObject clubObject = (JSONObject) events.get(i);
+                        try {
+                            Log.d("CLUBS BDE", String.valueOf(clubObject.get("title")));
+                            club.setTitle(String.valueOf(clubObject.get("title")));
+                            club.setId((Integer) clubObject.get("id"));
+                            club.setShortcode(String.valueOf(clubObject.get("shortcode")));
+                            club.setContent(String.valueOf(clubObject.get("abstract")));
+                            club.setEmail(String.valueOf(clubObject.get("email")));
+                            if(clubObject.has("logo_url")) {
+                                club.setImage(String.valueOf(clubObject.get("logo_url")));
+                            }
+                            clubsList.add(club);
+                        } catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     events = (JSONArray) timeline.get("Clubs du BDE");
 
                     for(int i = 0; i < events.length(); i++) {

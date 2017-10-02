@@ -95,7 +95,7 @@ public class ClubAdapter extends RecyclerView.Adapter<ClubAdapter.MyViewHolder> 
         holder.content.setText(club.getContent());
         holder.setMail(club.getEmail());
         holder.setUrl("https://bde.esiee.fr/clubs/view/"+club.getId()+"-"+club.getShortcode());
-        Picasso.with(context).load(club.getImage()).fit().into(holder.image);
+        Picasso.with(context).load(club.getImage()).resize(350, 350).centerCrop().into(holder.image);
     }
 
     @Override
