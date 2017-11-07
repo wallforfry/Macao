@@ -15,7 +15,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Macao.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 4;
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
