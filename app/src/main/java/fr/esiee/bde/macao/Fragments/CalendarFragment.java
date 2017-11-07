@@ -48,6 +48,7 @@ import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 import static android.graphics.Color.parseColor;
+import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -413,6 +414,10 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                                 String name = obj.get("name").toString();
                                 WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
                                 CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
+                                calendarEvent.setRooms(obj.getString("rooms"));
+                                calendarEvent.setProf(obj.getString("prof"));
+                                calendarEvent.setUnite(obj.getString("unite"));
+                                calendarEvent.setColor();
 
                                 //events.add(event);
                                 cupboard().withDatabase(database).put(calendarEvent);
@@ -444,48 +449,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         mWeekView.notifyDatasetChanged();
     }
 
-    private WeekViewEvent createWeekViewEvent(int id, String title, String startString, String endString, String name){
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-        dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date start = null;
-        Date end = null;
-        try {
-            start = dateformat.parse(startString);
-            end = dateformat.parse(endString);
-
-            Calendar startTime = Calendar.getInstance();
-            startTime.set(Calendar.DAY_OF_MONTH, start.getDate());
-            startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
-            startTime.set(Calendar.MINUTE, start.getMinutes());
-            startTime.set(Calendar.MONTH, start.getMonth());
-            startTime.set(Calendar.YEAR, start.getYear()+1900);
-            Calendar endTime = (Calendar) startTime.clone();
-            endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
-            endTime.set(Calendar.MINUTE, end.getMinutes()-1);
-            endTime.set(Calendar.MONTH, end.getMonth());
-            endTime.set(Calendar.YEAR, start.getYear()+1900);
-            WeekViewEvent event = new WeekViewEvent(id, title, startTime, endTime);
-            if(name.contains("CTRL")){
-                event.setColor(parseColor("#e74c3c"));
-            }
-            else if(name.contains("TD")){
-                event.setColor(parseColor("#f39c12"));
-            }
-            else if(name.contains("PERS")){
-                event.setColor(parseColor("#95a5a6"));
-            }
-            else if(name.contains("TP")){
-                event.setColor(parseColor("#27ae60"));
-            }
-            else {
-                event.setColor(parseColor("#35a9fb"));
-            }
-            return event;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
         //noinspection WrongConstant
         return event != null && ((event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1));
