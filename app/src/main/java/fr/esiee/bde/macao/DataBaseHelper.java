@@ -9,13 +9,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
+import fr.esiee.bde.macao.Events.Event;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Macao.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -24,6 +25,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     static {
         // register our models
         cupboard().register(CalendarEvent.class);
+        cupboard().register(Event.class);
     }
 
     @Override

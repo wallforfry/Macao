@@ -11,6 +11,7 @@ import java.util.Locale;
  */
 
 public class Event {
+    private int id;
     private String title, start, end, place = "", image = "https://bde.esiee.fr/bundles/applicationbde/img/couverture.png", content, slug, publicationDate;
 
     public Event(){
@@ -206,5 +207,13 @@ public class Event {
 
     public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

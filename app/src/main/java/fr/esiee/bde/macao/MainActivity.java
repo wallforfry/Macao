@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import fr.esiee.bde.macao.Calendar.CalendarService;
+import fr.esiee.bde.macao.Events.EventService;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
@@ -174,6 +175,7 @@ public class MainActivity extends AppCompatActivity
         //startService(new Intent(this, AutoStart.class));
         startService(new Intent(this, NotificationService.class));
         startService(new Intent(this, CalendarService.class));
+        startService(new Intent(this, EventService.class));
     }
 
     @Override
@@ -429,6 +431,8 @@ public class MainActivity extends AppCompatActivity
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("mail", email);
                 editor.commit();
+
+                startService(new Intent(this, CalendarService.class));
 
                 updateUI(true);
             } else {
