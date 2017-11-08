@@ -51,8 +51,6 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
         public void onCreate() {
 
-            Log.e("WIDGET", "CREATE");
-
             // In onCreate() you set up any connections / cursors to your data source. Heavy lifting,
             // for example downloading or creating content etc, should be deferred to onDataSetChanged()
             // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.

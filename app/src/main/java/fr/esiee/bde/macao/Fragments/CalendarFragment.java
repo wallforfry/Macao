@@ -154,7 +154,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
         //getGroups();
         retrieveEvents();
-        getEvents();
+        //getEvents();
 
         return view;
     }
@@ -165,7 +165,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
             loader.setVisibility(View.GONE);
         //}*/
         Log.d("LOG", "3");
-        getEvents();
+        //getEvents();
+        retrieveEvents();
         loader.setVisibility(View.GONE);
     }
 
@@ -245,7 +246,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 return true;
             case R.id.action_update_events:
-                this.getEvents();
+                this.retrieveEvents();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -331,108 +332,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         }
         return  matchedEvents;
 
-    }
-
-    public void getGroups(){
-        loader.setVisibility(View.VISIBLE);
-        RequestParams rp = new RequestParams();
-        //rp.add("username", "aaa"); rp.add("password", "aaa@123");
-        String username = ((MainActivity) this.getActivity()).getUsername();
-        HttpUtils.getByUrl("https://bde.esiee.fr/agenda/groups/" + username + ".json", rp, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
-                Log.d("asd", "---------------- this is response : " + response);
-                try {
-                    JSONObject serverResp = new JSONObject(response.toString());
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                // Pull out the first event on the public timeline
-                //getEvents(timeline);
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                mListener.makeSnackBar("Connectez vous d'abord sur le site");
-                loader.setVisibility(View.GONE);
-            }
-
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                loader.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    private void getEvents(){
-        loader.setVisibility(View.VISIBLE);
-        if(!((MainActivity) this.getActivity()).isSignedIn()){
-            mListener.makeSnackBar("Veuillez vous connecter");
-            loader.setVisibility(View.GONE);
-        }
-        else {
-            String mail = ((MainActivity) this.getActivity()).getMail();
-            RequestParams rp = new RequestParams();
-            rp.add("mail", mail);
-
-            HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    // If the response is JSONObject instead of expected JSONArray
-                    Log.d("asd", "---------------- this is response : " + response);
-                    try {
-                        JSONObject serverResp = new JSONObject(response.toString());
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                    // Pull out the first event on the public timeline
-                    try {
-                        if(!((JSONObject) timeline.get(0)).has("error")) {
-                            cupboard().withDatabase(database).delete(CalendarEvent.class, null);
-                            for (int i = 0; i < timeline.length(); i++) {
-                                JSONObject obj = (JSONObject) timeline.get(i);
-                                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-                                dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                String start = obj.get("start").toString();
-                                String end = obj.get("end").toString();
-
-                                String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
-                                String name = obj.get("name").toString();
-                                WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
-                                CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
-                                calendarEvent.setRooms(obj.getString("rooms"));
-                                calendarEvent.setProf(obj.getString("prof"));
-                                calendarEvent.setUnite(obj.getString("unite"));
-                                calendarEvent.setColor();
-
-                                //events.add(event);
-                                cupboard().withDatabase(database).put(calendarEvent);
-
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    retrieveEvents();
-                    //mListener.makeSnackBar("Agenda à jour");
-                    loader.setVisibility(View.GONE);
-                }
-            });
-        }
     }
 
     private void retrieveEvents(){

@@ -1,6 +1,5 @@
 package fr.esiee.bde.macao;
 
-import android.*;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -10,18 +9,16 @@ import android.accounts.OperationCanceledException;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,7 +31,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -47,12 +43,12 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
-import com.lusfold.spinnerloading.SpinnerLoading;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
@@ -61,6 +57,7 @@ import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.Notifications.NotificationService;
 
 
 public class MainActivity extends AppCompatActivity
@@ -72,12 +69,12 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
-    private boolean isSignedIn = false;
+    private static boolean isSignedIn = false;
 
     private String username = "";
     private String firstname = "";
     private String lastname = "";
-    private String mail = "";
+    private static String mail = "";
     private String idToken = "";
     private String id = "";
     private String authCode = "";
@@ -173,6 +170,10 @@ public class MainActivity extends AppCompatActivity
                 .check();
 
         this.savedInstanceState = savedInstanceState;
+
+        //startService(new Intent(this, AutoStart.class));
+        startService(new Intent(this, NotificationService.class));
+        startService(new Intent(this, CalendarService.class));
     }
 
     @Override
@@ -423,6 +424,12 @@ public class MainActivity extends AppCompatActivity
 
                 //mStatusTextView.setText(username);
 
+                //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("mail", email);
+                editor.commit();
+
                 updateUI(true);
             } else {
                 signOut();
@@ -533,7 +540,7 @@ public class MainActivity extends AppCompatActivity
         snackbar.show();
     }
 
-    public boolean isSignedIn() {
+    public static boolean isSignedIn() {
         return isSignedIn;
     }
 
@@ -549,7 +556,7 @@ public class MainActivity extends AppCompatActivity
         return idToken;
     }
 
-    public String getMail() {
+    public static String getMail() {
         return mail;
     }
 

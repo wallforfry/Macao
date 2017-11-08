@@ -12,6 +12,7 @@ public class CalendarEvent {
     private int id;
     private String title, startString,endString, name, rooms, prof, unite;
     private int color;
+    private boolean notified;
 
     public CalendarEvent(){
 
@@ -23,6 +24,7 @@ public class CalendarEvent {
         this.startString = startString;
         this.endString = endString;
         this.name = name;
+        this.notified = false;
     }
 
     public int getId() {
@@ -109,5 +111,13 @@ public class CalendarEvent {
         else {
             this.color = parseColor("#35a9fb");
         }
+    }
+
+    public boolean isNotified() {
+        return notified;
+    }
+
+    public void setNotified(boolean notified) {
+        this.notified = notified;
     }
 }
