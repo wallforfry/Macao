@@ -43,21 +43,22 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
         public ListViewRemoteViewsFactory(Context context, Intent intent) {
             mContext = context;
+            dbHelper =  new DataBaseHelper(mContext);
+            database = dbHelper.getWritableDatabase();
         }
 
         // Initialize the data set.
 
         public void onCreate() {
 
+            Log.e("WIDGET", "CREATE");
+
             // In onCreate() you set up any connections / cursors to your data source. Heavy lifting,
             // for example downloading or creating content etc, should be deferred to onDataSetChanged()
             // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
 
             events=new ArrayList<CalendarEvent>();
-            dbHelper =  new DataBaseHelper(mContext);
-            database = dbHelper.getWritableDatabase();
-
-            onDataSetChanged();
+            retrieveEvents();
         }
         // Given the position (index) of a WidgetItem in the array, use the item's text value in
         // combination with the app widget item XML file to construct a RemoteViews object.
@@ -154,12 +155,12 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
     private void retrieveEvents(){
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        //calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date today = calendar.getTime();
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
 
-        String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+        String ISO_FORMAT = "yyyy-MM-dd'T00:00:00.000Z'";
         SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
         String dateStart = sdf.format(today);
         String dateEnd = sdf.format(tomorrow);
@@ -168,6 +169,7 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         events.clear();
         //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
         Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and endString < ? order by startString asc", dateStart, dateEnd).getCursor();
+        //Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).getCursor();
         // or we can iterate all results
         Iterable<CalendarEvent> itr = cupboard().withCursor(cursor).iterate(CalendarEvent.class);
         for (CalendarEvent calendarEvent: itr) {

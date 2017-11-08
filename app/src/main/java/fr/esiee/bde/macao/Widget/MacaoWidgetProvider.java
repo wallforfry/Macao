@@ -40,6 +40,8 @@ public class MacaoWidgetProvider extends AppWidgetProvider{
                          int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
+        Log.e("WIDGET", "UPDATE");
+
         for (int i = 0; i < appWidgetIds.length; i++) {
 
             Intent intent = new Intent(context, WidgetService.class);
@@ -59,6 +61,8 @@ public class MacaoWidgetProvider extends AppWidgetProvider{
 
             //rv.setEmptyView(R.id.list, R.id.empty_view);
             appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
+
+            Log.e("WIDGET", "UPDATE "+i);
         }
 
     }
