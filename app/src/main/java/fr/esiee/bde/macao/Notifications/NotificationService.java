@@ -78,7 +78,7 @@ public class NotificationService extends Service {
         Log.e("Notification", "Start");
         for (CalendarEvent event : events){
             if(!notificationId.contains(event.getId())) {
-                Log.e("Notification", event.getName());
+                Log.e("Notification", event.getName()+" : "+event.getRooms());
                 createNotification(event);
                 /*event.setNotified(true);
                 ContentValues values = new ContentValues();
@@ -182,78 +182,5 @@ public class NotificationService extends Service {
 
         notificationId.add(event.getId());
         mNotification.notify(event.getId(), builder.build());
-    }
-
-
-    private void getEvents(){
-        //SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-        SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
-        String mail = sharedPref.getString("mail", "");
-        if(mail.equals("")){
-            /*mListener.makeSnackBar("Veuillez vous connecter");
-            loader.setVisibility(View.GONE);*/
-            Log.e("Agenda", "Non connecté");
-        }
-        else {
-            Log.i("Agenda", "Maj des events");
-            RequestParams rp = new RequestParams();
-            rp.add("mail", mail);
-
-            HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    // If the response is JSONObject instead of expected JSONArray
-                    Log.d("asd", "---------------- this is response : " + response);
-                    try {
-                        JSONObject serverResp = new JSONObject(response.toString());
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                    // Pull out the first event on the public timeline
-                    try {
-                        if(!((JSONObject) timeline.get(0)).has("error")) {
-                            cupboard().withDatabase(database).delete(CalendarEvent.class, null);
-                            for (int i = 0; i < timeline.length(); i++) {
-                                JSONObject obj = (JSONObject) timeline.get(i);
-                                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-                                dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                String start = obj.get("start").toString();
-                                String end = obj.get("end").toString();
-
-                                String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
-                                String name = obj.get("name").toString();
-                                WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
-                                CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
-                                calendarEvent.setRooms(obj.getString("rooms"));
-                                calendarEvent.setProf(obj.getString("prof"));
-                                calendarEvent.setUnite(obj.getString("unite"));
-                                calendarEvent.setColor();
-
-                                //events.add(event);
-                                cupboard().withDatabase(database).put(calendarEvent);
-
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    retrieveEvents();
-                    Log.i("Agenda", "Agenda à jour");
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                    Log.d("Failed: ", ""+statusCode);
-                    Log.d("Error : ", "" + throwable);
-                }
-
-            });
-        }
     }
 }

@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
@@ -69,7 +70,7 @@ public class EventService extends Service {
         AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarm.set(
                 AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + (1000 * 60 * 10),
+                System.currentTimeMillis() + (1000 * 10 ),
                 PendingIntent.getService(this, 0, new Intent(this, EventService.class), 0)
         );
     }
@@ -107,8 +108,25 @@ public class EventService extends Service {
                             }
 
                             Event old = cupboard().withDatabase(database).query(Event.class).withSelection("title = ?", event.getTitle()).get();
+
+                            try {
+                                Calendar calendar = Calendar.getInstance();
+                                String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'+'SSSS";
+                                SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
+                                Date now = calendar.getTime();
+                                Date date = sdf.parse(event.getStart());
+                                Log.d("DATE", date.toString());
+                                Log.d("NOW", now.toString());
+                                if (now.compareTo(date) <= 0) {
+                                    if ((old != null && !old.isNotified()) || old == null) {
+                                        createNotification(event);
+                                    }
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
                             if(old == null) {
-                                createNotification(event);
                                 cupboard().withDatabase(database).put(event);
                             }
 
@@ -151,5 +169,8 @@ public class EventService extends Service {
                 .setOnlyAlertOnce(true);
 
         mNotification.notify(event.getId(), builder.build());
+
+        event.setNotified(true);
+        cupboard().withDatabase(database).put(event);
     }
 }

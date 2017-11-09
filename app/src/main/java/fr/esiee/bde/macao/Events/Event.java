@@ -13,6 +13,7 @@ import java.util.Locale;
 public class Event {
     private int id;
     private String title, start, end, place = "", image = "https://bde.esiee.fr/bundles/applicationbde/img/couverture.png", content, slug, publicationDate;
+    private boolean notified = false;
 
     public Event(){
 
@@ -215,5 +216,13 @@ public class Event {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isNotified() {
+        return notified;
+    }
+
+    public void setNotified(boolean notified) {
+        this.notified = notified;
     }
 }

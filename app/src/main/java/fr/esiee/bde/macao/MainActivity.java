@@ -352,6 +352,12 @@ public class MainActivity extends AppCompatActivity
                         idToken = "";
                         authCode = "";
                         updateUI(false);
+
+                        SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("mail", "");
+                        editor.commit();
+
                         // [END_EXCLUDE]
                     }
                 });
