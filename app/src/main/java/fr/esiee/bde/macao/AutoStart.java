@@ -16,8 +16,8 @@ import fr.esiee.bde.macao.Notifications.NotificationService;
 public class AutoStart extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        context.startService(new Intent(context, NotificationService.class));
         context.startService(new Intent(context, CalendarService.class));
         context.startService(new Intent(context, EventService.class));
+        context.startService(new Intent(context, NotificationService.class));
     }
 }

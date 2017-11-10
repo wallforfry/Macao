@@ -167,9 +167,6 @@ public class NotificationService extends Service {
             e.printStackTrace();
         }
 
-
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("Titre")

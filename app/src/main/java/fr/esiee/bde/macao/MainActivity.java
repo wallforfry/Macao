@@ -173,9 +173,9 @@ public class MainActivity extends AppCompatActivity
         this.savedInstanceState = savedInstanceState;
 
         //startService(new Intent(this, AutoStart.class));
-        startService(new Intent(this, NotificationService.class));
         startService(new Intent(this, CalendarService.class));
         startService(new Intent(this, EventService.class));
+        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
