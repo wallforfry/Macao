@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -49,10 +50,17 @@ public class EventService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        dbHelper =  new DataBaseHelper(this);
-        database = dbHelper.getWritableDatabase();
 
-        getEvents();
+        try {
+            dbHelper =  new DataBaseHelper(this);
+            database = dbHelper.getWritableDatabase();
+
+            getEvents();
+        }
+        catch (SQLiteException e){
+            Log.e("EventService", e.toString());
+        }
+
         stopSelf();
 
         return START_NOT_STICKY;
