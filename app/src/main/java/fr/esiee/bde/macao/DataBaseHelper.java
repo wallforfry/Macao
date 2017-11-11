@@ -33,7 +33,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         // this will ensure that all tables are created
         cupboard().withDatabase(db).createTables();
         // add indexes and other database tweaks in this method if you want
-
     }
 
     @Override

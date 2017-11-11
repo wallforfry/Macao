@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
@@ -69,23 +70,27 @@ public class NotificationService extends Service {
 
         // I don't want this service to stay in memory, so I stop it
         // immediately after doing what I wanted it to do.
+        try {
+            dbHelper = new DataBaseHelper(this);
+            database = dbHelper.getWritableDatabase();
 
-        dbHelper =  new DataBaseHelper(this);
-        database = dbHelper.getWritableDatabase();
+            //getEvents();
 
-        //getEvents();
-
-        retrieveEvents();
-        Log.e("Notification", "Start");
-        for (CalendarEvent event : events){
-            if(!notificationId.contains(event.getId())) {
-                Log.e("Notification", event.getName()+" : "+event.getRooms());
-                createNotification(event);
+            retrieveEvents();
+            Log.i("Notification", "Start");
+            for (CalendarEvent event : events) {
+                if (!notificationId.contains(event.getId())) {
+                    Log.i("Notification", event.getName() + " : " + event.getRooms());
+                    createNotification(event);
                 /*event.setNotified(true);
                 ContentValues values = new ContentValues();
                 values.put("notified", true);
                 cupboard().withDatabase(this.database).update(CalendarEvent.class, values, "startString = ?", event.getStartString());*/
+                }
             }
+        }
+        catch (SQLiteException e){
+            Log.e("Notification", e.toString());
         }
 
         stopSelf();
