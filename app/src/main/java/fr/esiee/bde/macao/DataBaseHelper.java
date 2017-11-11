@@ -16,7 +16,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Macao.db";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,8 +40,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         // this will upgrade tables, adding columns and new tables.
         // Note that existing columns will not be converted
         cupboard().withDatabase(db).dropAllTables();
-        cupboard().withDatabase(db).createTables();
-        //cupboard().withDatabase(db).upgradeTables();
+        cupboard().withDatabase(db).dropAllIndices();
+        //cupboard().withDatabase(db).createTables();
+        cupboard().withDatabase(db).upgradeTables();
         // do migration work if you have an alteration to make to your schema here
 
     }
