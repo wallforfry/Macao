@@ -16,8 +16,8 @@ public class WidgetService extends RemoteViewsService {
     }
 
     protected void onMessage(Context context, Intent data) {
-        Intent intent_meeting_update=new  Intent(context,MacaoWidgetProvider.class);
-        intent_meeting_update.setAction(MacaoWidgetProvider.UPDATE_MEETING_ACTION);
+        Intent intent_meeting_update=new  Intent(context,MacaoAppWidget.class);
+        intent_meeting_update.setAction(MacaoAppWidget.UPDATE_MEETING_ACTION);
         sendBroadcast(intent_meeting_update);
     }
 }

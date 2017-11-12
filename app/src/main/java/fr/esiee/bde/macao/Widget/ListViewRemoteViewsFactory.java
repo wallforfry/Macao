@@ -106,7 +106,7 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
             // Next, set a fill-intent, which will be used to fill in the pending intent template
             // that is set on the collection view in ListViewWidgetProvider.
             Bundle extras = new Bundle();
-            extras.putInt(MacaoWidgetProvider.EXTRA_ITEM, position);
+            extras.putInt(MacaoAppWidget.EXTRA_ITEM, position);
             Intent fillInIntent = new Intent();
             fillInIntent.putExtra("homescreen_meeting",data);
             fillInIntent.putExtras(extras);

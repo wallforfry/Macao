@@ -175,6 +175,7 @@ public class NotificationService extends Service {
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("Titre")
+                .setSmallIcon(R.drawable.ic_notification_icon)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(event.getName()+" : "+event.getRooms())
                 .setContentText(startHour+" - "+endHour+" "+event.getId())
@@ -182,9 +183,9 @@ public class NotificationService extends Service {
                 .setDefaults(DEFAULT_ALL)
                 .setOnlyAlertOnce(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.setSmallIcon(Icon.createWithBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
-        }
+        }*/
 
         notificationId.add(event.getId());
         mNotification.notify(event.getId(), builder.build());
