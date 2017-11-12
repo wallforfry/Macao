@@ -9,6 +9,7 @@ import static android.graphics.Color.parseColor;
  */
 
 public class CalendarEvent {
+    public Long _id;
     private int id;
     private String title, startString,endString, name, rooms, prof, unite;
     private int color;

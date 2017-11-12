@@ -11,6 +11,7 @@ import java.util.Locale;
  */
 
 public class Event {
+    public Long _id;
     private int id;
     private String title, start, end, place = "", image = "https://bde.esiee.fr/bundles/applicationbde/img/couverture.png", content, slug, publicationDate;
     private boolean notified = false;
