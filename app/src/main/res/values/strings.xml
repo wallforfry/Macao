@@ -46,4 +46,6 @@
     <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations]]]></string>
     <string name="settings">Paramètres</string>
     <string name="close">Fermer</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
