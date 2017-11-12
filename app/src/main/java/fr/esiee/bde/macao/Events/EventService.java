@@ -13,7 +13,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -28,11 +27,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
-import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.MainActivity;
-import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
 
 import static android.app.Notification.DEFAULT_ALL;

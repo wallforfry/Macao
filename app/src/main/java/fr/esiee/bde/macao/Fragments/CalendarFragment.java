@@ -22,32 +22,19 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.lusfold.spinnerloading.SpinnerLoading;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
-import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
-import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
-import static android.graphics.Color.parseColor;
 import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 

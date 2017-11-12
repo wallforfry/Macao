@@ -1,7 +1,5 @@
 package fr.esiee.bde.macao.Calendar;
 
-import android.graphics.Color;
-
 import static android.graphics.Color.parseColor;
 
 /**
@@ -9,8 +7,8 @@ import static android.graphics.Color.parseColor;
  */
 
 public class CalendarEvent {
-    public Long _id;
-    private int id;
+    private Long _id;
+    private int eventId;
     private String title, startString,endString, name, rooms, prof, unite;
     private int color;
     private boolean notified;
@@ -19,8 +17,8 @@ public class CalendarEvent {
 
     }
 
-    public CalendarEvent(int id, String title, String startString, String endString, String name){
-        this.id = id;
+    public CalendarEvent(int eventId, String title, String startString, String endString, String name){
+        this.eventId = eventId;
         this.title = title;
         this.startString = startString;
         this.endString = endString;
@@ -29,11 +27,11 @@ public class CalendarEvent {
     }
 
     public int getId() {
-        return id;
+        return eventId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int eventId) {
+        this.eventId = eventId;
     }
 
     public String getTitle() {
