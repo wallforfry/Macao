@@ -6,11 +6,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -140,8 +142,15 @@ public class NotificationService extends Service {
             calendar.add(Calendar.HOUR_OF_DAY, 1);
             startHour= hdf.format(calendar.getTime());
 
+            int minute_before_event = 30;
+            try {
+                minute_before_event = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("time_before_calendar_notification", "30"));
+            } catch (NumberFormatException e){
+                Log.e("Settings", "La préférence minute_before_event n'est pas un nombre");
+            }
+
             calendar.setTime(sdf.parse(endHour));
-            calendar.add(Calendar.HOUR_OF_DAY, 1);
+            calendar.add(Calendar.MINUTE, minute_before_event);
             endHour = hdf.format(calendar.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
