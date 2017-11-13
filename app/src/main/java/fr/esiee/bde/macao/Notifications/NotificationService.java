@@ -37,6 +37,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 public class NotificationService extends Service {
 
     private static List<Integer> notificationId = new ArrayList<Integer>();
+    private static List<String> notificationStartString = new ArrayList<String>();
     private List<CalendarEvent> events = new ArrayList<CalendarEvent>();
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
@@ -56,7 +57,7 @@ public class NotificationService extends Service {
             retrieveEvents();
             Log.i("Notification", "Start");
             for (CalendarEvent event : events) {
-                if (!notificationId.contains(event.getId())) {
+                if ((!notificationId.contains(event.getId())) && notificationStartString.contains(event.getStartString())) {
                     Log.i("Notification", event.getName() + " : " + event.getRooms());
                     boolean notified = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("enable_calendar_notification", true);
                     if(notified) {
@@ -176,6 +177,7 @@ public class NotificationService extends Service {
         }*/
 
         notificationId.add(event.getId());
+        notificationStartString.add(event.getStartString());
         mNotification.notify(event.getId(), builder.build());
     }
 }
