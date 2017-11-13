@@ -113,9 +113,9 @@ public class NotificationService extends Service {
 
 
         events.clear();
-        //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
         Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and startString <= ? order by startString asc", dateStart, dateEnd).getCursor();
-        //Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).getCursor();
+        // For debug :
+        //Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? order by startString asc", dateStart).getCursor();
         // or we can iterate all results
         Iterable<CalendarEvent> itr = cupboard().withCursor(cursor).iterate(CalendarEvent.class);
         for (CalendarEvent calendarEvent: itr) {
@@ -125,6 +125,7 @@ public class NotificationService extends Service {
     }
 
     private void createNotification(CalendarEvent event){
+        Log.d("Notification", event.getName()+" is notified");
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         final Intent launchNotifiactionIntent = new Intent(this, MainActivity.class);
