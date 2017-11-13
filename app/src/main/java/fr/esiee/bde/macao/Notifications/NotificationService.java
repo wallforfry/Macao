@@ -58,7 +58,10 @@ public class NotificationService extends Service {
             for (CalendarEvent event : events) {
                 if (!notificationId.contains(event.getId())) {
                     Log.i("Notification", event.getName() + " : " + event.getRooms());
-                    createNotification(event);
+                    boolean notified = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("enable_calendar_notification", true);
+                    if(notified) {
+                        createNotification(event);
+                    }
                 /*event.setNotified(true);
                 ContentValues values = new ContentValues();
                 values.put("notified", true);
@@ -159,7 +162,7 @@ public class NotificationService extends Service {
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("Titre")
-                .setSmallIcon(R.drawable.ic_notification_icon)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(event.getName()+" : "+event.getRooms())
                 .setContentText(startHour+" - "+endHour+" "+event.getId())

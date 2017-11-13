@@ -5,21 +5,23 @@
     <PreferenceCategory
         android:title="Notification de l'agenda">
 
-
-        <!--<CheckBoxPreference
-            android:key="checkbox_preference"
-            android:title="Titre checkbox"
-            android:summary="Summary checkbox" />-->
-
     </PreferenceCategory>
+    <CheckBoxPreference
+        android:key="enable_calendar_notification"
+        android:title="Activer les notification"
+        android:summary="Active les notification de l'agenda"
+        android:defaultValue="true"/>
+
     <EditTextPreference
+        android:dependency="enable_calendar_notification"
+        android:layout="?android:attr/preferenceLayoutChild"
         android:defaultValue="30"
         android:icon="@drawable/ic_notifications_black_24dp"
         android:inputType="number"
         android:key="time_before_calendar_notification"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:summary="Nombre de minute avant un évènement"
+        android:summary="Temps avant la notification d'un évènement"
         android:title="Notification" />
     <!--
     <PreferenceCategory
