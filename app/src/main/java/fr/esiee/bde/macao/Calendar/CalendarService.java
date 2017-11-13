@@ -81,8 +81,8 @@ public class CalendarService extends Service {
         AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarm.set(
                 AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + (1000 * 60 * 10),
-                PendingIntent.getService(this, 0, new Intent(this, NotificationService.class), 0)
+                System.currentTimeMillis() + (1000 * 60 * 5),
+                PendingIntent.getService(this, 0, new Intent(this, CalendarService.class), 0)
         );
     }
 
