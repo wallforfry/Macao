@@ -60,6 +60,7 @@ import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
+import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
 
 public class MainActivity extends AppCompatActivity
@@ -177,6 +178,7 @@ public class MainActivity extends AppCompatActivity
         startService(new Intent(this, CalendarService.class));
         startService(new Intent(this, EventService.class));
         startService(new Intent(this, NotificationService.class));
+        startService(new Intent(this, WidgetUpdateService.class));
     }
 
     @Override

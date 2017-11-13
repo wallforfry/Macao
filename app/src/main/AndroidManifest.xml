@@ -54,6 +54,7 @@
         <service
             android:name=".Widget.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+        <service android:name=".Widget.WidgetUpdateService" />
 
         <receiver android:name=".AutoStart">
             <intent-filter>

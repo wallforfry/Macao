@@ -26,7 +26,7 @@ public class MacaoAppWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-
+            Log.i("Widget", "Widget is up to date");
             Intent intent = new Intent(context, WidgetService.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                     appWidgetId);
@@ -52,7 +52,6 @@ public class MacaoAppWidget extends AppWidgetProvider {
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
         if (intent.getAction().equals(UPDATE_MEETING_ACTION)) {
             int appWidgetIds[] = mgr.getAppWidgetIds(new ComponentName(context,MacaoAppWidget.class));
-            Log.e("received", intent.getAction());
             mgr.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.listview_widget);
         }
         super.onReceive(context, intent);
