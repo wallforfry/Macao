@@ -59,6 +59,7 @@ import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Notifications.NotificationService;
+import fr.esiee.bde.macao.Settings.SettingsActivity;
 
 
 public class MainActivity extends AppCompatActivity
@@ -304,6 +305,9 @@ public class MainActivity extends AppCompatActivity
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
             emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
             startActivity(Intent.createChooser(emailIntent, "Send email..."));
+        } else if (id == R.id.nav_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
         }
 
         if(fragment != null) {

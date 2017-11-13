@@ -75,7 +75,7 @@ public class EventService extends Service {
         AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarm.set(
                 AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + (1000 * 10 ),
+                System.currentTimeMillis() + (1000 * 60 * 5 ),
                 PendingIntent.getService(this, 0, new Intent(this, EventService.class), 0)
         );
     }

@@ -18,6 +18,7 @@
     <ListView
         android:id="@+id/listview_widget"
         style="@android:style/TextAppearance.Medium"
+        android:layout_below="@+id/widget_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="2dp"

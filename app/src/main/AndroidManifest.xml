@@ -28,6 +28,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Settings.SettingsActivity"
+            android:label="@string/settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+
         <receiver
             android:name=".Widget.MacaoAppWidget"
             android:icon="@mipmap/ic_launcher"

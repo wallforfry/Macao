@@ -1,6 +1,7 @@
 package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.RectF;
@@ -31,8 +32,10 @@ import java.util.List;
 import java.util.Locale;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
+import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
 
 import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
@@ -234,6 +237,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 return true;
             case R.id.action_update_events:
                 this.retrieveEvents();
+                getActivity().startService(new Intent(this.getContext(), CalendarService.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
