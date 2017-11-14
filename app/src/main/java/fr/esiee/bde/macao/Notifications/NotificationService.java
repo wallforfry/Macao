@@ -57,7 +57,8 @@ public class NotificationService extends Service {
             retrieveEvents();
             Log.i("Notification", "Start");
             for (CalendarEvent event : events) {
-                if ((!notificationId.contains(event.getId())) && notificationStartString.contains(event.getStartString())) {
+                //if ((!notificationId.contains(event.getId())) && notificationStartString.contains(event.getStartString())) {
+                if (!notificationId.contains(event.getId())) {
                     Log.i("Notification", event.getName() + " : " + event.getRooms());
                     boolean notified = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("enable_calendar_notification", true);
                     if(notified) {
@@ -67,6 +68,9 @@ public class NotificationService extends Service {
                 ContentValues values = new ContentValues();
                 values.put("notified", true);
                 cupboard().withDatabase(this.database).update(CalendarEvent.class, values, "startString = ?", event.getStartString());*/
+                }
+                else{
+                    Log.d("Notification", "Don't notify "+event.getName()+" "+event.getRooms());
                 }
             }
         }
@@ -97,24 +101,31 @@ public class NotificationService extends Service {
 
     private void retrieveEvents(){
         Calendar calendar = Calendar.getInstance();
-        //calendar.add(Calendar.DAY_OF_YEAR, -1);
+
+        int minute_before_event = 30;
+        try {
+            minute_before_event = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("time_before_calendar_notification", "30"));
+        } catch (NumberFormatException e){
+            Log.e("Settings", "La préférence minute_before_event n'est pas un nombre");
+        }
+
         calendar.add(Calendar.HOUR, -1);
-        Date today = calendar.getTime();
-        Log.i("TIME", String.valueOf(calendar.getTime()));
-        //calendar.add(Calendar.HOUR, 10);
-        calendar.add(Calendar.HOUR, 1);
-        //calendar.add(Calendar.MINUTE, 30);
-        Log.i("TIME", String.valueOf(calendar.getTime()));
-        Date tomorrow = calendar.getTime();
+
+        Date startdate = calendar.getTime();
+        Log.i("TIME START", String.valueOf(startdate));
+
+        calendar.add(Calendar.MINUTE, -minute_before_event);
+        Date startdateminusMinutes = calendar.getTime();
+        Log.i("TIME START - MINUTES", String.valueOf(startdateminusMinutes));
 
         String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
         SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);
-        String dateStart = sdf.format(today);
-        String dateEnd = sdf.format(tomorrow);
+        String dateStartMinusMinutes = sdf.format(startdateminusMinutes);
+        String dateStart = sdf.format(startdate);
 
 
         events.clear();
-        Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and startString <= ? order by startString asc", dateStart, dateEnd).getCursor();
+        Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and startString <= ? order by startString asc", dateStartMinusMinutes, dateStart).getCursor();
         // For debug :
         //Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? order by startString asc", dateStart).getCursor();
         // or we can iterate all results
@@ -147,15 +158,8 @@ public class NotificationService extends Service {
             calendar.add(Calendar.HOUR_OF_DAY, 1);
             startHour= hdf.format(calendar.getTime());
 
-            int minute_before_event = 30;
-            try {
-                minute_before_event = Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("time_before_calendar_notification", "30"));
-            } catch (NumberFormatException e){
-                Log.e("Settings", "La préférence minute_before_event n'est pas un nombre");
-            }
-
             calendar.setTime(sdf.parse(endHour));
-            calendar.add(Calendar.MINUTE, minute_before_event);
+            calendar.add(Calendar.HOUR, 1);
             endHour = hdf.format(calendar.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
