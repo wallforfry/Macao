@@ -43,6 +43,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.lusfold.spinnerloading.SpinnerLoading;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -82,16 +83,16 @@ public class MainActivity extends AppCompatActivity
     private String id = "";
     private String authCode = "";
 
+    private NavigationView navigationView;
     TextView nameDrawer;
     TextView mailDrawer;
     ImageView pictureDrawer;
     ImageView backgroundDrawer;
+    private int selectedMenuItemId;
 
     private View mainView;
 
     private Fragment currentFragment = null;
-
-    private Bundle savedInstanceState;
 
     private SQLiteDatabase database;
 
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        this.navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         nameDrawer = (TextView) headerView.findViewById(R.id.nameDrawer);
         mailDrawer = (TextView) headerView.findViewById(R.id.mailDrawer);
@@ -172,13 +173,34 @@ public class MainActivity extends AppCompatActivity
                 .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
                 .check();
 
-        this.savedInstanceState = savedInstanceState;
+        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        loader.setVisibility(View.GONE);
 
-        //startService(new Intent(this, AutoStart.class));
-        startService(new Intent(this, CalendarService.class));
-        startService(new Intent(this, EventService.class));
-        startService(new Intent(this, NotificationService.class));
-        startService(new Intent(this, WidgetUpdateService.class));
+        if(savedInstanceState == null) {
+            //startService(new Intent(this, AutoStart.class));
+            startService(new Intent(this, CalendarService.class));
+            startService(new Intent(this, EventService.class));
+            startService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, WidgetUpdateService.class));
+
+            onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
+        }
+        else {
+            //onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
+            // Todo: select item in drawer when orientation change
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putInt("SelectedMenuItemId", selectedMenuItemId);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //selectedMenuItemId = savedInstanceState.getInt("SelectedMenuItemId");
     }
 
     @Override
@@ -205,27 +227,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
-        /*if (savedInstanceState == null) {
-            // The Activity is NOT being re-created so we can instantiate a new Fragment
-            // and add it to the Activity
-            Fragment fragment = new CalendarFragment();
 
-            switchFragment(fragment);
-
-        } else {
-            // The Activity IS being re-created so we don't need to instantiate the Fragment or add it,
-            // but if we need a reference to it, we can use the tag we passed to .replace
-            Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
-            switchFragment(fragment);
-        }*/
-        /*if(currentFragment == null){
-            switchFragment((Fragment) new CalendarFragment());
-        }*/
-        /*else{
-            Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
-            switchFragment(fragment);
-        }*/
-        switchFragment(((Fragment) new CalendarFragment()));
     }
 
     @Override
@@ -280,53 +282,69 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
 
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        switch(item.getItemId()){
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-            fragment = new CalendarFragment();
-        } else if (id == R.id.nav_gallery) {
-            fragment = new SignInFragment();
-
-        } else if (id == R.id.nav_slideshow) {
-            fragment = new RoomsFragment();
-
-        } else if (id == R.id.nav_jobs) {
-            fragment = new JobsFragment();
-
-        } else if (id == R.id.nav_manage) {
-            fragment = new EventsFragment();
-
-        } else if (id == R.id.nav_share) {
-            fragment = new AnnalesFragment();
-        } else if (id == R.id.nav_clubs) {
-            fragment = new ClubsFragment();
-        } else if (id == R.id.nav_send) {
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto","wallerand.delevacq@edu.esiee.fr", null));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
-        } else if (id == R.id.nav_settings) {
-            Intent i = new Intent(this, SettingsActivity.class);
-            startActivity(i);
+            case R.id.nav_calendar:
+                fragment = new CalendarFragment();
+                break;
+            case R.id.nav_signin:
+                fragment = new SignInFragment();
+                break;
+            case R.id.nav_rooms:
+                fragment = new RoomsFragment();
+                break;
+            case R.id.nav_jobs:
+                fragment = new JobsFragment();
+                break;
+            case R.id.nav_events:
+                fragment = new EventsFragment();
+                break;
+            case R.id.nav_annales:
+                fragment = new AnnalesFragment();
+                break;
+            case R.id.nav_clubs:
+                fragment = new ClubsFragment();
+                break;
+            case R.id.nav_send:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto","wallerand.delevacq@edu.esiee.fr", null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                break;
+            case R.id.nav_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                break;
         }
 
         if(fragment != null) {
-            switchFragment(fragment);
+            currentFragment = fragment;
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.replace(R.id.content_main, fragment, "FragmentSaved");
+            transaction.commit();
+
+            // Unchecked all items
+            int size = navigationView.getMenu().size();
+            for (int i = 0; i < size; i++) {
+                if(navigationView.getMenu().getItem(i).getSubMenu() != null) {
+                    int subSize = navigationView.getMenu().getItem(i).getSubMenu().size();
+                    for (int j = 0; j < subSize; j++) {
+                        navigationView.getMenu().getItem(i).getSubMenu().getItem(j).setChecked(false);
+                    }
+                }
+                navigationView.getMenu().getItem(i).setChecked(false);
+            }
+
+            item.setChecked(true);
+            setTitle(item.getTitle());
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
-    private void switchFragment(Fragment fragment){
-        currentFragment = fragment;
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.content_main, fragment, "FragmentSaved");
-        transaction.commit();
+        return false;
     }
 
     @Override
@@ -420,8 +438,8 @@ public class MainActivity extends AppCompatActivity
                 this.username = username;
                 this.firstname = firstname;
                 this.lastname = lastname;
-                this.mail = email;
-                this.isSignedIn = true;
+                mail = email;
+                isSignedIn = true;
 
                 this.nameDrawer.setText(username);
                 this.mailDrawer.setText(mail);
@@ -498,7 +516,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+        if (mProgressDialog != null) {
             mProgressDialog.hide();
         }
     }
@@ -506,13 +524,8 @@ public class MainActivity extends AppCompatActivity
     private void updateUI(boolean signedIn) {
         this.isSignedIn = signedIn;
 
-        Log.d("LOK", "1");
         if(currentFragment instanceof SignInFragment) {
             ((SignInFragment) currentFragment).connectUser(signedIn);
-        }
-        else if(currentFragment instanceof CalendarFragment) {
-            ((CalendarFragment) currentFragment).onSignedIn();
-            Log.d("LOK", "2");
         }
     }
 

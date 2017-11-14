@@ -149,18 +149,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         return view;
     }
 
-    public void onSignedIn(){
-        /*if(!((MainActivity) this.getActivity()).isSignedIn()){
-            ((OnFragmentInteractionListener) this.getActivity()).makeSnackBar("Veuillez vous connecter");
-            loader.setVisibility(View.GONE);
-        //}*/
-        Log.d("LOG", "3");
-        //getEvents();
-        retrieveEvents();
-        loader.setVisibility(View.GONE);
-    }
-
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
