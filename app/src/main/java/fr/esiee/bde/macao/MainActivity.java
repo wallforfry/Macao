@@ -154,13 +154,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onPermissionGranted() {
                 //The user have conceded permission
-                makeSnackBar("Permissions Granted");
+                //makeSnackBar("Permissions Granted");
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                 //close the app or do whatever you want
-                makeSnackBar("Permission Denied");
+                makeSnackBar("Permissions manquantes..");
             }
         };
 
