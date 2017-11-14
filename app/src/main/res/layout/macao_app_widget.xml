@@ -24,6 +24,7 @@
         android:layout_below="@+id/widget_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="6dp"
         android:divider="@null">
     </ListView>
 
