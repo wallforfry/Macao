@@ -25,8 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="6dp"
-        android:divider="@null"
-        debug:listitem="@layout/widget_list_row">
+        android:divider="@null">
     </ListView>
 
 </RelativeLayout>
