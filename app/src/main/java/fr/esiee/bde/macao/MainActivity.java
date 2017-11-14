@@ -306,11 +306,16 @@ public class MainActivity extends AppCompatActivity
                 fragment = new ClubsFragment();
                 break;
             case R.id.nav_send:
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                         "mailto","wallerand.delevacq@edu.esiee.fr", null));
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
-                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));*/
+
+                String url = "https://macao.ngdesk.com/#/login";
+                Intent web_intent = new Intent(Intent.ACTION_VIEW);
+                web_intent.setData(Uri.parse(url));
+                startActivity(web_intent);
                 break;
             case R.id.nav_settings:
                 Intent i = new Intent(this, SettingsActivity.class);
