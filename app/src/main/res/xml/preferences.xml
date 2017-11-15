@@ -8,8 +8,8 @@
     </PreferenceCategory>
     <CheckBoxPreference
         android:key="enable_calendar_notification"
-        android:title="Activer les notification"
-        android:summary="Active les notification de l'agenda"
+        android:title="Activer les notifications"
+        android:summary="Active les notifications de l'agenda"
         android:defaultValue="true"/>
 
     <EditTextPreference
