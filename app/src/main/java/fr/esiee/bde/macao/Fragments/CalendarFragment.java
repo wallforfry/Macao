@@ -252,9 +252,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                     weekday = String.valueOf(weekday.charAt(0));
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
-
             @Override
-            public String interpretTime(int hour) {
+            public String interpretTime(int hour, int minute) {
                 //return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
                 return hour +"h";
             }
