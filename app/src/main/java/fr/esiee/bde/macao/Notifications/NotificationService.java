@@ -114,7 +114,7 @@ public class NotificationService extends Service {
         Date startdate = calendar.getTime();
         Log.i("TIME START", String.valueOf(startdate));
 
-        calendar.add(Calendar.MINUTE, -minute_before_event);
+        calendar.add(Calendar.MINUTE, minute_before_event);
         Date startdateminusMinutes = calendar.getTime();
         Log.i("TIME START - MINUTES", String.valueOf(startdateminusMinutes));
 
