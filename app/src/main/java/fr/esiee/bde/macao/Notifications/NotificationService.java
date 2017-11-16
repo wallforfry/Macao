@@ -125,7 +125,8 @@ public class NotificationService extends Service {
 
 
         events.clear();
-        Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and startString <= ? order by startString asc", dateStartMinusMinutes, dateStart).getCursor();
+        Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and startString <= ? order by startString asc",  dateStart, dateStartMinusMinutes).getCursor();
+        Log.d("Notification", cursor.getCount()+" notifications preloaded");
         // For debug :
         //Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? order by startString asc", dateStart).getCursor();
         // or we can iterate all results
