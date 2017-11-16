@@ -20,6 +20,8 @@
         app:headerRowBackgroundColor="#ffefefef"
         app:dayBackgroundColor="#05000000"
         app:todayBackgroundColor="#1848adff"
-        app:headerColumnBackground="#ffffffff"/>
+        app:headerColumnBackground="#ffffffff"
+        app:minTime="7"
+        app:maxTime="20"/>
 
 </FrameLayout>
