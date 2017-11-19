@@ -85,7 +85,7 @@ public class Event {
     public String getHourStart(){
         GregorianCalendar calendar = new GregorianCalendar();
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
-        SimpleDateFormat hoursformat = new SimpleDateFormat("H'h'm");
+        SimpleDateFormat hoursformat = new SimpleDateFormat("HH'h'mm");
         try {
             calendar.setTime(dateformat.parse(this.start));
             return hoursformat.format(calendar.getTime());
@@ -136,7 +136,7 @@ public class Event {
     public String getHourEnd(){
         GregorianCalendar calendar = new GregorianCalendar();
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
-        SimpleDateFormat hoursformat = new SimpleDateFormat("H'h'm");
+        SimpleDateFormat hoursformat = new SimpleDateFormat("HH'h'mm");
         try {
             calendar.setTime(dateformat.parse(this.end));
             return hoursformat.format(calendar.getTime());
