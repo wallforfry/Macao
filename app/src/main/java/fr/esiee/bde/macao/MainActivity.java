@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import fr.esiee.bde.macao.Calendar.CalendarService;
+import fr.esiee.bde.macao.Events.Event;
 import fr.esiee.bde.macao.Events.EventService;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
@@ -70,6 +71,7 @@ import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
 import static android.support.v4.app.NotificationCompat.DEFAULT_ALL;
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 
 public class MainActivity extends AppCompatActivity

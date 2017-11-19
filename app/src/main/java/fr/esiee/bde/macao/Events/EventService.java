@@ -107,7 +107,7 @@ public class EventService extends Service {
                             if(newsObject.has("photo")) {
                                 event.setImage(String.valueOf(((JSONObject) newsObject.get("photo")).get("url_thumbnail")));
                             }
-                            event.setPublicationDate(String.valueOf(newsObject.get("created_at")));
+                            event.setPublicationDate(String.valueOf(newsObject.get("publication_date_start")));
                             event.setSlug(String.valueOf(newsObject.get("slug")));
                             if(jsonObject.has("place")) {
                                 event.setPlace(String.valueOf(jsonObject.get("place")));
