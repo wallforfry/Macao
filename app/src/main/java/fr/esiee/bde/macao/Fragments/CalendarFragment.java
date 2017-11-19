@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
@@ -37,6 +38,7 @@ import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
+import me.drakeet.materialdialog.MaterialDialog;
 
 import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
@@ -266,7 +268,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(this.getActivity().getApplicationContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.getActivity().getApplicationContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+        openDialog(event);
     }
 
     @Override
@@ -329,6 +332,38 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
         //noinspection WrongConstant
         return event != null && ((event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1));
+    }
+
+    private void openDialog(WeekViewEvent event){
+
+        int startMinuteValue = event.getStartTime().get(Calendar.MINUTE);
+        String startMinute = String.valueOf(startMinuteValue);
+        if(startMinuteValue < 10)
+            startMinute = "0"+startMinuteValue;
+
+        int endMinuteValue = event.getEndTime().get(Calendar.MINUTE);
+        String endMinute = String.valueOf(endMinuteValue);
+        if(endMinuteValue < 10)
+            endMinute = "0"+endMinuteValue;
+
+        final MaterialDialog mMaterialDialog = new MaterialDialog(this.getContext());
+                mMaterialDialog
+                        .setTitle("De "+event.getStartTime().get(Calendar.HOUR_OF_DAY)+"h"+startMinute+" à "+event.getEndTime().get(Calendar.HOUR_OF_DAY)+"h"+endMinute)
+                        .setMessage(event.getName())
+                        .setPositiveButton("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mMaterialDialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mMaterialDialog.dismiss();
+                            }
+                        });
+
+        mMaterialDialog.show();
     }
 }
 
