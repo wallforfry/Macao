@@ -153,14 +153,14 @@ public class EventService extends Service {
         });
     }
 
-    private void createNotification(Event event){
+    public void createNotification(Event event){
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         final Intent launchNotifiactionIntent = new Intent(this, MainActivity.class);
         launchNotifiactionIntent.putExtra("SelectedMenuItem", 0);
         launchNotifiactionIntent.putExtra("SelectedSubMenuItem", 1);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, launchNotifiactionIntent,
+                (int) System.currentTimeMillis(), launchNotifiactionIntent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -172,6 +172,7 @@ public class EventService extends Service {
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle("Nouvel évènement")
                 .setContentText(event.getTitle())
+                .setStyle(new Notification.BigTextStyle().bigText(event.getTitle()+"\n"+event.getTimeString()))
                 .setContentIntent(pendingIntent)
                 .setDefaults(DEFAULT_ALL)
                 .setOnlyAlertOnce(true)
