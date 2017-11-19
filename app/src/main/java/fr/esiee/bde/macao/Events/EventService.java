@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -156,6 +157,8 @@ public class EventService extends Service {
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         final Intent launchNotifiactionIntent = new Intent(this, MainActivity.class);
+        launchNotifiactionIntent.putExtra("SelectedMenuItem", 0);
+        launchNotifiactionIntent.putExtra("SelectedSubMenuItem", 1);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, launchNotifiactionIntent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -165,13 +168,21 @@ public class EventService extends Service {
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("Titre")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_launcher_transparent)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle("Nouvel évènement")
                 .setContentText(event.getTitle())
                 .setContentIntent(pendingIntent)
                 .setDefaults(DEFAULT_ALL)
-                .setOnlyAlertOnce(true);
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setColor(getResources().getColor(R.color.colorPrimary));
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                builder.setColor(getColor(R.color.colorPrimary));
+        }
 
         mNotification.notify(event.getId(), builder.build());
 

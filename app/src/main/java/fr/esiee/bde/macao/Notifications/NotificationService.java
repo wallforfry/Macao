@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -142,6 +143,8 @@ public class NotificationService extends Service {
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         final Intent launchNotifiactionIntent = new Intent(this, MainActivity.class);
+        launchNotifiactionIntent.putExtra("SelectedMenuItem", 1);
+        launchNotifiactionIntent.putExtra("SelectedSubMenuItem", 0);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, launchNotifiactionIntent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -169,13 +172,22 @@ public class NotificationService extends Service {
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker("Titre")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_launcher_transparent)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(event.getName()+" : "+event.getRooms())
                 .setContentText(startHour+" - "+endHour+" "+event.getId())
                 .setContentIntent(pendingIntent)
                 .setDefaults(DEFAULT_ALL)
-                .setOnlyAlertOnce(true);
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setColor(getResources().getColor(R.color.colorPrimary));
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            builder.setColor(getColor(R.color.colorPrimary));
+        }
 
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.setSmallIcon(Icon.createWithBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));

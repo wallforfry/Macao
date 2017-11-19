@@ -51,10 +51,9 @@
         android:icon="@drawable/ic_menu_send"
         android:title="@string/rapport_de_bug" />
 
-    <item android:title="Communicate"
-        android:visible="false">
-        <menu>
-        </menu>
-    </item>
+    <item android:title="Test"
+        android:id="@+id/test"
+        android:icon="@drawable/ic_refresh_white_24dp"
+        android:visible="false"/>
 
 </menu>

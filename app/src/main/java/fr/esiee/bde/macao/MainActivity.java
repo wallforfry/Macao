@@ -6,12 +6,18 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -62,6 +68,8 @@ import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
+
+import static android.support.v4.app.NotificationCompat.DEFAULT_ALL;
 
 
 public class MainActivity extends AppCompatActivity
@@ -188,6 +196,12 @@ public class MainActivity extends AppCompatActivity
         else {
             //onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
             // Todo: select item in drawer when orientation change
+        }
+
+        if(getIntent() != null) {
+            int menuItem = getIntent().getIntExtra("SelectedMenuItem", 1);
+            int subMenuItem = getIntent().getIntExtra("SelectedSubMenuItem", 0);
+            onNavigationItemSelected(navigationView.getMenu().getItem(menuItem).getSubMenu().getItem(subMenuItem));
         }
     }
 
@@ -320,6 +334,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_settings:
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
+                break;
+            case R.id.test:
+                //do something for test
                 break;
         }
 
