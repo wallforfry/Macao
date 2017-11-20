@@ -185,6 +185,10 @@ public class EventService extends Service {
                 builder.setColor(getColor(R.color.colorPrimary));
         }
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            builder.setShowWhen(true);
+        }
+
         mNotification.notify(event.getId(), builder.build());
 
         event.setNotified(true);

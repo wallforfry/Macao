@@ -189,6 +189,10 @@ public class NotificationService extends Service {
             builder.setColor(getColor(R.color.colorPrimary));
         }
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            builder.setShowWhen(true);
+        }
+
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.setSmallIcon(Icon.createWithBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
         }*/
