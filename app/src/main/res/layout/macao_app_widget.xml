@@ -27,5 +27,4 @@
         android:paddingBottom="6dp"
         android:divider="@null">
     </ListView>
-
 </RelativeLayout>

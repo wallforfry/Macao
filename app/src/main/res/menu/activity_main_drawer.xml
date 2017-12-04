@@ -44,6 +44,7 @@
     </item>
     <item
         android:id="@+id/nav_settings"
+        android:visible="false"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/settings" />
     <item

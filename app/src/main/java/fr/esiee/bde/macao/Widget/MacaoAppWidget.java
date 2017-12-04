@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +44,7 @@ public class MacaoAppWidget extends AppWidgetProvider {
 
             rv.setRemoteAdapter(appWidgetId, R.id.listview_widget, intent);
 
-            //rv.setEmptyView(R.id.list, R.id.empty_view);
+            //rv.setEmptyView(appWidgetId, R.id.widget_empty_view);
             appWidgetManager.updateAppWidget(appWidgetId, rv);
     }
 

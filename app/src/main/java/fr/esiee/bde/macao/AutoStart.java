@@ -24,7 +24,7 @@ public class AutoStart extends BroadcastReceiver {
 
         context.startService(new Intent(context, CalendarService.class));
         context.startService(new Intent(context, EventService.class));
-        context.startService(new Intent(context, NotificationService.class));
+        //context.startService(new Intent(context, NotificationService.class));
         context.startService(new Intent(context, WidgetUpdateService.class));
     }
 }
