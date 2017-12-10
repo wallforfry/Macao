@@ -172,13 +172,14 @@ public class EventsFragment extends Fragment {
     private void retrieveEvents(){
         eventsList.clear();
         //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
-        Cursor cursor = cupboard().withDatabase(database).query(Event.class).getCursor();
+        Cursor cursor = cupboard().withDatabase(database).query(Event.class).orderBy("eventId desc").getCursor();
         // or we can iterate all results
         Iterable<Event> itr = cupboard().withCursor(cursor).iterate(Event.class);
         for (Event event: itr) {
             // do something with book
             //WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
             eventsList.add(event);
+            Log.i("Event", event.getTitle());
         }
 
         loader.setVisibility(View.GONE);

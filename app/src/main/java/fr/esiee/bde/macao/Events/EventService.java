@@ -99,9 +99,9 @@ public class EventService extends Service {
                         JSONObject newsObject = (JSONObject) events.get(i);
                         try {
                             JSONObject jsonObject = (JSONObject) newsObject.get("event");
-                            Log.d("EVENT BDE", String.valueOf(jsonObject.get("title")));
+                            Log.d("EVENT BDE", "ID : "+String.valueOf(newsObject.get("id"))+" "+String.valueOf(jsonObject.get("title")));
                             event.setId((int) jsonObject.get("id"));
-                            event.setTitle(String.valueOf(jsonObject.get("title")));
+                            event.setTitle(String.valueOf(newsObject.get("title")));
                             event.setStart(String.valueOf(jsonObject.get("start")));
                             event.setEnd(String.valueOf(jsonObject.get("end")));
                             if(newsObject.has("photo")) {
@@ -113,7 +113,7 @@ public class EventService extends Service {
                                 event.setPlace(String.valueOf(jsonObject.get("place")));
                             }
 
-                            Event old = cupboard().withDatabase(database).query(Event.class).withSelection("title = ?", event.getTitle()).get();
+                            Event old = cupboard().withDatabase(database).query(Event.class).withSelection("eventId = ?", String.valueOf(event.getId())).get();
 
                             try {
                                 Calendar calendar = Calendar.getInstance();
@@ -133,6 +133,11 @@ public class EventService extends Service {
                             }
 
                             if(old == null) {
+                                cupboard().withDatabase(database).put(event);
+                            }
+                            else{
+                                event.setNotified(old.isNotified());
+                                cupboard().withDatabase(database).delete(Event.class, "eventId = ?", String.valueOf(old.getId()));
                                 cupboard().withDatabase(database).put(event);
                             }
 
