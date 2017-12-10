@@ -88,7 +88,7 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
         loader.setItemCount(8);
-        loader.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.GONE);
 
         this.connectUser(((MainActivity) this.getActivity()).isSignedIn());
 
