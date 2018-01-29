@@ -1,27 +1,30 @@
 package fr.esiee.bde.macao;
 
-import android.*;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,7 +37,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -53,6 +55,9 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import fr.esiee.bde.macao.Calendar.CalendarService;
+import fr.esiee.bde.macao.Events.Event;
+import fr.esiee.bde.macao.Events.EventService;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
@@ -61,6 +66,12 @@ import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.Notifications.NotificationService;
+import fr.esiee.bde.macao.Settings.SettingsActivity;
+import fr.esiee.bde.macao.Widget.WidgetUpdateService;
+
+import static android.support.v4.app.NotificationCompat.DEFAULT_ALL;
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 
 public class MainActivity extends AppCompatActivity
@@ -72,26 +83,26 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
-    private boolean isSignedIn = false;
+    private static boolean isSignedIn = false;
 
     private String username = "";
     private String firstname = "";
     private String lastname = "";
-    private String mail = "";
+    private static String mail = "";
     private String idToken = "";
     private String id = "";
     private String authCode = "";
 
+    private NavigationView navigationView;
     TextView nameDrawer;
     TextView mailDrawer;
     ImageView pictureDrawer;
     ImageView backgroundDrawer;
+    private int selectedMenuItemId;
 
     private View mainView;
 
     private Fragment currentFragment = null;
-
-    private Bundle savedInstanceState;
 
     private SQLiteDatabase database;
 
@@ -123,7 +134,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        this.navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         nameDrawer = (TextView) headerView.findViewById(R.id.nameDrawer);
         mailDrawer = (TextView) headerView.findViewById(R.id.mailDrawer);
@@ -154,13 +165,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onPermissionGranted() {
                 //The user have conceded permission
-                makeSnackBar("Permissions Granted");
+                //makeSnackBar("Permissions Granted");
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
                 //close the app or do whatever you want
-                makeSnackBar("Permission Denied");
+                makeSnackBar("Permissions manquantes..");
             }
         };
 
@@ -172,7 +183,40 @@ public class MainActivity extends AppCompatActivity
                 .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
                 .check();
 
-        this.savedInstanceState = savedInstanceState;
+        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        loader.setVisibility(View.GONE);
+
+        if(savedInstanceState == null) {
+            //startService(new Intent(this, AutoStart.class));
+            startService(new Intent(this, CalendarService.class));
+            startService(new Intent(this, EventService.class));
+            //startService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, WidgetUpdateService.class));
+
+            onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
+        }
+        else {
+            //onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
+            // Todo: select item in drawer when orientation change
+        }
+
+        if(getIntent() != null) {
+            int menuItem = getIntent().getIntExtra("SelectedMenuItem", 1);
+            int subMenuItem = getIntent().getIntExtra("SelectedSubMenuItem", 0);
+            onNavigationItemSelected(navigationView.getMenu().getItem(menuItem).getSubMenu().getItem(subMenuItem));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putInt("SelectedMenuItemId", selectedMenuItemId);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //selectedMenuItemId = savedInstanceState.getInt("SelectedMenuItemId");
     }
 
     @Override
@@ -199,27 +243,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
-        /*if (savedInstanceState == null) {
-            // The Activity is NOT being re-created so we can instantiate a new Fragment
-            // and add it to the Activity
-            Fragment fragment = new CalendarFragment();
 
-            switchFragment(fragment);
-
-        } else {
-            // The Activity IS being re-created so we don't need to instantiate the Fragment or add it,
-            // but if we need a reference to it, we can use the tag we passed to .replace
-            Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
-            switchFragment(fragment);
-        }*/
-        /*if(currentFragment == null){
-            switchFragment((Fragment) new CalendarFragment());
-        }*/
-        /*else{
-            Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentByTag("FragmentSaved");
-            switchFragment(fragment);
-        }*/
-        switchFragment(((Fragment) new CalendarFragment()));
     }
 
     @Override
@@ -274,50 +298,77 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
 
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        switch(item.getItemId()){
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-            fragment = new CalendarFragment();
-        } else if (id == R.id.nav_gallery) {
-            fragment = new SignInFragment();
+            case R.id.nav_calendar:
+                fragment = new CalendarFragment();
+                break;
+            case R.id.nav_signin:
+                fragment = new SignInFragment();
+                break;
+            case R.id.nav_rooms:
+                fragment = new RoomsFragment();
+                break;
+            case R.id.nav_jobs:
+                fragment = new JobsFragment();
+                break;
+            case R.id.nav_events:
+                fragment = new EventsFragment();
+                break;
+            case R.id.nav_annales:
+                fragment = new AnnalesFragment();
+                break;
+            case R.id.nav_clubs:
+                fragment = new ClubsFragment();
+                break;
+            case R.id.nav_send:
+                /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto","wallerand.delevacq@edu.esiee.fr", null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));*/
 
-        } else if (id == R.id.nav_slideshow) {
-            fragment = new RoomsFragment();
-
-        } else if (id == R.id.nav_jobs) {
-            fragment = new JobsFragment();
-
-        } else if (id == R.id.nav_manage) {
-            fragment = new EventsFragment();
-
-        } else if (id == R.id.nav_share) {
-            fragment = new AnnalesFragment();
-        } else if (id == R.id.nav_clubs) {
-            fragment = new ClubsFragment();
-        } else if (id == R.id.nav_send) {
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto","wallerand.delevacq@edu.esiee.fr", null));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
-            emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                String url = "https://macao.ngdesk.com/#/login";
+                Intent web_intent = new Intent(Intent.ACTION_VIEW);
+                web_intent.setData(Uri.parse(url));
+                startActivity(web_intent);
+                break;
+            case R.id.nav_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                break;
+            case R.id.test:
+                //do something for test
+                break;
         }
 
         if(fragment != null) {
-            switchFragment(fragment);
+            currentFragment = fragment;
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.replace(R.id.content_main, fragment, "FragmentSaved");
+            transaction.commit();
+
+            // Unchecked all items
+            int size = navigationView.getMenu().size();
+            for (int i = 0; i < size; i++) {
+                if(navigationView.getMenu().getItem(i).getSubMenu() != null) {
+                    int subSize = navigationView.getMenu().getItem(i).getSubMenu().size();
+                    for (int j = 0; j < subSize; j++) {
+                        navigationView.getMenu().getItem(i).getSubMenu().getItem(j).setChecked(false);
+                    }
+                }
+                navigationView.getMenu().getItem(i).setChecked(false);
+            }
+
+            item.setChecked(true);
+            setTitle(item.getTitle());
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
-    private void switchFragment(Fragment fragment){
-        currentFragment = fragment;
-
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.content_main, fragment, "FragmentSaved");
-        transaction.commit();
+        return false;
     }
 
     @Override
@@ -349,6 +400,12 @@ public class MainActivity extends AppCompatActivity
                         idToken = "";
                         authCode = "";
                         updateUI(false);
+
+                        SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("mail", "");
+                        editor.commit();
+
                         // [END_EXCLUDE]
                     }
                 });
@@ -405,8 +462,8 @@ public class MainActivity extends AppCompatActivity
                 this.username = username;
                 this.firstname = firstname;
                 this.lastname = lastname;
-                this.mail = email;
-                this.isSignedIn = true;
+                mail = email;
+                isSignedIn = true;
 
                 this.nameDrawer.setText(username);
                 this.mailDrawer.setText(mail);
@@ -422,6 +479,14 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 //mStatusTextView.setText(username);
+
+                //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("mail", email);
+                editor.commit();
+
+                startService(new Intent(this, CalendarService.class));
 
                 updateUI(true);
             } else {
@@ -475,7 +540,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+        if (mProgressDialog != null) {
             mProgressDialog.hide();
         }
     }
@@ -483,13 +548,8 @@ public class MainActivity extends AppCompatActivity
     private void updateUI(boolean signedIn) {
         this.isSignedIn = signedIn;
 
-        Log.d("LOK", "1");
         if(currentFragment instanceof SignInFragment) {
             ((SignInFragment) currentFragment).connectUser(signedIn);
-        }
-        else if(currentFragment instanceof CalendarFragment) {
-            ((CalendarFragment) currentFragment).onSignedIn();
-            Log.d("LOK", "2");
         }
     }
 
@@ -533,7 +593,7 @@ public class MainActivity extends AppCompatActivity
         snackbar.show();
     }
 
-    public boolean isSignedIn() {
+    public static boolean isSignedIn() {
         return isSignedIn;
     }
 
@@ -549,7 +609,7 @@ public class MainActivity extends AppCompatActivity
         return idToken;
     }
 
-    public String getMail() {
+    public static String getMail() {
         return mail;
     }
 

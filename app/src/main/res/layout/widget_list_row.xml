@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:debug="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="60dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="0dp"
+    android:layout_marginLeft="2dp"
+    android:layout_marginRight="2dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:id="@+id/widget_recycler"
+    android:gravity="center"
+    debug:background="@color/colorPrimary">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="2dp"
+        android:id="@+id/widget_starttime"
+        android:textColor="@color/cardview_light_background"
+        debug:text="16:00"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="2dp"
+        android:id="@+id/widget_endtime"
+        android:layout_below="@+id/widget_starttime"
+        android:textColor="@color/cardview_light_background"
+        debug:text="17:00"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:id="@+id/widget_item_text"
+        android:layout_toRightOf="@+id/widget_starttime"
+        android:layout_toLeftOf="@+id/widget_room"
+        android:layout_alignTop="@+id/widget_starttime"
+        android:layout_alignBottom="@+id/widget_starttime"
+        android:ellipsize="marquee"
+        android:textColor="@color/cardview_light_background"
+        debug:text="Nom et info du cours"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:id="@+id/widget_prof"
+        android:layout_toRightOf="@+id/widget_starttime"
+        android:layout_toLeftOf="@+id/widget_room"
+        android:layout_alignTop="@+id/widget_endtime"
+        android:layout_alignBottom="@+id/widget_endtime"
+        android:ellipsize="marquee"
+        android:textColor="@color/cardview_light_background"
+        debug:text="Nom de l'unitée"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/widget_room"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:textColor="@color/cardview_light_background"
+        debug:text="1001"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

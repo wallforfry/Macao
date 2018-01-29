@@ -1,6 +1,7 @@
 package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.RectF;
@@ -22,32 +23,24 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 import com.lusfold.spinnerloading.SpinnerLoading;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
+import java.util.StringTokenizer;
 
-import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
+import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.DataBaseHelper;
-import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.MainActivity;
+import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
+import me.drakeet.materialdialog.MaterialDialog;
 
-import static android.graphics.Color.parseColor;
+import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -153,21 +146,10 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
         //getGroups();
         retrieveEvents();
-        getEvents();
+        //getEvents();
 
         return view;
     }
-
-    public void onSignedIn(){
-        /*if(!((MainActivity) this.getActivity()).isSignedIn()){
-            ((OnFragmentInteractionListener) this.getActivity()).makeSnackBar("Veuillez vous connecter");
-            loader.setVisibility(View.GONE);
-        //}*/
-        Log.d("LOG", "3");
-        getEvents();
-        loader.setVisibility(View.GONE);
-    }
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -244,7 +226,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 return true;
             case R.id.action_update_events:
-                this.getEvents();
+                this.retrieveEvents();
+                getActivity().startService(new Intent(this.getContext(), CalendarService.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -271,9 +254,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                     weekday = String.valueOf(weekday.charAt(0));
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
-
             @Override
-            public String interpretTime(int hour) {
+            public String interpretTime(int hour, int minute) {
                 //return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
                 return hour +"h";
             }
@@ -286,7 +268,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(this.getActivity().getApplicationContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.getActivity().getApplicationContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+        openDialog(event);
     }
 
     @Override
@@ -332,104 +315,6 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
 
     }
 
-    public void getGroups(){
-        loader.setVisibility(View.VISIBLE);
-        RequestParams rp = new RequestParams();
-        //rp.add("username", "aaa"); rp.add("password", "aaa@123");
-        String username = ((MainActivity) this.getActivity()).getUsername();
-        HttpUtils.getByUrl("https://bde.esiee.fr/agenda/groups/" + username + ".json", rp, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // If the response is JSONObject instead of expected JSONArray
-                Log.d("asd", "---------------- this is response : " + response);
-                try {
-                    JSONObject serverResp = new JSONObject(response.toString());
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                // Pull out the first event on the public timeline
-                //getEvents(timeline);
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                mListener.makeSnackBar("Connectez vous d'abord sur le site");
-                loader.setVisibility(View.GONE);
-            }
-
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                loader.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    private void getEvents(){
-        loader.setVisibility(View.VISIBLE);
-        if(!((MainActivity) this.getActivity()).isSignedIn()){
-            mListener.makeSnackBar("Veuillez vous connecter");
-            loader.setVisibility(View.GONE);
-        }
-        else {
-            String mail = ((MainActivity) this.getActivity()).getMail();
-            RequestParams rp = new RequestParams();
-            rp.add("mail", mail);
-
-            HttpUtils.postByUrl("http://ade.wallforfry.fr/api/ade-esiee/agenda", rp, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    // If the response is JSONObject instead of expected JSONArray
-                    Log.d("asd", "---------------- this is response : " + response);
-                    try {
-                        JSONObject serverResp = new JSONObject(response.toString());
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
-                    // Pull out the first event on the public timeline
-                    try {
-                        if(!((JSONObject) timeline.get(0)).has("error")) {
-                            cupboard().withDatabase(database).delete(CalendarEvent.class, null);
-                            for (int i = 0; i < timeline.length(); i++) {
-                                JSONObject obj = (JSONObject) timeline.get(i);
-                                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-                                dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                String start = obj.get("start").toString();
-                                String end = obj.get("end").toString();
-
-                                String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
-                                String name = obj.get("name").toString();
-                                WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
-                                CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
-
-                                //events.add(event);
-                                cupboard().withDatabase(database).put(calendarEvent);
-
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    retrieveEvents();
-                    //mListener.makeSnackBar("Agenda à jour");
-                    loader.setVisibility(View.GONE);
-                }
-            });
-        }
-    }
-
     private void retrieveEvents(){
         events.clear();
         //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
@@ -444,51 +329,41 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         mWeekView.notifyDatasetChanged();
     }
 
-    private WeekViewEvent createWeekViewEvent(int id, String title, String startString, String endString, String name){
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-        dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date start = null;
-        Date end = null;
-        try {
-            start = dateformat.parse(startString);
-            end = dateformat.parse(endString);
-
-            Calendar startTime = Calendar.getInstance();
-            startTime.set(Calendar.DAY_OF_MONTH, start.getDate());
-            startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
-            startTime.set(Calendar.MINUTE, start.getMinutes());
-            startTime.set(Calendar.MONTH, start.getMonth());
-            startTime.set(Calendar.YEAR, start.getYear()+1900);
-            Calendar endTime = (Calendar) startTime.clone();
-            endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
-            endTime.set(Calendar.MINUTE, end.getMinutes()-1);
-            endTime.set(Calendar.MONTH, end.getMonth());
-            endTime.set(Calendar.YEAR, start.getYear()+1900);
-            WeekViewEvent event = new WeekViewEvent(id, title, startTime, endTime);
-            if(name.contains("CTRL")){
-                event.setColor(parseColor("#e74c3c"));
-            }
-            else if(name.contains("TD")){
-                event.setColor(parseColor("#f39c12"));
-            }
-            else if(name.contains("PERS")){
-                event.setColor(parseColor("#95a5a6"));
-            }
-            else if(name.contains("TP")){
-                event.setColor(parseColor("#27ae60"));
-            }
-            else {
-                event.setColor(parseColor("#35a9fb"));
-            }
-            return event;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
         //noinspection WrongConstant
         return event != null && ((event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1));
+    }
+
+    private void openDialog(WeekViewEvent event){
+
+        int startMinuteValue = event.getStartTime().get(Calendar.MINUTE);
+        String startMinute = String.valueOf(startMinuteValue);
+        if(startMinuteValue < 10)
+            startMinute = "0"+startMinuteValue;
+
+        int endMinuteValue = event.getEndTime().get(Calendar.MINUTE);
+        String endMinute = String.valueOf(endMinuteValue);
+        if(endMinuteValue < 10)
+            endMinute = "0"+endMinuteValue;
+
+        final MaterialDialog mMaterialDialog = new MaterialDialog(this.getContext());
+                mMaterialDialog
+                        .setTitle("De "+event.getStartTime().get(Calendar.HOUR_OF_DAY)+"h"+startMinute+" à "+event.getEndTime().get(Calendar.HOUR_OF_DAY)+"h"+endMinute)
+                        .setMessage(event.getName())
+                        .setPositiveButton("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mMaterialDialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mMaterialDialog.dismiss();
+                            }
+                        });
+
+        mMaterialDialog.show();
     }
 }
 

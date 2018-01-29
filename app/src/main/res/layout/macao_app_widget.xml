@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:debug="http://schemas.android.com/tools"
+    android:background="@drawable/list_row_rounded_corner"
+    android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/widget_title"
+        style="@android:style/TextAppearance.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:textColor="@color/cardview_light_background"
+        android:background="@drawable/list_row_rounded_corner_top"
+        android:backgroundTint="@color/colorPrimary"
+        debug:text="12 Novembre 2017">
+    </TextView>
+
+    <ListView
+        android:id="@+id/listview_widget"
+        style="@android:style/TextAppearance.Medium"
+        android:layout_below="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="6dp"
+        android:divider="@null">
+    </ListView>
+</RelativeLayout>

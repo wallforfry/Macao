@@ -11,7 +11,10 @@ import java.util.Locale;
  */
 
 public class Event {
+    private Long _id;
+    private int eventId;
     private String title, start, end, place = "", image = "https://bde.esiee.fr/bundles/applicationbde/img/couverture.png", content, slug, publicationDate;
+    private boolean notified = false;
 
     public Event(){
 
@@ -82,7 +85,7 @@ public class Event {
     public String getHourStart(){
         GregorianCalendar calendar = new GregorianCalendar();
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
-        SimpleDateFormat hoursformat = new SimpleDateFormat("H'h'm");
+        SimpleDateFormat hoursformat = new SimpleDateFormat("HH'h'mm");
         try {
             calendar.setTime(dateformat.parse(this.start));
             return hoursformat.format(calendar.getTime());
@@ -133,7 +136,7 @@ public class Event {
     public String getHourEnd(){
         GregorianCalendar calendar = new GregorianCalendar();
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
-        SimpleDateFormat hoursformat = new SimpleDateFormat("H'h'm");
+        SimpleDateFormat hoursformat = new SimpleDateFormat("HH'h'mm");
         try {
             calendar.setTime(dateformat.parse(this.end));
             return hoursformat.format(calendar.getTime());
@@ -206,5 +209,21 @@ public class Event {
 
     public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
+    }
+
+    public int getId() {
+        return eventId;
+    }
+
+    public void setId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public boolean isNotified() {
+        return notified;
+    }
+
+    public void setNotified(boolean notified) {
+        this.notified = notified;
     }
 }

@@ -1,12 +1,7 @@
 <resources>
     <string name="app_name">Macao</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
-
-
+    <!-- Google Signin -->
     <string name="title_text">Google Sign-In\nQuickstart</string>
 
     <string name="signed_in_fmt">Signed in as: %s</string>
@@ -27,23 +22,35 @@
     <string name="disconnect">Disconnect</string>
     <string name="refresh_token">Get Fresh Token</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="actualiser">Actualiser</string>
-    <string name="today">Aujourd\'hui</string>
+    <!-- Main Menu -->
+    <string name="action_settings">Settings</string>
+
+    <!-- Navigation Drawer -->
     <string name="agenda">Agenda</string>
+    <string name="annales">Annales</string>
     <string name="connexion">Connexion</string>
     <string name="rooms">Salles libres</string>
     <string name="evenements">Evenements</string>
     <string name="jobs">Jobs</string>
+    <string name="settings">Paramètres</string>
+    <string name="les_clubs">Les Clubs</string>
+    <string name="rapport_de_bug">Signaler un bug</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!-- Annales -->
     <string name="annales_client_id">2_4r1x05vo8oiswwgwk8okcgwo8s0o40c4cskkok8wwcs8k4woc4</string>
     <string name="annales_secret">25yyrbggzi9wg0wgskgc004wko8w0k0oowcg8kcsckgog80wkw</string>
+
+    <!-- Menu Agenda -->
+    <string name="actualiser">Actualiser</string>
+    <string name="today">Aujourd\'hui</string>
     <string name="day_view">Jour</string>
     <string name="three_day">3 Jours</string>
     <string name="week_view">Semaine</string>
-    <string name="annales">Annales</string>
+
+    <!-- Permission Manager -->
     <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations]]]></string>
-    <string name="settings">Paramètres</string>
     <string name="close">Fermer</string>
+    <string name="no_event_today">Pas d\'évènements aujourd\'hui</string>
 </resources>

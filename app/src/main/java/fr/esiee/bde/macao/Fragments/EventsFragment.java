@@ -2,6 +2,8 @@ package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alamkanak.weekview.WeekViewEvent;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.lusfold.spinnerloading.SpinnerLoading;
@@ -30,12 +33,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import fr.esiee.bde.macao.Calendar.CalendarEvent;
+import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.DividerItemDecoration;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Events.Event;
 import fr.esiee.bde.macao.Events.EventAdapter;
+
+import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,6 +70,9 @@ public class EventsFragment extends Fragment {
     private EventAdapter mAdapter;
 
     private SpinnerLoading loader;
+
+    private DataBaseHelper dbHelper;
+    private SQLiteDatabase database;
 
     public EventsFragment() {
         // Required empty public constructor
@@ -92,6 +103,9 @@ public class EventsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        dbHelper =  new DataBaseHelper(this.getContext());
+        database = dbHelper.getWritableDatabase();
     }
 
     @Override
@@ -117,7 +131,7 @@ public class EventsFragment extends Fragment {
         }
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
+        //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
         loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
@@ -126,7 +140,7 @@ public class EventsFragment extends Fragment {
         loader.setItemCount(8);
         loader.setVisibility(View.VISIBLE);
 
-        getEvents();
+        retrieveEvents();
 
         return view;
     }
@@ -155,55 +169,21 @@ public class EventsFragment extends Fragment {
         mListener = null;
     }
 
-    private void getEvents(){
-        RequestParams rp = new RequestParams();
+    private void retrieveEvents(){
+        eventsList.clear();
+        //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
+        Cursor cursor = cupboard().withDatabase(database).query(Event.class).orderBy("eventId desc").getCursor();
+        // or we can iterate all results
+        Iterable<Event> itr = cupboard().withCursor(cursor).iterate(Event.class);
+        for (Event event: itr) {
+            // do something with book
+            //WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
+            eventsList.add(event);
+            Log.i("Event", event.getTitle());
+        }
 
-        HttpUtils.getByUrl("https://bde.esiee.fr/api/posts.json", rp, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject timeline) {
-                // Pull out the first event on the public timeline
-                eventsList.clear();
-                JSONArray events = null;
-                try {
-                    events = (JSONArray) timeline.get("entries");
-
-                    for(int i = 0; i < events.length(); i++) {
-                        Event event = new Event();
-                        JSONObject newsObject = (JSONObject) events.get(i);
-                        try {
-                            JSONObject jsonObject = (JSONObject) newsObject.get("event");
-                            Log.d("EVENT BDE", String.valueOf(jsonObject.get("title")));
-                            event.setTitle(String.valueOf(jsonObject.get("title")));
-                            event.setStart(String.valueOf(jsonObject.get("start")));
-                            event.setEnd(String.valueOf(jsonObject.get("end")));
-                            if(newsObject.has("photo")) {
-                                event.setImage(String.valueOf(((JSONObject) newsObject.get("photo")).get("url_thumbnail")));
-                            }
-                            event.setPublicationDate(String.valueOf(newsObject.get("created_at")));
-                            event.setSlug(String.valueOf(newsObject.get("slug")));
-                            if(jsonObject.has("place")) {
-                                event.setPlace(String.valueOf(jsonObject.get("place")));
-                            }
-                            eventsList.add(event);
-                        } catch (JSONException e){
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mAdapter.notifyDataSetChanged();
-                mListener.makeSnackBar("Events à jour");
-                loader.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                mListener.makeSnackBar("Oups...");
-                loader.setVisibility(View.GONE);
-            }
-        });
+        loader.setVisibility(View.GONE);
+        mAdapter.notifyDataSetChanged();
     }
 
 }
