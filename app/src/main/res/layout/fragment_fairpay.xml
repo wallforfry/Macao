@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="fr.esiee.bde.macao.Fragments.FairpayFragment">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/fairpayUserImage"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="56dp"
+                app:civ_border_color="#FF000000"
+                app:civ_border_width="0dp"
+                app:srcCompat="@android:drawable/sym_def_app_icon" />
+
+            <TextView
+                android:id="@+id/fairpayUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fairpayUserImage"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="36dp"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                tools:text="Prénom Nom" />
+
+            <TextView
+                android:id="@+id/fairpayUserBalance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fairpayUserName"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="23dp"
+                android:textAlignment="center"
+                tools:text="Ton solde FairPay : 10,00 €" />
+
+            <ImageView
+                android:id="@+id/fairpayBarcode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fairpayUserBalance"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="45dp"
+                android:src="@color/card_shadow" />
+
+            <TextView
+                android:id="@+id/fairpayUserId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fairpayBarcode"
+                android:layout_marginTop="10dp"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center"
+                tools:text="1001010" />
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>

@@ -53,4 +53,8 @@
     <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations]]]></string>
     <string name="close">Fermer</string>
     <string name="no_event_today">Pas d\'évènements aujourd\'hui</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fairpay">FairPay</string>
 </resources>

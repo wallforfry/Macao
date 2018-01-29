@@ -31,6 +31,10 @@
                     android:icon="@drawable/ic_date_range_white_24dp"
                     android:title="@string/agenda" />
                 <item
+                    android:id="@+id/nav_fairpay"
+                    android:icon="@drawable/ic_payment_black_24dp"
+                    android:title="@string/fairpay" />
+                <item
                     android:id="@+id/nav_annales"
                     android:icon="@drawable/ic_book_white_24dp"
                     android:title="@string/annales" />

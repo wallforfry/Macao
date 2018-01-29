@@ -62,6 +62,7 @@ import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
+import fr.esiee.bde.macao.Fragments.FairpayFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
@@ -320,6 +321,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_clubs:
                 fragment = new ClubsFragment();
+                break;
+            case R.id.nav_fairpay:
+                fragment = new FairpayFragment();
                 break;
             case R.id.nav_send:
                 /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
