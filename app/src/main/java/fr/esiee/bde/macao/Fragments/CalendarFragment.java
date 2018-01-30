@@ -305,13 +305,15 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         events.add(event);
      */
 
-        List<WeekViewEvent> matchedEvents = new ArrayList<WeekViewEvent>();
+        /*List<WeekViewEvent> matchedEvents = new ArrayList<WeekViewEvent>();
         for (WeekViewEvent event : events) {
             if (eventMatches(event, newYear, newMonth)) {
                 matchedEvents.add(event);
             }
-        }
-        return  matchedEvents;
+        }*/
+        retrieveEvents();
+
+        return events;
 
     }
 
