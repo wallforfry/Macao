@@ -10,7 +10,7 @@ android {
         }
     }
     compileSdkVersion 25
-    buildToolsVersion "26.0.2"
+    buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "fr.esiee.bde.macao"
         minSdkVersion 16

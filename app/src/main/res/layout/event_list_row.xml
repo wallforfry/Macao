@@ -24,7 +24,7 @@
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            card_view:srcCompat="@drawable/couverture"/>
+            card_view:srcCompat="@drawable/couverture_macao"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
