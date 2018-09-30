@@ -116,6 +116,7 @@ public class CalendarService extends Service {
                     try {
                         if(!((JSONObject) timeline.get(0)).has("error")) {
                             cupboard().withDatabase(database).delete(CalendarEvent.class, null);
+                            Log.i("Agenda", timeline.get(0).toString());
                             for (int i = 0; i < timeline.length(); i++) {
                                 JSONObject obj = (JSONObject) timeline.get(i);
                                 SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
@@ -148,6 +149,12 @@ public class CalendarService extends Service {
                     super.onFailure(statusCode, headers, responseString, throwable);
                     Log.d("Failed: ", ""+statusCode);
                     Log.d("Error : ", "" + throwable);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject jsonObject){
+                    super.onFailure(statusCode, headers, throwable, jsonObject);
+                    Log.e("AGENDA", ""+statusCode+" "+throwable);
                 }
 
             });

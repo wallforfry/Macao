@@ -43,6 +43,10 @@ public class HttpUtils {
     }
 
     public static void postByUrl(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        int time = 1000 * 60 * 5;
+        client.setTimeout(time);
+        client.setConnectTimeout(time);
+        client.setResponseTimeout(time);
         client.post(url, params, responseHandler);
     }
 

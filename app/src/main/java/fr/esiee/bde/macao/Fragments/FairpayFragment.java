@@ -22,25 +22,16 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.text.SimpleDateFormat;
 import java.util.EnumMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
-import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.R;
-
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
-import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -85,11 +85,11 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
             try {
                 calendar.setTime(sdf.parse(startTime));
-                calendar.add(Calendar.HOUR_OF_DAY, 1);
+                calendar.add(Calendar.HOUR_OF_DAY, 2);
                 startTime = hdf.format(calendar.getTime());
 
                 calendar.setTime(sdf.parse(endTime));
-                calendar.add(Calendar.HOUR_OF_DAY, 1);
+                calendar.add(Calendar.HOUR_OF_DAY, 2);
                 endTime = hdf.format(calendar.getTime());
             } catch (ParseException e) {
                 e.printStackTrace();

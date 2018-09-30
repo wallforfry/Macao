@@ -6,18 +6,13 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.BitmapFactory;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -55,8 +50,8 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cz.msebera.android.httpclient.client.cache.Resource;
 import fr.esiee.bde.macao.Calendar.CalendarService;
-import fr.esiee.bde.macao.Events.Event;
 import fr.esiee.bde.macao.Events.EventService;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
@@ -67,12 +62,8 @@ import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
-
-import static android.support.v4.app.NotificationCompat.DEFAULT_ALL;
-import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 
 public class MainActivity extends AppCompatActivity
@@ -394,7 +385,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onResult(Status status) {
                         // [START_EXCLUDE]
-                        nameDrawer.setText("Macao");
+                        nameDrawer.setText(R.string.app_name);
                         mailDrawer.setText("");
                         username = "";
                         firstname = "";
@@ -510,18 +501,21 @@ public class MainActivity extends AppCompatActivity
             Bundle bundle = null;
             try {
                 bundle = result.getResult();
+                // The token is a named value in the bundle. The name of the value
+                // is stored in the constant AccountManager.KEY_AUTHTOKEN.
+                idToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+                Log.d("IDDDD", idToken);
             } catch (OperationCanceledException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (AuthenticatorException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            // The token is a named value in the bundle. The name of the value
-            // is stored in the constant AccountManager.KEY_AUTHTOKEN.
-            idToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-            Log.d("IDDDD", idToken);
+
         }
     }
 
