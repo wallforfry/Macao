@@ -165,7 +165,6 @@ public class FairpayFragment extends Fragment {
                     Log.d("asd", "---------------- this is response : " + response);
                     try {
                         JSONObject serverResp = new JSONObject(response.toString());
-                        loader.setVisibility(View.GONE);
                         if((boolean) serverResp.get("has_fairpay")) {
                             getStudentBalance(serverResp);
                         }
@@ -204,6 +203,7 @@ public class FairpayFragment extends Fragment {
                 try {
                     JSONObject balance = new JSONObject(response.toString());
                     setValue(studentInfo, balance);
+                    loader.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -236,6 +236,7 @@ public class FairpayFragment extends Fragment {
             setPicture(pictureBaseUrl+studentInfo.get("email"));
             barcodeImage.setImageBitmap(createBarcode(studentInfo.get("id").toString()));
             id.setText(studentInfo.get("id").toString());
+            loader.setVisibility(View.GONE);
         } catch (JSONException e) {
             e.printStackTrace();
         }
