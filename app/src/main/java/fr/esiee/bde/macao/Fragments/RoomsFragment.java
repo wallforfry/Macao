@@ -63,7 +63,7 @@ public class RoomsFragment extends Fragment {
     private SpinnerLoading loader;
 
     private TextView currentDisplayedTime;
-    private int time;
+    private int shift;
 
     public RoomsFragment() {
         // Required empty public constructor
@@ -95,8 +95,9 @@ public class RoomsFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
-        Calendar rightNow = Calendar.getInstance();
-        time = rightNow.get(Calendar.HOUR_OF_DAY);
+        //Calendar rightNow = Calendar.getInstance();
+        //time = rightNow.get(Calendar.HOUR_OF_DAY);
+        shift = 0;
     }
 
     @Override
@@ -121,7 +122,7 @@ public class RoomsFragment extends Fragment {
         loader.setCircleRadius(20);
         loader.setItemCount(8);
 
-        getRooms(time);
+        getRooms(shift);
 
         return view;
     }
@@ -154,7 +155,8 @@ public class RoomsFragment extends Fragment {
         loader.setVisibility(View.VISIBLE);
         RequestParams rp = new RequestParams();
 
-        HttpUtils.getByUrl("https://bde.esiee.fr/api/calendar/rooms/"+time+"h00", rp, new JsonHttpResponseHandler() {
+        //HttpUtils.getByUrl("https://bde.esiee.fr/api/calendar/rooms/"+time+"h00", rp, new JsonHttpResponseHandler() {
+        HttpUtils.getByUrl("https://ade.wallforfry.fr/api/rooms/"+time, rp, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
@@ -170,7 +172,13 @@ public class RoomsFragment extends Fragment {
                 for (int i = 0; i < timeline.length(); i++) {
                     //Log.d("ROOM", "Add " + String.valueOf(i));
                     try {
-                        int epi = Integer.parseInt(String.valueOf(timeline.get(i)).substring(0, 1));
+                        Log.d("Rooms", String.valueOf(timeline.get(i)));
+                        int epi;
+                        try {
+                            epi = Integer.parseInt(String.valueOf(timeline.get(i)).substring(0, 1));
+                        } catch (NumberFormatException e) {
+                            epi = 0;
+                        }
                         switch (epi) {
                             case 0:
                                 if (autre.getRooms().length() == 0) {
@@ -239,7 +247,8 @@ public class RoomsFragment extends Fragment {
             }
         });
 
-        currentDisplayedTime.setText("Salles libres à "+time+"h");
+        int time_shifted = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + time;
+        currentDisplayedTime.setText("Salles libres à "+time_shifted+"h");
     }
 
     @Override
@@ -253,20 +262,22 @@ public class RoomsFragment extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_update_rooms:
-                time = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-                getRooms(time);
+                //time = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+                shift = 0;
+                getRooms(shift);
                 return true;
             case R.id.action_rooms_plus_hour:
-                if(time < 23) {
-                    time++;
+                int now = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+                if(now+shift < 23) {
+                    shift++;
                 }
-                getRooms(time);
+                getRooms(shift);
                 return true;
             case R.id.action_rooms_minus_hour:
-                if(time > 0) {
-                    time--;
+                if(shift > 0) {
+                    shift--;
                 }
-                getRooms(time);
+                getRooms(shift);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
