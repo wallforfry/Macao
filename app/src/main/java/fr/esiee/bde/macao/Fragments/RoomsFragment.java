@@ -23,7 +23,6 @@ import com.lusfold.spinnerloading.SpinnerLoading;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -172,7 +171,6 @@ public class RoomsFragment extends Fragment {
                 for (int i = 0; i < timeline.length(); i++) {
                     //Log.d("ROOM", "Add " + String.valueOf(i));
                     try {
-                        Log.d("Rooms", String.valueOf(timeline.get(i)));
                         int epi;
                         try {
                             epi = Integer.parseInt(String.valueOf(timeline.get(i)).substring(0, 1));
@@ -268,7 +266,7 @@ public class RoomsFragment extends Fragment {
                 return true;
             case R.id.action_rooms_plus_hour:
                 int now = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-                if(now+shift < 23) {
+                if(now+ shift < 23) {
                     shift++;
                 }
                 getRooms(shift);
