@@ -160,6 +160,8 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                 webView.loadUrl("javascript:(function() { " +
                         "document.getElementsById('left-menu')[0].style.width=\"0px\";" +
                         "})()");
+                loader.setVisibility(View.GONE);
+                webView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -304,7 +306,6 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
                     JSONObject file = (JSONObject) files.get(0);
                     String url = "https://docs.google.com/gview?url=https://bde.esiee.fr"+file.get("download_path")+"&embedded=true";
                     displayAnnale(url);
-                    loader.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -319,7 +320,6 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
 
     private void displayAnnale(String url){
         webView.loadUrl(url);
-        webView.setVisibility(View.VISIBLE);
         back.setVisible(true);
     }
 
