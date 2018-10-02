@@ -20,6 +20,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.lusfold.spinnerloading.SpinnerLoading;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -57,6 +58,9 @@ public class FairpayFragment extends Fragment {
     private ImageView pictureStudent;
     private ImageView barcodeImage;
     private TextView id;
+
+
+    private SpinnerLoading loader;
 
     private String pictureBaseUrl = "https://bde.esiee.fr/fairpay/api/students/photo/by-email/";
 
@@ -103,6 +107,13 @@ public class FairpayFragment extends Fragment {
         barcodeImage = (ImageView) view.findViewById(R.id.fairpayBarcode);
         id = (TextView) view.findViewById(R.id.fairpayUserId);
 
+        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
+        loader.setPaintMode(1);
+        loader.setCircleRadius(20);
+        loader.setItemCount(8);
+
+        loader.setVisibility(View.VISIBLE);
+
         getStudentInfo();
 
         return view;
@@ -139,6 +150,8 @@ public class FairpayFragment extends Fragment {
         String mail = sharedPref.getString("mail", "");
         if(mail.equals("")){
             Log.e("Agenda", "Non connecté");
+            name.setText("Tu dois te connecter pour accéder à FairPay");
+            loader.setVisibility(View.GONE);
         }
         else {
             Log.i("Agenda", "Maj de la balance fairpay");
@@ -152,6 +165,7 @@ public class FairpayFragment extends Fragment {
                     Log.d("asd", "---------------- this is response : " + response);
                     try {
                         JSONObject serverResp = new JSONObject(response.toString());
+                        loader.setVisibility(View.GONE);
                         if((boolean) serverResp.get("has_fairpay")) {
                             getStudentBalance(serverResp);
                         }
