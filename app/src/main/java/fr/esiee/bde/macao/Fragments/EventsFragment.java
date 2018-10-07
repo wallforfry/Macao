@@ -138,7 +138,7 @@ public class EventsFragment extends Fragment {
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
         loader.setItemCount(8);
-        loader.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.GONE);
 
         retrieveEvents();
 

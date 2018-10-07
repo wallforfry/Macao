@@ -111,8 +111,7 @@ public class FairpayFragment extends Fragment {
         loader.setPaintMode(1);
         loader.setCircleRadius(20);
         loader.setItemCount(8);
-
-        loader.setVisibility(View.VISIBLE);
+        loader.setVisibility(View.GONE);
 
         getStudentInfo();
 
@@ -154,6 +153,7 @@ public class FairpayFragment extends Fragment {
             loader.setVisibility(View.GONE);
         }
         else {
+            loader.setVisibility(View.VISIBLE);
             Log.i("Agenda", "Maj de la balance fairpay");
             RequestParams rp = new RequestParams();
             //rp.add("mail", mail);
