@@ -32,16 +32,13 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         private Context mContext;
 
-        private ArrayList<String> records;
-
-
-        private List<CalendarEvent> events = new ArrayList<CalendarEvent>();
+        private ArrayList<CalendarEvent> events;
         private DataBaseHelper dbHelper;
         private SQLiteDatabase database;
 
 
 
-        public ListViewRemoteViewsFactory(Context context, Intent intent) {
+        ListViewRemoteViewsFactory(Context context, Intent intent) {
             mContext = context;
             dbHelper =  new DataBaseHelper(mContext);
             database = dbHelper.getWritableDatabase();
@@ -120,7 +117,7 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
         public int getCount(){
 
-            Log.e("size=",events.size()+"");
+            Log.d("size=",events.size()+"");
 
             return events.size();
 
@@ -152,11 +149,13 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         }
 
     private void retrieveEvents(){
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = MacaoAppWidget.calendar;
+        Log.d("RV", calendar.getTime().toString());
         //calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date today = calendar.getTime();
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-        Date tomorrow = calendar.getTime();
+        Calendar calendar_tomorrow = (Calendar) calendar.clone();
+        calendar_tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        Date tomorrow = calendar_tomorrow.getTime();
 
         String ISO_FORMAT = "yyyy-MM-dd'T00:00:00.000Z'";
         SimpleDateFormat sdf = new SimpleDateFormat(ISO_FORMAT);

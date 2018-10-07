@@ -236,6 +236,9 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
+        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        loader.setVisibility(View.GONE);
+
     }
 
     @Override

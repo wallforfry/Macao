@@ -3,6 +3,7 @@ package fr.esiee.bde.macao.Widget;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RemoteViewsService;
 
 /**
