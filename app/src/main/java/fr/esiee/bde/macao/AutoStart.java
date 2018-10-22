@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.util.Calendar;
+import android.util.Log;
 
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
@@ -19,12 +20,15 @@ public class AutoStart extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        DataBaseHelper dbHelper = new DataBaseHelper(context);
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-
-        context.startService(new Intent(context, CalendarService.class));
-        context.startService(new Intent(context, EventService.class));
-        //context.startService(new Intent(context, NotificationService.class));
-        context.startService(new Intent(context, WidgetUpdateService.class));
+        /*DataBaseHelper dbHelper = new DataBaseHelper(context);
+        SQLiteDatabase database = dbHelper.getWritableDatabase();*/
+        try {
+            context.startService(new Intent(context, CalendarService.class));
+            context.startService(new Intent(context, EventService.class));
+            //context.startService(new Intent(context, NotificationService.class));
+            context.startService(new Intent(context, WidgetUpdateService.class));
+        } catch (IllegalStateException e){
+            Log.e("AutoStart", e.toString());
+        }
     }
 }
