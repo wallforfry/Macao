@@ -149,7 +149,14 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         }
 
     private void retrieveEvents(){
-        Calendar calendar = MacaoAppWidget.calendar;
+        Calendar calendar;
+        try {
+            calendar = MacaoAppWidget.calendar;
+        } catch (NullPointerException e) {
+            calendar = Calendar.getInstance();
+            MacaoAppWidget.calendar = calendar;
+        }
+
         Log.d("RV", calendar.getTime().toString());
         //calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date today = calendar.getTime();
