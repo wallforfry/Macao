@@ -41,7 +41,6 @@ import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
 
 import static android.app.Notification.DEFAULT_ALL;
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -119,21 +118,19 @@ public class CalendarService extends Service {
                             Log.i("Agenda", timeline.get(0).toString());
                             for (int i = 0; i < timeline.length(); i++) {
                                 JSONObject obj = (JSONObject) timeline.get(i);
-                                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
-                                dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
                                 String start = obj.get("start").toString();
                                 String end = obj.get("end").toString();
 
                                 String title = obj.get("name") + "\n" + obj.get("rooms") + "\n" + obj.get("prof") + "\n" + obj.get("unite");
                                 String name = obj.get("name").toString();
-                                com.alamkanak.weekview.WeekViewEvent event = createWeekViewEvent(i, title, start, end, name);
+
                                 CalendarEvent calendarEvent = new CalendarEvent(i, title, start, end, name);
                                 calendarEvent.setRooms(obj.getString("rooms"));
                                 calendarEvent.setProf(obj.getString("prof"));
                                 calendarEvent.setUnite(obj.getString("unite"));
                                 calendarEvent.setColor();
 
-                                //events.add(event);
                                 cupboard().withDatabase(database).put(calendarEvent);
 
                             }

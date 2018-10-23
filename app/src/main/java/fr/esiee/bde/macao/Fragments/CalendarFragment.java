@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewDisplayable;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.lusfold.spinnerloading.SpinnerLoading;
 
@@ -30,17 +31,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
 import me.drakeet.materialdialog.MaterialDialog;
 
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -72,10 +70,12 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     private View view;
     private SpinnerLoading loader;
 
-    private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+    private List<WeekViewDisplayable> events = new ArrayList<WeekViewDisplayable>();
 
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
+
+    private Calendar mCalendar;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -109,6 +109,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         setHasOptionsMenu(true);
         dbHelper =  new DataBaseHelper(this.getContext());
         database = dbHelper.getWritableDatabase();
+
+        mCalendar = Calendar.getInstance();
     }
 
     @Override
@@ -145,7 +147,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         loader.setVisibility(View.GONE);
 
         //getGroups();
-        retrieveEvents();
+        //retrieveEvents(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH));
         //getEvents();
 
         return view;
@@ -226,7 +228,9 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 return true;
             case R.id.action_update_events:
-                this.retrieveEvents();
+                retrieveEvents(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH));
+                mWeekView.goToToday();
+                mWeekView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
                 getActivity().startService(new Intent(this.getContext(), CalendarService.class));
                 return true;
             default:
@@ -254,11 +258,17 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                     weekday = String.valueOf(weekday.charAt(0));
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
+
             @Override
+            public String interpretTime(int hour) {
+                return hour + "h";
+            }
+
+            /*@Override
             public String interpretTime(int hour, int minute) {
                 //return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
                 return hour +"h";
-            }
+            }*/
         });
     }
 
@@ -287,37 +297,16 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     }
 
     @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+    public List<WeekViewDisplayable> onMonthChange(int newYear, int newMonth) {
 
         // Populate the week view with some events.
-
-    /*
-        startTime = Calendar.getInstance();
-        startTime.set(Calendar.DAY_OF_MONTH, startTime.getActualMaximum(Calendar.DAY_OF_MONTH));
-        startTime.set(Calendar.HOUR_OF_DAY, 15);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
-        startTime.set(Calendar.YEAR, newYear);
-        endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR_OF_DAY, 3);
-        event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.colorPrimary));
-        events.add(event);
-     */
-
-        /*List<WeekViewEvent> matchedEvents = new ArrayList<WeekViewEvent>();
-        for (WeekViewEvent event : events) {
-            if (eventMatches(event, newYear, newMonth)) {
-                matchedEvents.add(event);
-            }
-        }*/
-        retrieveEvents();
+        retrieveEvents(newYear, newMonth);
 
         return events;
 
     }
 
-    private void retrieveEvents(){
+    private void retrieveEvents(int newYear, int newMonth){
         events.clear();
         //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
         Cursor cursor = cupboard().withDatabase(database).query(CalendarEvent.class).getCursor();
@@ -325,15 +314,17 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         Iterable<CalendarEvent> itr = cupboard().withCursor(cursor).iterate(CalendarEvent.class);
         for (CalendarEvent calendarEvent: itr) {
             // do something with book
-            WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
-            events.add(event);
+            if (eventMatches(calendarEvent.toWeekViewEvent(), newYear, newMonth)) {
+                WeekViewEvent event = calendarEvent.toWeekViewEvent();
+                events.add(event);
+            }
         }
         mWeekView.notifyDatasetChanged();
     }
 
     private boolean eventMatches(WeekViewEvent event, int year, int month) {
         //noinspection WrongConstant
-        return event != null && ((event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1));
+        return (event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1);
     }
 
     private void openDialog(WeekViewEvent event){

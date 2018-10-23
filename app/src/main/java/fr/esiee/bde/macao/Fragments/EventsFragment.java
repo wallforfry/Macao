@@ -42,7 +42,6 @@ import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Events.Event;
 import fr.esiee.bde.macao.Events.EventAdapter;
 
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -177,7 +176,6 @@ public class EventsFragment extends Fragment {
         Iterable<Event> itr = cupboard().withCursor(cursor).iterate(Event.class);
         for (Event event: itr) {
             // do something with book
-            //WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
             eventsList.add(event);
             Log.i("Event", event.getTitle());
         }
