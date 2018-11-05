@@ -11,12 +11,14 @@ import android.widget.RemoteViewsService;
 
 import com.alamkanak.weekview.WeekViewEvent;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
@@ -79,13 +81,16 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
             String endTime = events.get(position).getEndString();
             String prof = events.get(position).getProf();
 
+            TimeZone timezone = TimeZone.getTimeZone("CET");
+
             try {
                 calendar.setTime(sdf.parse(startTime));
-                calendar.add(Calendar.HOUR_OF_DAY, 2);
+                long offSet = timezone.getOffset(calendar.getTimeInMillis());
+                calendar.add(Calendar.MILLISECOND, (int) offSet);
                 startTime = hdf.format(calendar.getTime());
 
                 calendar.setTime(sdf.parse(endTime));
-                calendar.add(Calendar.HOUR_OF_DAY, 2);
+                calendar.add(Calendar.MILLISECOND, (int) offSet);
                 endTime = hdf.format(calendar.getTime());
             } catch (ParseException e) {
                 e.printStackTrace();
