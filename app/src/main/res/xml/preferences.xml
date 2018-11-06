@@ -23,6 +23,10 @@
         android:singleLine="true"
         android:summary="Temps avant la notification d'un évènement"
         android:title="Notification" />
+
+    <Preference android:title="À propos"
+        android:key="about_button"
+        android:summary="À propos de l'application"/>
     <!--
     <PreferenceCategory
         android:title="Dialogue">

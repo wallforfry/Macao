@@ -1,7 +1,9 @@
 package fr.esiee.bde.macao.Settings;
 
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -46,6 +48,16 @@ public class SettingsActivity extends AppCompatActivity {
         {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+
+            Preference button = findPreference("about_button");
+            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Snackbar.make(getView(), R.string.about_text, Snackbar.LENGTH_LONG).show();
+                    return true;
+                }
+            });
+
         }
     }
 
