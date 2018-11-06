@@ -13,12 +13,12 @@
         android:defaultValue="true"/>
 
     <EditTextPreference
-        android:dependency="enable_calendar_notification"
-        android:layout="?android:attr/preferenceLayoutChild"
         android:defaultValue="30"
+        android:dependency="enable_calendar_notification"
         android:icon="@drawable/ic_notifications_black_24dp"
-        android:inputType="number"
+        android:inputType="numberSigned"
         android:key="time_before_calendar_notification"
+        android:layout="?android:attr/preferenceLayoutChild"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:summary="Temps avant la notification d'un évènement"

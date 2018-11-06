@@ -7,6 +7,7 @@ import android.util.Log;
 
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
+import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
 /**
@@ -22,7 +23,7 @@ public class AutoStart extends BroadcastReceiver {
         try {
             context.startService(new Intent(context, CalendarService.class));
             context.startService(new Intent(context, EventService.class));
-            //context.startService(new Intent(context, NotificationService.class));
+            context.startService(new Intent(context, NotificationService.class));
             context.startService(new Intent(context, WidgetUpdateService.class));
         } catch (IllegalStateException e){
             Log.e("AutoStart", e.toString());

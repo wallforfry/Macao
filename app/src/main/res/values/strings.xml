@@ -50,7 +50,7 @@
     <string name="week_view">Semaine</string>
 
     <!-- Permission Manager -->
-    <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations]]]></string>
+    <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations] \n\n Les demandes d\'accès aux appels et aux contacts servent uniquement à pouvoir cliquer sur un numéro de téléphone afin de l\'appeler]]></string>
     <string name="close">Fermer</string>
     <string name="no_event_today">Pas d\'évènements aujourd\'hui</string>
 

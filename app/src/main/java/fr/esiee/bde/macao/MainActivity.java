@@ -59,6 +59,7 @@ import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
@@ -167,7 +168,7 @@ public class MainActivity extends AppCompatActivity
         TedPermission.with(this)
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage(R.string.close)
-                .setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS)
+                .setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.VIBRATE, Manifest.permission.INTERNET)
                 .setGotoSettingButtonText(R.string.settings)
                 .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
                 .check();
@@ -179,7 +180,7 @@ public class MainActivity extends AppCompatActivity
             //startService(new Intent(this, AutoStart.class));
             startService(new Intent(this, CalendarService.class));
             startService(new Intent(this, EventService.class));
-            //startService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, NotificationService.class));
             startService(new Intent(this, WidgetUpdateService.class));
 
             onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));

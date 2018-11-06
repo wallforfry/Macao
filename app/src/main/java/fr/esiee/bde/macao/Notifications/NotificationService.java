@@ -2,6 +2,7 @@ package fr.esiee.bde.macao.Notifications;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -13,6 +14,8 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -42,8 +45,12 @@ public class NotificationService extends Service {
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
 
+    private static String NOTIFICATION_CHANNEL_NAME = "Agenda";
+    private static String NOTIFICATION_CHANNEL_DESCRIPTION = "Notification de l'agenda";
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        createNotificationChannel();
         // Query the database and show alarm if it applies
 
         // I don't want this service to stay in memory, so I stop it
@@ -123,7 +130,6 @@ public class NotificationService extends Service {
         String dateStartMinusMinutes = sdf.format(startdateminusMinutes);
         String dateStart = sdf.format(startdate);
 
-
         events.clear();
         Cursor cursor = cupboard().withDatabase(this.database).query(CalendarEvent.class).withSelection("startString >= ? and startString <= ? order by startString asc",  dateStart, dateStartMinusMinutes).getCursor();
         Log.d("Notification", cursor.getCount()+" notifications preloaded");
@@ -170,25 +176,31 @@ public class NotificationService extends Service {
 
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
-                .setTicker("Titre")
-                .setSmallIcon(R.drawable.ic_launcher_transparent)
+                .setTicker(event.getName())
+                .setSmallIcon(R.drawable.fuego_notification_icon)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
-                .setContentTitle(event.getName()+" : "+event.getRooms())
-                .setContentText(startHour+" - "+endHour+" "+event.getId())
+                .setContentTitle(event.getName()+" : "+event.getUnite())
+                .setContentText(startHour+" - "+endHour)
                 .setContentIntent(pendingIntent)
-                .setDefaults(DEFAULT_ALL)
+                .setStyle(new Notification.BigTextStyle().bigText(startHour+" - "+endHour+"\n"+event.getRooms()+"\n"+event.getProf()))
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(true);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setColor(getResources().getColor(R.color.colorPrimary));
-        }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            builder.setColor(getColor(R.color.colorPrimary));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(NOTIFICATION_CHANNEL_NAME);
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            builder.setColor(getColor(R.color.colorPrimary));
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setColor(getResources().getColor(R.color.colorPrimary));
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             builder.setShowWhen(true);
         }
 
@@ -199,5 +211,21 @@ public class NotificationService extends Service {
         notificationId.add(event.getId());
         notificationStartString.add(event.getStartString());
         mNotification.notify(event.getId(), builder.build());
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = NOTIFICATION_CHANNEL_NAME;
+            String description = NOTIFICATION_CHANNEL_DESCRIPTION;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_NAME, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }
