@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.alamkanak.weekview.WeekViewEvent;
+import com.alamkanak.weekview.model.WeekViewEvent;
 
 import java.sql.Time;
 import java.text.ParseException;

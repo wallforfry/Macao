@@ -1,7 +1,7 @@
 package fr.esiee.bde.macao.Calendar;
 
-import com.alamkanak.weekview.WeekViewDisplayable;
-import com.alamkanak.weekview.WeekViewEvent;
+import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.model.WeekViewEvent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,7 +16,7 @@ import static android.graphics.Color.parseColor;
  * Created by Wallerand on 06/06/2017.
  */
 
-public class CalendarEvent implements WeekViewDisplayable {
+public class CalendarEvent implements WeekViewDisplayable<CalendarEvent> {
     private Long _id;
     private int eventId;
     private String title, startString,endString, name, rooms, prof, unite;
@@ -132,7 +132,7 @@ public class CalendarEvent implements WeekViewDisplayable {
     }
 
     @Override
-    public WeekViewEvent toWeekViewEvent() {
+    public WeekViewEvent<CalendarEvent> toWeekViewEvent() {
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
         dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date start = null;
@@ -151,7 +151,8 @@ public class CalendarEvent implements WeekViewDisplayable {
             endTime.set(Calendar.MINUTE, end.getMinutes()-1);
             endTime.set(Calendar.MONTH, end.getMonth());
             endTime.set(Calendar.YEAR, start.getYear()+1900);
-            com.alamkanak.weekview.WeekViewEvent event = new com.alamkanak.weekview.WeekViewEvent(_id, title, startTime, endTime);
+            WeekViewEvent event = new WeekViewEvent<>(_id,title,startTime,endTime,"",0,false,this);
+            //WeekViewEvent event = new WeekViewEvent<>(_id, title, startTime, endTime);
             if(name.contains("CTRL")){
                 event.setColor(parseColor("#e74c3c"));
             }

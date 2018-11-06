@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="fr.esiee.bde.macao.Fragments.CalendarFragment">
 
-    <com.alamkanak.weekview.WeekView
+    <com.alamkanak.weekview.ui.WeekView
         android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +23,8 @@
         app:headerColumnBackground="#ffffffff"
         app:showNowLine="true"
         app:nowLineColor="@color/colorAccent"
-        app:nowLineThickness="2dp"/>
+        app:nowLineThickness="2dp"
+        app:firstDayOfWeek="monday"/>
         <!--app:minTime="7"
         app:maxTime="20"/>-->
 
