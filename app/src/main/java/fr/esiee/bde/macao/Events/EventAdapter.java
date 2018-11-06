@@ -81,7 +81,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder
         Event event = eventsList.get(position);
         holder.day.setText(event.getDayStart());
         holder.date.setText(event.getDateStart());
-        holder.month.setText(event.getMonthStart());
+        holder.month.setText(event.getMonthStartShort());
         holder.title.setText(event.getTitle());
         holder.time.setText(event.getTimeString());
         if(!event.getPlace().equals("")) {
