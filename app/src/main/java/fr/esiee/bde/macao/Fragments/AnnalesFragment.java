@@ -66,6 +66,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private MaterialSearchView searchView;
     private WebView webView;
     private MenuItem back;
+    private MenuItem searchButton;
 
     private ProgressBar loader;
 
@@ -175,8 +176,8 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.annales, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
+        searchButton = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(searchButton);
         back = menu.findItem(R.id.annale_back);
     }
 
@@ -316,11 +317,13 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private void displayAnnale(String url){
         webView.loadUrl(url);
         back.setVisible(true);
+        searchButton.setVisible(false);
     }
 
     private void hideAnnale(){
         webView.setVisibility(View.GONE);
         back.setVisible(false);
+        searchButton.setVisible(true);
     }
 
 }
