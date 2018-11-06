@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -68,7 +69,7 @@ public class EventsFragment extends Fragment {
     private RecyclerView recyclerView;
     private EventAdapter mAdapter;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
@@ -133,10 +134,7 @@ public class EventsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         retrieveEvents();

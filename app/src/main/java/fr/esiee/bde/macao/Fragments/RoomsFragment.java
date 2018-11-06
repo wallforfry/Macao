@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -59,7 +60,7 @@ public class RoomsFragment extends Fragment {
     private RecyclerView recyclerView;
     private RoomAdapter mAdapter;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private TextView currentDisplayedTime;
     private int shift;
@@ -116,10 +117,7 @@ public class RoomsFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         getRooms(shift);

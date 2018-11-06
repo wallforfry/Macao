@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -69,7 +70,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private WebView webView;
     private MenuItem back;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     public AnnalesFragment() {
         // Required empty public constructor
@@ -165,10 +166,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
             }
         });
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         annalesSignin();

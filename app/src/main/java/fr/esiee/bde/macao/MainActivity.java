@@ -31,6 +31,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity
                 .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
                 .check();
 
-        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        ProgressBar loader = (ProgressBar) findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         if(savedInstanceState == null) {
@@ -236,7 +237,7 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
-        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        ProgressBar loader = (ProgressBar) findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
     }

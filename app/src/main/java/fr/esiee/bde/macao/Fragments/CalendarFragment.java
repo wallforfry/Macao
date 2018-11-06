@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,7 +76,7 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
     private WeekView mWeekView;
 
     private View view;
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private List<WeekViewDisplayable> events = new ArrayList<WeekViewDisplayable>();
 
@@ -149,10 +150,7 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
         // the week view. This is optional.
         setupDateTimeInterpreter(true);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         //getGroups();

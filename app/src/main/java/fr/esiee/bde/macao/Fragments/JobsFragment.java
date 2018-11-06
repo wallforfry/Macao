@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -59,7 +60,7 @@ public class JobsFragment extends Fragment {
     private RecyclerView recyclerView;
     private JobsAdapter mAdapter;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private OnFragmentInteractionListener mListener;
 
@@ -119,10 +120,7 @@ public class JobsFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         getJobs();

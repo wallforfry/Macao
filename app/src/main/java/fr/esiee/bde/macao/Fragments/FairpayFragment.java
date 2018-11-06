@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -60,7 +61,7 @@ public class FairpayFragment extends Fragment {
     private TextView id;
 
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private String pictureBaseUrl = "https://bde.esiee.fr/fairpay/api/students/photo/by-email/";
 
@@ -107,10 +108,7 @@ public class FairpayFragment extends Fragment {
         barcodeImage = (ImageView) view.findViewById(R.id.fairpayBarcode);
         id = (TextView) view.findViewById(R.id.fairpayUserId);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         getStudentInfo();

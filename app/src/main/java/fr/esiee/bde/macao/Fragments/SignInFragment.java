@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lusfold.spinnerloading.SpinnerLoading;
@@ -38,7 +39,7 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
     private TextView mStatusTextView;
     private View view;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     public SignInFragment() {
         // Required empty public constructor
@@ -84,10 +85,7 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
 
         mStatusTextView = (TextView) view.findViewById(R.id.status);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         this.connectUser(((MainActivity) this.getActivity()).isSignedIn());

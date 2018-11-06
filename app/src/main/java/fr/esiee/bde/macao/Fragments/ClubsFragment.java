@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -59,7 +60,7 @@ public class ClubsFragment extends Fragment {
     private RecyclerView recyclerView;
     private ClubAdapter mAdapter;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     public ClubsFragment() {
         // Required empty public constructor
@@ -118,10 +119,7 @@ public class ClubsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         getEvents();
