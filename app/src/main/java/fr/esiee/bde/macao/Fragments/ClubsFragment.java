@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -17,7 +16,6 @@ import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,9 +27,6 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Clubs.Club;
 import fr.esiee.bde.macao.Clubs.ClubAdapter;
-import fr.esiee.bde.macao.DividerItemDecoration;
-import fr.esiee.bde.macao.Events.Event;
-import fr.esiee.bde.macao.Events.EventAdapter;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.R;
@@ -99,7 +94,7 @@ public class ClubsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_clubs, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_clubs);
+        recyclerView = view.findViewById(R.id.recycler_view_clubs);
 
         mAdapter = new ClubAdapter(clubsList, this.getContext());
         //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -119,7 +114,7 @@ public class ClubsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         getEvents();

@@ -1,17 +1,13 @@
 package fr.esiee.bde.macao.Annales;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import java.util.List;
 
-import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.R;
 
 /**
@@ -28,10 +24,10 @@ public class AnnaleAdapter extends RecyclerView.Adapter<AnnaleAdapter.MyViewHold
 
         public MyViewHolder(View view) {
             super(view);
-            subject = (TextView) view.findViewById(R.id.annale_subject);
-            teacher = (TextView) view.findViewById(R.id.annale_teacher);
-            unit = (TextView) view.findViewById(R.id.annale_unit);
-            year = (TextView) view.findViewById(R.id.annale_year);
+            subject = view.findViewById(R.id.annale_subject);
+            teacher = view.findViewById(R.id.annale_teacher);
+            unit = view.findViewById(R.id.annale_unit);
+            year = view.findViewById(R.id.annale_year);
             view.setOnClickListener(this);
         }
 

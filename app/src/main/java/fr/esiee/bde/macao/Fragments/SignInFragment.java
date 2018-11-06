@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.lusfold.spinnerloading.SpinnerLoading;
-
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
@@ -83,9 +81,9 @@ public class SignInFragment extends Fragment implements View.OnClickListener{
         view.findViewById(R.id.sign_out_button).setOnClickListener(this);
         //findViewById(R.id.disconnect_button).setOnClickListener(this);
 
-        mStatusTextView = (TextView) view.findViewById(R.id.status);
+        mStatusTextView = view.findViewById(R.id.status);
 
-        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         this.connectUser(((MainActivity) this.getActivity()).isSignedIn());

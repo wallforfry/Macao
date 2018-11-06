@@ -9,14 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import fr.esiee.bde.macao.Clubs.Club;
 import fr.esiee.bde.macao.R;
 
 /**
@@ -38,11 +36,11 @@ public class ClubAdapter extends RecyclerView.Adapter<ClubAdapter.MyViewHolder> 
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.club_title);
-            content = (TextView) view.findViewById(R.id.club_content);
-            image = (ImageView) view.findViewById(R.id.club_image);
-            link = (Button) view.findViewById(R.id.club_link);
-            email = (Button) view.findViewById(R.id.club_email_button);
+            title = view.findViewById(R.id.club_title);
+            content = view.findViewById(R.id.club_content);
+            image = view.findViewById(R.id.club_image);
+            link = view.findViewById(R.id.club_link);
+            email = view.findViewById(R.id.club_email_button);
 
             link.setOnClickListener(this);
             email.setOnClickListener(this);

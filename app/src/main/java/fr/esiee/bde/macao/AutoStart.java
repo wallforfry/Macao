@@ -3,13 +3,10 @@ package fr.esiee.bde.macao;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.icu.util.Calendar;
 import android.util.Log;
 
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
-import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
 /**

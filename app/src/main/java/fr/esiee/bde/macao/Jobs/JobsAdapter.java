@@ -42,18 +42,18 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
 
         public MyViewHolder(View view) {
             super(view);
-            category = (TextView) view.findViewById(R.id.job_category);
-            title = (TextView) view.findViewById(R.id.job_title);
-            content = (TextView) view.findViewById(R.id.job_content);
+            category = view.findViewById(R.id.job_category);
+            title = view.findViewById(R.id.job_title);
+            content = view.findViewById(R.id.job_content);
             content.setMovementMethod(LinkMovementMethod.getInstance());
-            name = (TextView) view.findViewById(R.id.job_name);
-            email = (TextView) view.findViewById(R.id.job_email);
-            telephone = (TextView) view.findViewById(R.id.job_telephone);
+            name = view.findViewById(R.id.job_name);
+            email = view.findViewById(R.id.job_email);
+            telephone = view.findViewById(R.id.job_telephone);
 
-            layout_color = (RelativeLayout) view.findViewById(R.id.job_layout_color);
-            layout_name = (RelativeLayout) view.findViewById(R.id.job_layout_name);
-            layout_email = (RelativeLayout) view.findViewById(R.id.job_layout_email);
-            layout_telephone = (RelativeLayout) view.findViewById(R.id.job_layout_telephone);
+            layout_color = view.findViewById(R.id.job_layout_color);
+            layout_name = view.findViewById(R.id.job_layout_name);
+            layout_email = view.findViewById(R.id.job_layout_email);
+            layout_telephone = view.findViewById(R.id.job_layout_telephone);
 
         }
     }

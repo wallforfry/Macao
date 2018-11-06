@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,20 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-
+import com.alamkanak.weekview.data.MonthLoader;
 import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
 import com.alamkanak.weekview.listeners.EventClickListener;
 import com.alamkanak.weekview.listeners.EventLongPressListener;
-import com.alamkanak.weekview.utils.DateTimeInterpreter;
-import com.alamkanak.weekview.data.MonthLoader;
-import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.model.WeekViewDisplayable;
 import com.alamkanak.weekview.model.WeekViewEvent;
-import com.lusfold.spinnerloading.SpinnerLoading;
-
-import org.w3c.dom.Text;
+import com.alamkanak.weekview.ui.WeekView;
+import com.alamkanak.weekview.utils.DateTimeInterpreter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -129,7 +123,7 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
         // Get a reference for the week view in the layout.
-        mWeekView = (WeekView) view.findViewById(R.id.weekView);
+        mWeekView = view.findViewById(R.id.weekView);
 
         // Show a toast message about the touched event.
         mWeekView.setOnEventClickListener(this);
@@ -150,7 +144,7 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
         // the week view. This is optional.
         setupDateTimeInterpreter(true);
 
-        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         //getGroups();

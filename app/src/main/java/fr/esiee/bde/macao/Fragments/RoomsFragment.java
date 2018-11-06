@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -106,9 +104,9 @@ public class RoomsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_rooms, container, false);
 
-        currentDisplayedTime = (TextView) view.findViewById(R.id.rooms_current_time);
+        currentDisplayedTime = view.findViewById(R.id.rooms_current_time);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_rooms);
+        recyclerView = view.findViewById(R.id.recycler_view_rooms);
 
         mAdapter = new RoomAdapter(roomsList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -117,7 +115,7 @@ public class RoomsFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         getRooms(shift);

@@ -8,40 +8,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.alamkanak.weekview.model.WeekViewEvent;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
-import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
-import fr.esiee.bde.macao.DividerItemDecoration;
-import fr.esiee.bde.macao.HttpUtils;
-import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Events.Event;
 import fr.esiee.bde.macao.Events.EventAdapter;
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.R;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
@@ -114,7 +96,7 @@ public class EventsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_events, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_events);
+        recyclerView = view.findViewById(R.id.recycler_view_events);
 
         mAdapter = new EventAdapter(eventsList, this.getContext());
         //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -134,7 +116,7 @@ public class EventsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (ProgressBar) getActivity().findViewById(R.id.loader_view);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         retrieveEvents();

@@ -1,10 +1,8 @@
 package fr.esiee.bde.macao.Settings;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import fr.esiee.bde.macao.R;
