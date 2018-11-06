@@ -170,7 +170,8 @@ public class MainActivity extends AppCompatActivity
                 .setDeniedMessage(R.string.close)
                 .setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.VIBRATE, Manifest.permission.INTERNET)
                 .setGotoSettingButtonText(R.string.settings)
-                .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
+                .setDeniedCloseButtonText(R.string.close)
+                .setDeniedMessage(R.string.permissionDeniedMessage)
                 .check();
 
         ProgressBar loader = findViewById(R.id.loader_view);
