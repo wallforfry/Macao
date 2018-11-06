@@ -157,6 +157,12 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
         //retrieveEvents(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH));
         //getEvents();
 
+        monthTriggered = 0;
+        events.clear();
+        mWeekView.goToToday();
+        mWeekView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        getActivity().startService(new Intent(this.getContext(), CalendarService.class));
+
         return view;
     }
 
