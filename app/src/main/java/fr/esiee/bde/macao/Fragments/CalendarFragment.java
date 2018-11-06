@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -28,6 +30,8 @@ import com.alamkanak.weekview.ui.WeekView;
 import com.alamkanak.weekview.model.WeekViewDisplayable;
 import com.alamkanak.weekview.model.WeekViewEvent;
 import com.lusfold.spinnerloading.SpinnerLoading;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -285,12 +289,22 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
 
     @Override
     public void onEventLongPress(CalendarEvent event, RectF eventRect) {
-        Toast.makeText(this.getActivity().getApplicationContext(), "Long pressed event: " + event.toWeekViewEvent().getData().getName(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.getActivity().getApplicationContext(), "Long pressed event: " + event.toWeekViewEvent().getData().getName(), Toast.LENGTH_SHORT).show();
+        final Snackbar snack = Snackbar.make(view.getRootView(), "Merci d'avoir demandé à la planif de retirer ce cours. Ils vous recontacteront ultérieurement", Snackbar.LENGTH_INDEFINITE);
+        snack.setAction("Cacher", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snack.dismiss();
+                }
+            });
+        ((TextView) snack.getView().findViewById(android.support.design.R.id.snackbar_text)).setMaxLines(5);
+        snack.show();
     }
 
     @Override
     public void onEmptyViewLongPress(Calendar time) {
-        Toast.makeText(this.getActivity().getApplicationContext(), "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.getActivity().getApplicationContext(), "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this.getActivity().getApplicationContext(), "Ceci n'est pas un EasterEgg", Toast.LENGTH_SHORT).show();
     }
 
     public WeekView getWeekView() {
