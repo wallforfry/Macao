@@ -62,9 +62,9 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".Notifications.NotificationService" />
-        <service android:name=".Calendar.CalendarService" />
-        <service android:name=".Events.EventService" />
+        <service android:name=".Notifications.NotificationService" android:exported="false" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Calendar.CalendarService" android:exported="false" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".Events.EventService" android:exported="false" android:permission="android.permission.BIND_JOB_SERVICE"/>
 
     </application>
 

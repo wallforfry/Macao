@@ -3,6 +3,8 @@ package fr.esiee.bde.macao.Widget;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
@@ -16,10 +18,7 @@ public class WidgetUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d("WidgetUpdateService", "Widget Update Started");
-        Intent intent_meeting_update=new  Intent(this,MacaoAppWidget.class);
-        intent_meeting_update.setAction(MacaoAppWidget.UPDATE_MEETING_ACTION);
-        sendBroadcast(intent_meeting_update);
+        doJob();
 
         stopSelf();
 
@@ -31,10 +30,17 @@ public class WidgetUpdateService extends Service {
         return null;
     }
 
+    private void doJob() {
+        Log.d("WidgetUpdateService", "Widget Update Started");
+        Intent intent_meeting_update = new Intent(this, MacaoAppWidget.class);
+        intent_meeting_update.setAction(MacaoAppWidget.UPDATE_MEETING_ACTION);
+        sendBroadcast(intent_meeting_update);
+    }
+
     @Override
     public void onDestroy() {
         // I want to restart this service again in one hour
-        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarm.set(
                 AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + (1000 * 60 * 15),

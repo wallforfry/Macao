@@ -3,6 +3,8 @@ package fr.esiee.bde.macao.Calendar;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +29,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by delevacw on 08/11/17.
  */
 
-public class CalendarService extends Service {
+public class CalendarService extends JobService {
 
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
@@ -39,30 +41,47 @@ public class CalendarService extends Service {
         // I don't want this service to stay in memory, so I stop it
         // immediately after doing what I wanted it to do.
 
+        doJob();
+
+        //stopSelf();
+
+        return START_STICKY;
+    }
+
+    private void doJob(){
+        Log.d("CalendarService", "Start");
         dbHelper =  new DataBaseHelper(this);
         database = dbHelper.getWritableDatabase();
 
         getEvents();
+    }
 
-        stopSelf();
+    /*@Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }*/
 
-        return START_NOT_STICKY;
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        doJob();
+        return false;
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public boolean onStopJob(JobParameters params) {
+        return false;
     }
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         // I want to restart this service again in one hour
-        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+        /*AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
         alarm.set(
                 AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + (1000 * 60 * 5),
                 PendingIntent.getService(this, 0, new Intent(this, CalendarService.class), 0)
-        );
+        );*/
     }
 
     private void getEvents(){
@@ -94,8 +113,8 @@ public class CalendarService extends Service {
                     // Pull out the first event on the public timeline
                     try {
                         if(!((JSONObject) timeline.get(0)).has("error")) {
-                            cupboard().withDatabase(database).delete(CalendarEvent.class, null);
-                            Log.i("Agenda", timeline.get(0).toString());
+                            //cupboard().withDatabase(database).delete(CalendarEvent.class, null);
+                            //Log.i("Agenda", timeline.get(0).toString());
                             for (int i = 0; i < timeline.length(); i++) {
                                 JSONObject obj = (JSONObject) timeline.get(i);
 
@@ -114,11 +133,13 @@ public class CalendarService extends Service {
                                 cupboard().withDatabase(database).put(calendarEvent);
 
                             }
+                            int eventsSize = cupboard().withCursor(cupboard().withDatabase(database).query(CalendarEvent.class).getCursor()).list(CalendarEvent.class).size();
+                            Log.i("Agenda", "Agenda à jour : "+eventsSize+" cours");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    Log.i("Agenda", "Agenda à jour");
+
                 }
 
                 @Override

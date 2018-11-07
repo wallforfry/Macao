@@ -178,11 +178,11 @@ public class MainActivity extends AppCompatActivity
         loader.setVisibility(View.GONE);
 
         if(savedInstanceState == null) {
-            //startService(new Intent(this, AutoStart.class));
-            startService(new Intent(this, CalendarService.class));
+            sendBroadcast(new Intent(this, AutoStart.class));
+            /*startService(new Intent(this, CalendarService.class));
             startService(new Intent(this, EventService.class));
             startService(new Intent(this, NotificationService.class));
-            startService(new Intent(this, WidgetUpdateService.class));
+            startService(new Intent(this, WidgetUpdateService.class));*/
 
             onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
         }

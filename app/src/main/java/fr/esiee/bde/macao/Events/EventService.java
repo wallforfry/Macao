@@ -6,6 +6,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -41,7 +43,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by delevacw on 08/11/17.
  */
 
-public class EventService extends Service {
+public class EventService extends JobService {
 
     private static final String NOTIFICATION_CHANNEL_NAME = "Calendrier BDE";
     private static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Notification des évènements du BDE";
@@ -51,6 +53,14 @@ public class EventService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
+        doJob();
+        stopSelf();
+
+        return START_STICKY;
+    }
+
+    private void doJob() {
+        Log.d("EventService", "StartService");
         createNotificationChannel();
         try {
             dbHelper =  new DataBaseHelper(this);
@@ -61,16 +71,17 @@ public class EventService extends Service {
         catch (SQLiteException e){
             Log.e("EventService", e.toString());
         }
-
-        stopSelf();
-
-        return START_NOT_STICKY;
     }
 
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        doJob();
+        return false;
+    }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public boolean onStopJob(JobParameters params) {
+        return false;
     }
 
     @Override

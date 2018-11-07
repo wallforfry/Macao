@@ -6,6 +6,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import fr.esiee.bde.macao.AutoStart;
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.MainActivity;
@@ -37,7 +40,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by delevacw on 08/11/17.
  */
 
-public class NotificationService extends Service {
+public class NotificationService extends JobService {
 
     private static List<Integer> notificationId = new ArrayList<Integer>();
     private static List<String> notificationStartString = new ArrayList<String>();
@@ -50,11 +53,18 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        createNotificationChannel();
         // Query the database and show alarm if it applies
 
         // I don't want this service to stay in memory, so I stop it
         // immediately after doing what I wanted it to do.
+        doJob();
+        //stopSelf();
+        //setRestart();
+        return START_STICKY;
+    }
+
+    private void doJob(){
+        createNotificationChannel();
         try {
             dbHelper = new DataBaseHelper(this);
             database = dbHelper.getWritableDatabase();
@@ -65,7 +75,7 @@ public class NotificationService extends Service {
             Log.i("Notification", "Start");
             for (CalendarEvent event : events) {
                 //if ((!notificationId.contains(event.getId())) && notificationStartString.contains(event.getStartString())) {
-                if (!notificationId.contains(event.getId())) {
+                if (!notificationId.contains(event.getTitle().hashCode())) {
                     Log.i("Notification", event.getName() + " : " + event.getRooms());
                     boolean notified = PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getBoolean("enable_calendar_notification", true);
                     if(notified) {
@@ -84,26 +94,51 @@ public class NotificationService extends Service {
         catch (SQLiteException e){
             Log.e("Notification", e.toString());
         }
-
-        stopSelf();
-
-        return START_NOT_STICKY;
+    }
+    private void setRestart(){
+        // I want to restart this service again in one hour
+        Log.d("Notification", "Restart Scheduled");
+        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+        alarm.set(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + (1000 * 5),
+                PendingIntent.getService(this, 0, new Intent(this, AutoStart.class), 0)
+                //PendingIntent.getService(this, 0, new Intent(this, NotificationService.class), 0)
+        );
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent){
+        super.onTaskRemoved(rootIntent);
+        //startService(new Intent(this, NotificationService.class));
+        //sendBroadcast(new Intent(this, AutoStart.class));
+    }
+
+    /*@Override
     public IBinder onBind(Intent intent) {
         return null;
+    }*/
+
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        doJob();
+        //setRestart();
+        sendBroadcast(new Intent(this, AutoStart.class));
+        return true;
+    }
+
+    @Override
+    public boolean onStopJob(JobParameters params) {
+        //sendBroadcast(new Intent(this, AutoStart.class));
+        return false;
     }
 
     @Override
     public void onDestroy() {
-        // I want to restart this service again in one hour
-        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
-        alarm.set(
-                AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + (1000 * 10),
-                PendingIntent.getService(this, 0, new Intent(this, NotificationService.class), 0)
-        );
+        super.onDestroy();
+//        setRestart();
+        //sendBroadcast(new Intent(this, AutoStart.class));
+        //startService(new Intent(this, NotificationService.class));
     }
 
     private void retrieveEvents(){
@@ -208,7 +243,7 @@ public class NotificationService extends Service {
             builder.setSmallIcon(Icon.createWithBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
         }*/
 
-        notificationId.add(event.getId());
+        notificationId.add(event.getTitle().hashCode());
         notificationStartString.add(event.getStartString());
         mNotification.notify(event.getId(), builder.build());
     }
