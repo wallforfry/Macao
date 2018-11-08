@@ -47,6 +47,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
@@ -159,8 +160,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                //close the app or do whatever you want
+            public void onPermissionDenied(List<String> deniedPermissions) {
                 makeSnackBar("Permissions manquantes..");
             }
         };
@@ -179,10 +179,10 @@ public class MainActivity extends AppCompatActivity
 
         if(savedInstanceState == null) {
             sendBroadcast(new Intent(this, AutoStart.class));
-            /*startService(new Intent(this, CalendarService.class));
+            startService(new Intent(this, CalendarService.class));
             startService(new Intent(this, EventService.class));
             startService(new Intent(this, NotificationService.class));
-            startService(new Intent(this, WidgetUpdateService.class));*/
+            startService(new Intent(this, WidgetUpdateService.class));
 
             onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
         }
@@ -379,6 +379,8 @@ public class MainActivity extends AppCompatActivity
     public void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
+
+        //TODO: check if internet connection else
     }
 
     public void signOut() {
