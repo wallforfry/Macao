@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +30,7 @@ import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Jobs.Jobs;
 import fr.esiee.bde.macao.Jobs.JobsAdapter;
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 /**
@@ -52,6 +54,7 @@ public class JobsFragment extends Fragment {
     private List<Jobs> jobsList = new ArrayList<Jobs>();
     private RecyclerView recyclerView;
     private JobsAdapter mAdapter;
+    private View view;
 
     private ProgressBar loader;
 
@@ -92,7 +95,7 @@ public class JobsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_jobs, container, false);
+        view = inflater.inflate(R.layout.fragment_jobs, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view_jobs);
 
@@ -174,6 +177,7 @@ public class JobsFragment extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 mListener.makeSnackBar("Oups...");
+                loader.setVisibility(View.GONE);
             }
         });
     }

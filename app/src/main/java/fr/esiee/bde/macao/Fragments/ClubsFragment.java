@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +30,7 @@ import fr.esiee.bde.macao.Clubs.Club;
 import fr.esiee.bde.macao.Clubs.ClubAdapter;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 /**
@@ -54,6 +56,7 @@ public class ClubsFragment extends Fragment {
     private List<Club> clubsList = new ArrayList<Club>();
     private RecyclerView recyclerView;
     private ClubAdapter mAdapter;
+    private View view;
 
     private ProgressBar loader;
 
@@ -92,7 +95,7 @@ public class ClubsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_clubs, container, false);
+        view = inflater.inflate(R.layout.fragment_clubs, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view_clubs);
 

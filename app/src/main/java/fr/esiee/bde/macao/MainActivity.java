@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -56,8 +58,10 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
+import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
@@ -71,6 +75,8 @@ import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
+
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 
 public class MainActivity extends AppCompatActivity
@@ -111,6 +117,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mainView = findViewById(R.id.drawer_layout);
 
         DataBaseHelper dbHelper= new DataBaseHelper(this);
         database = dbHelper.getWritableDatabase();
@@ -240,7 +248,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onPermissionDenied(List<String> deniedPermissions) {
-                makeSnackBar("Permissions manquantes..");
+                Snackbar.make(mainView, "Permissions manquantes..", Snackbar.LENGTH_LONG);
             }
         };
 
@@ -309,9 +317,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop(){
         super.onStop();
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
+        hideProgressDialog();
     }
 
     @Override
@@ -361,10 +367,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void signIn() {
+        showProgressDialog();
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-
-        //TODO: check if internet connection else
+        drawer.setSelection(R.id.nav_calendar, true);
     }
 
     private void signOut() {
@@ -372,7 +378,6 @@ public class MainActivity extends AppCompatActivity
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
-                        // [START_EXCLUDE]
                         username = "";
                         firstname = "";
                         lastname = "";
@@ -386,24 +391,13 @@ public class MainActivity extends AppCompatActivity
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("mail", "");
                         editor.apply();
-
-                        // [END_EXCLUDE]
-                    }
-                });
-        headerResult.clear();
-        headerResult.addProfiles(
-                profileDrawerItemBDE,
-                profileSettingDrawerItemAdd
-        );
-    }
-
-    private void revokeAccess() {
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // [START_EXCLUDE]
-                        // [END_EXCLUDE]
+                        headerResult.clear();
+                        headerResult.addProfiles(
+                                profileDrawerItemBDE,
+                                profileSettingDrawerItemAdd
+                        );
+                        cupboard().withDatabase(database).delete(CalendarEvent.class, null);
+                        drawer.setSelection(R.id.nav_calendar, true);
                     }
                 });
     }
@@ -416,26 +410,24 @@ public class MainActivity extends AppCompatActivity
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getEmail()));
 
             String email = acct.getEmail();
-            //Log.d("MAIN", acct.getServerAuthCode());
-            //String token = acct.getIdToken();
-            //Log.d("MAIN", token);
-            this.idToken = acct.getIdToken();
-            this.id = acct.getId();
-            //this.authCode = acct.getServerAuthCode();
 
-            AccountManager am = AccountManager.get(this);
-            Bundle options = new Bundle();
+                this.idToken = acct.getIdToken();
+                this.id = acct.getId();
+                //this.authCode = acct.getServerAuthCode();
 
-            am.getAuthToken(
-                    acct.getAccount(),                     // Account retrieved using getAccountsByType()
-                    "Manage your tasks",            // Auth scope
-                    options,                        // Authenticator-specific options
-                    this,                           // Your activity
-                    new OnTokenAcquired(),          // Callback called when a token is successfully acquired
-                    null);    // Callback called if an error occurs
+                AccountManager am = AccountManager.get(this);
+                Bundle options = new Bundle();
 
+                am.getAuthToken(
+                        acct.getAccount(),                     // Account retrieved using getAccountsByType()
+                        "Manage your tasks",            // Auth scope
+                        options,                        // Authenticator-specific options
+                        this,                           // Your activity
+                        new OnTokenAcquired(),          // Callback called when a token is successfully acquired
+                        null);    // Callback called if an error occurs
 
             if (email.substring(email.indexOf("@")).equals("@edu.esiee.fr")) {
+
                 String firstname = email.substring(0, email.indexOf("."));
                 String lastname = email.substring(email.indexOf(".") + 1, email.indexOf("@"));
                 String username;
@@ -470,7 +462,8 @@ public class MainActivity extends AppCompatActivity
 
                 startService(new Intent(this, CalendarService.class));
             } else {
-                makeSnackBar("Veuillez vous connecter avec un compte ESIEE");
+                Snackbar.make(mainView, "Veuillez vous connecter avec un compte ESIEE", Snackbar.LENGTH_LONG).show();
+                signOut();
             }
         }
     }
@@ -554,7 +547,6 @@ public class MainActivity extends AppCompatActivity
                 // The token is a named value in the bundle. The name of the value
                 // is stored in the constant AccountManager.KEY_AUTHTOKEN.
                 idToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-                Log.d("IDDDD", idToken);
             } catch (OperationCanceledException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -617,22 +609,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void makeSnackBar(String text){
-        Snackbar snackbar = Snackbar
-                .make(mainView, text, Snackbar.LENGTH_LONG);
-
-        if(text.equals("Connectez vous d'abord sur le site")){
-            snackbar.setAction("Ici", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bde.esiee.fr/aurion/agenda"));
-                    startActivity(browserIntent);
-                }
-            });
-        }
-
-        snackbar.show();
+    public void makeSnackBar(String text) {
+        Snackbar.make(mainView, text, Snackbar.LENGTH_SHORT);
     }
+
 
     public static boolean isSignedIn() {
         return isSignedIn;
@@ -641,6 +621,23 @@ public class MainActivity extends AppCompatActivity
 
     public String getIdToken() {
         return idToken;
+    }
+
+    public boolean isNetworkAvailable() {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) this
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            boolean connected = networkInfo != null && networkInfo.isAvailable() &&
+                    networkInfo.isConnected();
+            return connected;
+
+        } catch (Exception e) {
+            System.out.println("CheckConnectivity Exception: " + e.getMessage());
+            Log.v("connectivity", e.toString());
+        }
+        return false;
     }
 }
 
