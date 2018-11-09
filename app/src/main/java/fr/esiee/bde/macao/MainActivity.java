@@ -449,10 +449,18 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 headerResult.clear();
-                headerResult.addProfiles(
-                        new ProfileDrawerItem().withName(username).withEmail(mail).withIcon(pictureUrl),
-                        profileSettingDrawerItemLogout
-                );
+                if (pictureUrl != null) {
+                    headerResult.addProfiles(
+                            new ProfileDrawerItem().withName(username).withEmail(mail).withIcon(pictureUrl),
+                            profileSettingDrawerItemLogout
+                    );
+                }
+                else {
+                    headerResult.addProfiles(
+                            new ProfileDrawerItem().withName(username).withEmail(mail).withIcon(R.mipmap.ic_launcher),
+                            profileSettingDrawerItemLogout
+                    );
+                }
 
                 //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
