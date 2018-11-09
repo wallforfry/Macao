@@ -60,4 +60,7 @@
     <string name="next"><![CDATA[>]]></string>
     <string name="previous"><![CDATA[<]]></string>
     <string name="about_text">À propos de l\'application</string>
+    <string name="bde">BDE</string>
+    <string name="mon_espace">Mon Espace</string>
+    <string name="bde_website">bde.esiee.fr</string>
 </resources>

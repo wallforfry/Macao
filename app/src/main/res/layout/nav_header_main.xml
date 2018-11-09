@@ -46,7 +46,7 @@
             android:id="@+id/mailDrawer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="bde.esiee.fr" />
+            android:text="@string/bde_website" />
 
     </LinearLayout>
 </FrameLayout>
