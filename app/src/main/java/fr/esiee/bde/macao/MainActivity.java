@@ -15,13 +15,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -71,7 +67,6 @@ import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.FairpayFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
-import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
@@ -79,7 +74,7 @@ import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, OnFragmentInteractionListener, Drawer.OnDrawerItemClickListener {
+        implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, OnFragmentInteractionListener, Drawer.OnDrawerItemClickListener {
 
     private static final int ADD_PROFILE = 100000;
     private static final int REMOVE_PROFILE = 100001;
@@ -101,13 +96,6 @@ public class MainActivity extends AppCompatActivity
     private String idToken = "";
     private String id = "";
     private String authCode = "";
-
-    private NavigationView navigationView;
-    TextView nameDrawer;
-    TextView mailDrawer;
-    ImageView pictureDrawer;
-    ImageView backgroundDrawer;
-    private int selectedMenuItemId;
 
     private View mainView;
 
@@ -140,22 +128,6 @@ public class MainActivity extends AppCompatActivity
             }
         });*/
 
-        /*DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-
-        this.navigationView = findViewById(R.id.nav_view);
-        View headerView = navigationView.getHeaderView(0);
-        nameDrawer = headerView.findViewById(R.id.nameDrawer);
-        mailDrawer = headerView.findViewById(R.id.mailDrawer);
-        pictureDrawer = headerView.findViewById(R.id.imageDrawer);
-        backgroundDrawer = headerView.findViewById(R.id.backgroundDrawer);
-
-        navigationView.setNavigationItemSelectedListener(this);*/
-
 
         //initialize and create the image loader logic
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -184,8 +156,6 @@ public class MainActivity extends AppCompatActivity
             */
         });
 
-//create the drawer and remember the `Drawer` result object
-
         profileDrawerItemBDE = new ProfileDrawerItem().withName(getResources().getString(R.string.app_name)).withEmail("Pas d'utilisateur connecté").withIcon(getResources().getDrawable(R.mipmap.ic_launcher));
         profileSettingDrawerItemAdd = new ProfileSettingDrawerItem().withName("Ajouter un compte").withDescription("Compte ESIEE Paris").withIcon(R.drawable.baseline_person_add_black_24dp).withIdentifier(ADD_PROFILE);
         profileSettingDrawerItemLogout = new ProfileSettingDrawerItem().withName("Déconnexion").withIcon(R.drawable.baseline_delete_black_24dp).withIdentifier(REMOVE_PROFILE);
@@ -202,37 +172,10 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
                         if (profile instanceof IDrawerItem && profile.getIdentifier() == ADD_PROFILE) {
-                            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                            startActivityForResult(signInIntent, RC_SIGN_IN);
+                            signIn();
                         }
                         else if (profile instanceof IDrawerItem && profile.getIdentifier() == REMOVE_PROFILE) {
-                            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                                    new ResultCallback<Status>() {
-                                        @Override
-                                        public void onResult(@NonNull Status status) {
-                                            // [START_EXCLUDE]
-                                            username = "";
-                                            firstname = "";
-                                            lastname = "";
-                                            mail = "";
-                                            id = "";
-                                            idToken = "";
-                                            authCode = "";
-                                            updateUI(false);
-
-                                            SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
-                                            SharedPreferences.Editor editor = sharedPref.edit();
-                                            editor.putString("mail", "");
-                                            editor.apply();
-
-                                            // [END_EXCLUDE]
-                                        }
-                                    });
-                            headerResult.clear();
-                            headerResult.addProfiles(
-                                    profileDrawerItemBDE,
-                                    profileSettingDrawerItemAdd
-                            );
+                            signOut();
                         }
                         return false;
                     }
@@ -253,7 +196,6 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_calendar).withName(R.string.agenda).withIcon(R.drawable.baseline_date_range_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_fairpay).withName(R.string.fairpay).withIcon(R.drawable.ic_payment_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_annales).withName(R.string.annales).withIcon(R.drawable.baseline_book_black_24dp),
-                        new PrimaryDrawerItem().withIdentifier(R.id.nav_signin).withName(R.string.connexion).withIcon(R.drawable.baseline_account_circle_black_24dp),
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withIdentifier(R.id.nav_settings).withName(R.string.settings).withIcon(R.drawable.baseline_settings_black_24dp),
                         new SecondaryDrawerItem().withIdentifier(R.id.nav_send).withName(R.string.rapport_de_bug).withIcon(R.drawable.ic_menu_send)
@@ -320,18 +262,6 @@ public class MainActivity extends AppCompatActivity
             startService(new Intent(this, EventService.class));
             startService(new Intent(this, NotificationService.class));
             startService(new Intent(this, WidgetUpdateService.class));
-
-            //onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
-        }
-        else {
-            //onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
-            // Todo: select item in drawer when orientation change
-        }
-
-        if(getIntent() != null) {
-            int menuItem = getIntent().getIntExtra("SelectedMenuItem", 1);
-            int subMenuItem = getIntent().getIntExtra("SelectedSubMenuItem", 0);
-            //onNavigationItemSelected(navigationView.getMenu().getItem(menuItem).getSubMenu().getItem(subMenuItem));
         }
     }
 
@@ -339,13 +269,11 @@ public class MainActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         outState = drawer.saveInstanceState(outState);
         super.onSaveInstanceState(outState);
-        //outState.putInt("SelectedMenuItemId", selectedMenuItemId);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        //selectedMenuItemId = savedInstanceState.getInt("SelectedMenuItemId");
     }
 
     @Override
@@ -400,12 +328,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-        /*DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }*/
     }
 
     @Override
@@ -430,88 +352,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        Fragment fragment = null;
-
-        // Handle navigation view item clicks here.
-        switch(item.getItemId()){
-
-            case R.id.nav_calendar:
-                fragment = new CalendarFragment();
-                break;
-            case R.id.nav_signin:
-                fragment = new SignInFragment();
-                break;
-            case R.id.nav_rooms:
-                fragment = new RoomsFragment();
-                break;
-            case R.id.nav_jobs:
-                fragment = new JobsFragment();
-                break;
-            case R.id.nav_events:
-                fragment = new EventsFragment();
-                break;
-            case R.id.nav_annales:
-                fragment = new AnnalesFragment();
-                break;
-            case R.id.nav_clubs:
-                fragment = new ClubsFragment();
-                break;
-            case R.id.nav_fairpay:
-                fragment = new FairpayFragment();
-                break;
-            case R.id.nav_send:
-                /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto","wallerand.delevacq@edu.esiee.fr", null));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Bug de l'application Macao");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Salut,\n\nJ'ai remarqué un bug dans l'application :\n\n");
-                startActivity(Intent.createChooser(emailIntent, "Send email..."));*/
-
-                String url = "https://macao.ngdesk.com/#/login";
-                Intent web_intent = new Intent(Intent.ACTION_VIEW);
-                web_intent.setData(Uri.parse(url));
-                startActivity(web_intent);
-                break;
-            case R.id.nav_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                startActivity(i);
-                break;
-            case R.id.test:
-                //do something for test
-                break;
-        }
-
-        if(fragment != null) {
-          /*  currentFragment = fragment;
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction transaction = fm.beginTransaction();
-            transaction.replace(R.id.content_main, fragment, "FragmentSaved");
-            transaction.commit();
-
-            // Unchecked all items
-            int size = navigationView.getMenu().size();
-            for (int i = 0; i < size; i++) {
-                if(navigationView.getMenu().getItem(i).getSubMenu() != null) {
-                    int subSize = navigationView.getMenu().getItem(i).getSubMenu().size();
-                    for (int j = 0; j < subSize; j++) {
-                        navigationView.getMenu().getItem(i).getSubMenu().getItem(j).setChecked(false);
-                    }
-                }
-                navigationView.getMenu().getItem(i).setChecked(false);
-            }
-*/
-            item.setChecked(true);
-            setTitle(item.getTitle());
-
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-        }
-
-        return false;
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -527,14 +367,12 @@ public class MainActivity extends AppCompatActivity
         //TODO: check if internet connection else
     }
 
-    public void signOut() {
+    private void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
-                    public void onResult(Status status) {
+                    public void onResult(@NonNull Status status) {
                         // [START_EXCLUDE]
-                        //nameDrawer.setText(R.string.app_name);
-                        //mailDrawer.setText("");
                         username = "";
                         firstname = "";
                         lastname = "";
@@ -542,16 +380,21 @@ public class MainActivity extends AppCompatActivity
                         id = "";
                         idToken = "";
                         authCode = "";
-                        updateUI(false);
+
 
                         SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("mail", "");
-                        editor.commit();
+                        editor.apply();
 
                         // [END_EXCLUDE]
                     }
                 });
+        headerResult.clear();
+        headerResult.addProfiles(
+                profileDrawerItemBDE,
+                profileSettingDrawerItemAdd
+        );
     }
 
     private void revokeAccess() {
@@ -560,7 +403,6 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onResult(Status status) {
                         // [START_EXCLUDE]
-                        updateUI(false);
                         // [END_EXCLUDE]
                     }
                 });
@@ -608,42 +450,28 @@ public class MainActivity extends AppCompatActivity
                 mail = email;
                 isSignedIn = true;
 
-                //this.nameDrawer.setText(username);
-                //this.mailDrawer.setText(mail);
                 Uri uri = acct.getPhotoUrl();
                 String pictureUrl = null;
                 if (uri != null) {
                     pictureUrl = uri.toString();
                 }
-                /*if (pictureUrl != null) {
-                    Picasso.with(this).load(pictureUrl).into(pictureDrawer);
-                } else {
-                    pictureDrawer.setImageResource(R.mipmap.ic_launcher);
-                }*/
 
                 headerResult.clear();
                 headerResult.addProfiles(
                         new ProfileDrawerItem().withName(username).withEmail(mail).withIcon(pictureUrl),
                         profileSettingDrawerItemLogout
                 );
-                //mStatusTextView.setText(username);
 
                 //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("mail", email);
-                editor.commit();
+                editor.apply();
 
                 startService(new Intent(this, CalendarService.class));
-
-                updateUI(true);
             } else {
-                signOut();
                 makeSnackBar("Veuillez vous connecter avec un compte ESIEE");
             }
-        } else {
-            // Signed out, show unauthenticated UI.
-            updateUI(false);
         }
     }
 
@@ -659,9 +487,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_calendar:
                 fragment = new CalendarFragment();
-                break;
-            case R.id.nav_signin:
-                fragment = new SignInFragment();
                 break;
             case R.id.nav_jobs:
                 fragment = new JobsFragment();
@@ -768,14 +593,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void updateUI(boolean signedIn) {
-        isSignedIn = signedIn;
-
-        if(currentFragment instanceof SignInFragment) {
-            ((SignInFragment) currentFragment).connectUser(signedIn);
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -821,25 +638,9 @@ public class MainActivity extends AppCompatActivity
         return isSignedIn;
     }
 
-    public void setSignedIn(boolean signedIn) {
-        isSignedIn = signedIn;
-    }
-
-    public String getUsername() {
-        return username;
-    }
 
     public String getIdToken() {
         return idToken;
     }
-
-    public static String getMail() {
-        return mail;
-    }
-
-    public SQLiteDatabase getDatabase(){
-        return this.database;
-    }
-
 }
 
