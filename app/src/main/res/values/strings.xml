@@ -63,4 +63,16 @@
     <string name="bde">BDE</string>
     <string name="mon_espace">Mon Espace</string>
     <string name="bde_website">bde.esiee.fr</string>
+    <string name="administration">Administration</string>
+
+    <string-array name="administrator">
+        <item>wallerand.delevacq@edu.esiee.fr</item>
+    </string-array>
+
+    <string-array name="topics">
+        <item>dev</item>
+        <item>news</item>
+        <item>alpha</item>
+        <item>beta</item>
+    </string-array>
 </resources>

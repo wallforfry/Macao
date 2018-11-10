@@ -47,6 +47,11 @@
         </menu>
     </item>
     <item
+        android:id="@+id/nav_administration"
+        android:visible="true"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="@string/administration" />
+    <item
         android:id="@+id/nav_settings"
         android:visible="true"
         android:icon="@drawable/ic_settings_white_24dp"
