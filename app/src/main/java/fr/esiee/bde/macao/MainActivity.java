@@ -65,12 +65,14 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
+import fr.esiee.bde.macao.Fragments.AdministrationFragment;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
@@ -408,6 +410,7 @@ public class MainActivity extends AppCompatActivity
                         );
                         cupboard().withDatabase(database).delete(CalendarEvent.class, null);
                         drawer.setSelection(R.id.nav_calendar, true);
+                        drawer.removeItem(R.id.nav_administration);
                     }
                 });
     }
@@ -478,6 +481,14 @@ public class MainActivity extends AppCompatActivity
                 editor.putString("mail", email);
                 editor.apply();
 
+                if(Arrays.asList(getResources().getStringArray(R.array.administrator)).contains(mail)){
+                    if(drawer.getDrawerItem(R.id.nav_administration) == null) {
+                        drawer.addItemAtPosition(
+                                new SecondaryDrawerItem().withIdentifier(R.id.nav_administration).withName(R.string.administration).withIcon(R.drawable.baseline_developer_board_black_24dp)
+                                , drawer.getPosition(R.id.nav_settings));
+                    }
+                }
+
                 startService(new Intent(this, CalendarService.class));
             } else {
                 Snackbar.make(mainView, "Veuillez vous connecter avec un compte ESIEE", Snackbar.LENGTH_LONG).show();
@@ -513,6 +524,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_fairpay:
                 fragment = new FairpayFragment();
+                break;
+            case R.id.nav_administration:
+                fragment = new AdministrationFragment();
                 break;
             case R.id.nav_send:
                 /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
