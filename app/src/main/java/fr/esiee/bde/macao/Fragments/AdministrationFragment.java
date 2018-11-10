@@ -98,34 +98,7 @@ public class AdministrationFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final LayoutInflater factory = LayoutInflater.from(getContext());
-                final View dialogView = factory.inflate(R.layout.notification_dialog, null);
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Nouvelle notification");
-                builder.setView(dialogView);
-                builder.setPositiveButton("Envoyer", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String title = ((EditText) dialogView.findViewById(R.id.administration_notification_dialog_title)).getText().toString();
-                        final String body = ((EditText) dialogView.findViewById(R.id.administration_notification_dialog_message)).getText().toString();
-                        final String topic = ((Spinner) dialogView.findViewById(R.id.administration_notification_dialog_topic)).getSelectedItem().toString();
-
-                        final AlertDialog.Builder confirmation = new AlertDialog.Builder(getActivity());
-                        confirmation.setTitle("Confirmer l'envoi");
-                        confirmation.setMessage("Titre : "+title+"\nMessage : "+body+"\nTopic : "+topic);
-                        confirmation.setPositiveButton("Envoyer", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                sendMessage(title, body, topic, null);
-                            }
-                        });
-                        confirmation.setNegativeButton("Annuler", null);
-                        confirmation.show();
-                    }
-                });
-                builder.setNegativeButton("Annuler", null);
-                builder.show();
+               openNotificationDialog();
             }
         });
 
@@ -154,6 +127,37 @@ public class AdministrationFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    private void openNotificationDialog(){
+        final LayoutInflater factory = LayoutInflater.from(getContext());
+        final View dialogView = factory.inflate(R.layout.notification_dialog, null);
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Nouvelle notification");
+        builder.setView(dialogView);
+        builder.setPositiveButton("Envoyer", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String title = ((EditText) dialogView.findViewById(R.id.administration_notification_dialog_title)).getText().toString();
+                final String body = ((EditText) dialogView.findViewById(R.id.administration_notification_dialog_message)).getText().toString();
+                final String topic = ((Spinner) dialogView.findViewById(R.id.administration_notification_dialog_topic)).getSelectedItem().toString();
+
+                final AlertDialog.Builder confirmation = new AlertDialog.Builder(getActivity());
+                confirmation.setTitle("Confirmer l'envoi");
+                confirmation.setMessage("Titre : "+title+"\nMessage : "+body+"\nTopic : "+topic);
+                confirmation.setPositiveButton("Envoyer", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendMessage(title, body, topic, null);
+                    }
+                });
+                confirmation.setNegativeButton("Annuler", null);
+                confirmation.show();
+            }
+        });
+        builder.setNegativeButton("Annuler", null);
+        builder.show();
     }
 
     private void sendMessage(final String title, final String body, final String topic, final String icon) {
