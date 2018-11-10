@@ -24,6 +24,11 @@
         android:summary="Temps avant la notification d'un évènement"
         android:title="Notification" />
 
+    <Preference
+        android:key="firebase_button"
+        android:summary=""
+        android:title="Firebase ID" />
+
     <Preference android:title="À propos"
         android:key="about_button"
         android:summary="À propos de l'application"/>

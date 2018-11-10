@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -39,6 +40,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -72,6 +78,7 @@ import fr.esiee.bde.macao.Fragments.FairpayFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.Notifications.FirebaseService;
 import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
@@ -271,6 +278,7 @@ public class MainActivity extends AppCompatActivity
             startService(new Intent(this, NotificationService.class));
             startService(new Intent(this, WidgetUpdateService.class));
         }
+        Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());
     }
 
     @Override
@@ -646,6 +654,21 @@ public class MainActivity extends AppCompatActivity
             Log.v("connectivity", e.toString());
         }
         return false;
+    }
+
+    private void firebase(){
+        FirebaseMessaging.getInstance().subscribeToTopic("news")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "Message Reçu";
+                        if (!task.isSuccessful()) {
+                            msg = "Error..";
+                        }
+                        Log.d(TAG, msg);
+                        Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show();
+                    }
+                });
     }
 }
 
