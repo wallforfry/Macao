@@ -2,6 +2,7 @@ package fr.esiee.bde.macao.Settings;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -45,5 +46,13 @@ public class SettingsFragment extends PreferenceFragment
             }
         });
 
+        String versionNumber = "Inconnue";
+        Preference version = findPreference("version_button");
+        try {
+            versionNumber = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        version.setSummary(versionNumber);
     }
 }
