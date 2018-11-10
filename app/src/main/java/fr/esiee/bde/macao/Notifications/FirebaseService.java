@@ -6,12 +6,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.lang.reflect.Field;
 
 import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
@@ -71,7 +76,7 @@ public class FirebaseService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+            sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), remoteMessage.getNotification().getColor(), remoteMessage.getNotification().getIcon());
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -93,7 +98,7 @@ public class FirebaseService extends FirebaseMessagingService {
         Log.d(TAG, "Short lived task is done.");
     }
 
-    private void sendNotification(String messageTitle, String messageBody) {
+    private void sendNotification(String messageTitle, String messageBody, String messageColor, String messageIcon) {
         createNotificationChannel();
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -105,8 +110,7 @@ public class FirebaseService extends FirebaseMessagingService {
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
                 .setTicker(getResources().getString(R.string.app_name))
-                .setSmallIcon(R.drawable.fuego_notification_icon)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                .setSmallIcon(getNotificationIcon(messageIcon))
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setContentIntent(pendingIntent)
@@ -121,14 +125,26 @@ public class FirebaseService extends FirebaseMessagingService {
             builder.setChannelId(NOTIFICATION_CHANNEL_NAME);
         }
 
+        /*if(messageIcon != null){
+            if(!messageIcon.equals("default")) {
+                builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(messageIcon, "drawable", "fr.esiee.bde.macao")));
+            }
+            else {
+                builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+            }
+        }*/
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            builder.setColor(getColor(R.color.colorPrimary));
+        if(messageColor != null){
+            builder.setColor(Color.parseColor(messageColor));
         }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setColor(getResources().getColor(R.color.colorPrimary));
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                builder.setColor(getColor(R.color.colorPrimary));
+            }
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setColor(getResources().getColor(R.color.colorPrimary));
+            }
         }
-
 
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             builder.setSmallIcon(Icon.createWithBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
@@ -145,6 +161,17 @@ public class FirebaseService extends FirebaseMessagingService {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    private int getNotificationIcon(String messageIcon) {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        //If the build version is higher than kitkat we need to create Silhouette icon.
+        int iconId = R.drawable.fuego_notification_icon;
+        if(messageIcon != null) {
+            iconId = getResources().getIdentifier(messageIcon, "drawable", "fr.esiee.bde.macao");
+        }
+        //return useWhiteIcon ? R.drawable.fuego_notification_icon : iconId;
+        return iconId;
     }
 }
 

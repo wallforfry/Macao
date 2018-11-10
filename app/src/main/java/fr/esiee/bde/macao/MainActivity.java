@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -279,6 +280,7 @@ public class MainActivity extends AppCompatActivity
             startService(new Intent(this, WidgetUpdateService.class));
         }
         Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());
+        firebase();
     }
 
     @Override
@@ -657,18 +659,76 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void firebase(){
+
         FirebaseMessaging.getInstance().subscribeToTopic("news")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        String msg = "Message Reçu";
+                        String msg = "Subcribe to \"news\" topic";
                         if (!task.isSuccessful()) {
                             msg = "Error..";
                         }
-                        Log.d(TAG, msg);
-                        Snackbar.make(mainView, msg, Snackbar.LENGTH_LONG).show();
+                        Log.d("Firebase", msg);
                     }
                 });
+
+        try {
+
+            if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("a")) {
+
+                FirebaseMessaging.getInstance().subscribeToTopic("alpha")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                String msg = "Subcribe to \"alpha\" topic";
+                                if (!task.isSuccessful()) {
+                                    msg = "Error..";
+                                }
+                                Log.d("Firebase", msg);
+                            }
+                        });
+            }
+
+            if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("b")) {
+
+                FirebaseMessaging.getInstance().subscribeToTopic("beta")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                String msg = "Subcribe to \"beta\" topic";
+                                if (!task.isSuccessful()) {
+                                    msg = "Error..";
+                                }
+                                Log.d("Firebase", msg);
+                            }
+                        });
+            }
+
+            if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("d")) {
+
+                FirebaseMessaging.getInstance().subscribeToTopic("dev")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                String msg = "Subcribe to \"dev\" topic";
+                                if (!task.isSuccessful()) {
+                                    msg = "Error..";
+                                }
+                                Log.d("Firebase", msg);
+                            }
+                        });
+            }
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        database.close();
     }
 }
 
