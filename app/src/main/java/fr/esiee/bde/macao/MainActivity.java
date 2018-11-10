@@ -686,9 +686,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
 
-        try {
-
-            if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("a")) {
+            if(BuildConfig.VERSION_NAME.contains("a")) {
 
                 FirebaseMessaging.getInstance().subscribeToTopic("alpha")
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -703,7 +701,7 @@ public class MainActivity extends AppCompatActivity
                         });
             }
 
-            if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("b")) {
+            if(BuildConfig.VERSION_NAME.contains("b")) {
 
                 FirebaseMessaging.getInstance().subscribeToTopic("beta")
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -718,7 +716,7 @@ public class MainActivity extends AppCompatActivity
                         });
             }
 
-            if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("d")) {
+            if(BuildConfig.VERSION_NAME.contains("d")) {
 
                 FirebaseMessaging.getInstance().subscribeToTopic("dev")
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -732,11 +730,6 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
             }
-
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override
