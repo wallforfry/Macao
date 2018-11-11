@@ -16,8 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.Events.Event;
@@ -159,6 +165,23 @@ public class EventsFragment extends Fragment {
             eventsList.add(event);
             Log.i("Event", event.getTitle());
         }
+
+        Collections.sort(eventsList, new Comparator<Event>() {
+            @Override
+            public int compare(Event o1, Event o2) {
+                Calendar cal1 = Calendar.getInstance();
+                Calendar cal2 = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
+                try {
+                    cal1.setTime(sdf.parse(o1.getStart()));
+                    cal2.setTime(sdf.parse(o2.getStart()));
+                    return -cal1.compareTo(cal2);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return 0;
+            }
+        });
 
         loader.setVisibility(View.GONE);
         mAdapter.notifyDataSetChanged();
