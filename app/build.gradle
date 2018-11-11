@@ -15,8 +15,8 @@ android {
         applicationId "fr.esiee.bde.macao"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 35
-        versionName "1.3.3a"
+        versionCode 37
+        versionName "1.3.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
