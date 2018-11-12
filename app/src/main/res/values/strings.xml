@@ -14,7 +14,7 @@
         enabled for your project, you have a properly configured google-services.json file
         and that your device has an internet connection.
     </string>
-    <string name="loading">Loading…</string>
+    <string name="loading">Chargement</string>
     <string name="auth_code_fmt">Auth Code: %s</string>
     <string name="id_token_fmt">ID Token: %s</string>
 
@@ -30,7 +30,7 @@
     <string name="annales">Annales</string>
     <string name="connexion">Connexion</string>
     <string name="rooms">Salles libres</string>
-    <string name="evenements">Evenements</string>
+    <string name="evenements">Évènements</string>
     <string name="jobs">Jobs</string>
     <string name="settings">Paramètres</string>
     <string name="les_clubs">Les Clubs</string>
@@ -50,7 +50,7 @@
     <string name="week_view">Semaine</string>
 
     <!-- Permission Manager -->
-    <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations]]]></string>
+    <string name="permissionDeniedMessage"><![CDATA[Si vous refusez ces permissions, l\'utilisation de l\'application sera dégradée voir impossible \n\nMerci d\'activer les permissions dans [Paramètres] > [Autorisations] \n\nLes demandes d\'accès aux appels et aux contacts servent uniquement à pouvoir cliquer sur un numéro de téléphone afin de l\'appeler]]></string>
     <string name="close">Fermer</string>
     <string name="no_event_today">Pas d\'évènements aujourd\'hui</string>
 
@@ -59,4 +59,20 @@
     <string name="fairpay">FairPay</string>
     <string name="next"><![CDATA[>]]></string>
     <string name="previous"><![CDATA[<]]></string>
+    <string name="about_text">À propos de l\'application</string>
+    <string name="bde">BDE</string>
+    <string name="mon_espace">Mon Espace</string>
+    <string name="bde_website">bde.esiee.fr</string>
+    <string name="administration">Administration</string>
+
+    <string-array name="administrator">
+        <item>wallerand.delevacq@edu.esiee.fr</item>
+    </string-array>
+
+    <string-array name="topics">
+        <item>dev</item>
+        <item>news</item>
+        <item>alpha</item>
+        <item>beta</item>
+    </string-array>
 </resources>

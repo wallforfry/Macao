@@ -16,10 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import org.json.JSONArray;
@@ -33,8 +33,6 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Annales.Annale;
 import fr.esiee.bde.macao.Annales.AnnaleAdapter;
-import fr.esiee.bde.macao.DividerItemDecoration;
-import fr.esiee.bde.macao.Events.EventAdapter;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.MainActivity;
@@ -68,8 +66,9 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private MaterialSearchView searchView;
     private WebView webView;
     private MenuItem back;
+    private MenuItem searchButton;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     public AnnalesFragment() {
         // Required empty public constructor
@@ -110,7 +109,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_annales, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_annales);
+        recyclerView = view.findViewById(R.id.recycler_view_annales);
 
         mAdapter = new AnnaleAdapter(annalesList, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -119,7 +118,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        searchView = (MaterialSearchView) this.getActivity().findViewById(R.id.search_view);
+        searchView = this.getActivity().findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -147,7 +146,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
             }
         });
 
-        webView = (WebView) view.findViewById(R.id.annales_webview);
+        webView = view.findViewById(R.id.annales_webview);
         //webView.setWebViewClient(new annalesWebView());
         webView.getSettings().setBuiltInZoomControls(false);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -165,10 +164,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
             }
         });
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         annalesSignin();
@@ -180,8 +176,8 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.annales, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
+        searchButton = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(searchButton);
         back = menu.findItem(R.id.annale_back);
     }
 
@@ -252,7 +248,7 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
         HashMap<String, String> header = new HashMap<String, String>();
         header.put("Accept", "application/json");
         header.put("Content-Type", "application/json");
-        header.put("Authorization", "Bearer "+ this.annalesToken);
+        header.put("Authorization", "Bearer "+ annalesToken);
         HttpUtils.getByUrl("https://bde.esiee.fr/annales/api/document/search.json?s="+search+"&page=1", header, rp, new JsonHttpResponseHandler() {
 
             @Override
@@ -321,11 +317,13 @@ public class AnnalesFragment extends Fragment implements AnnaleAdapter.OnItemCli
     private void displayAnnale(String url){
         webView.loadUrl(url);
         back.setVisible(true);
+        searchButton.setVisible(false);
     }
 
     private void hideAnnale(){
         webView.setVisibility(View.GONE);
         back.setVisible(false);
+        searchButton.setVisible(true);
     }
 
 }

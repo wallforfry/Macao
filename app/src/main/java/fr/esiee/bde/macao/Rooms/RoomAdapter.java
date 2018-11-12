@@ -23,8 +23,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.MyViewHolder> 
 
         public MyViewHolder(View view) {
             super(view);
-            numEpi = (TextView) view.findViewById(R.id.numeroEpi);
-            rooms = (TextView) view.findViewById(R.id.rooms);
+            numEpi = view.findViewById(R.id.numeroEpi);
+            rooms = view.findViewById(R.id.rooms);
         }
     }
 

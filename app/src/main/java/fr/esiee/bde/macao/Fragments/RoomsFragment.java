@@ -3,6 +3,7 @@ package fr.esiee.bde.macao.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,14 +15,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,6 +33,7 @@ import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.DividerItemDecoration;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Rooms.Room;
 import fr.esiee.bde.macao.Rooms.RoomAdapter;
@@ -58,8 +61,9 @@ public class RoomsFragment extends Fragment {
     private List<Room> roomsList = new ArrayList<Room>();
     private RecyclerView recyclerView;
     private RoomAdapter mAdapter;
+    private View view;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private TextView currentDisplayedTime;
     private int shift;
@@ -103,11 +107,11 @@ public class RoomsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_rooms, container, false);
+        view = inflater.inflate(R.layout.fragment_rooms, container, false);
 
-        currentDisplayedTime = (TextView) view.findViewById(R.id.rooms_current_time);
+        currentDisplayedTime = view.findViewById(R.id.rooms_current_time);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_rooms);
+        recyclerView = view.findViewById(R.id.recycler_view_rooms);
 
         mAdapter = new RoomAdapter(roomsList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -116,10 +120,7 @@ public class RoomsFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         getRooms(shift);
@@ -243,6 +244,7 @@ public class RoomsFragment extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 mListener.makeSnackBar("Oups...");
+                loader.setVisibility(View.GONE);
             }
         });
 

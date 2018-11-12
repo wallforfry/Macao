@@ -2,9 +2,12 @@ package fr.esiee.bde.macao.Events;
 
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -40,15 +43,25 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Created by delevacw on 08/11/17.
  */
 
-public class EventService extends Service {
+public class EventService extends JobService {
 
+    private static final String NOTIFICATION_CHANNEL_NAME = "Calendrier BDE";
+    private static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Notification des évènements du BDE";
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
+        doJob();
+        stopSelf();
 
+        return START_STICKY;
+    }
+
+    private void doJob() {
+        Log.d("EventService", "StartService");
+        createNotificationChannel();
         try {
             dbHelper =  new DataBaseHelper(this);
             database = dbHelper.getWritableDatabase();
@@ -58,16 +71,17 @@ public class EventService extends Service {
         catch (SQLiteException e){
             Log.e("EventService", e.toString());
         }
-
-        stopSelf();
-
-        return START_NOT_STICKY;
     }
 
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        doJob();
+        return false;
+    }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public boolean onStopJob(JobParameters params) {
+        return false;
     }
 
     @Override
@@ -172,8 +186,8 @@ public class EventService extends Service {
 
         Notification.Builder builder = new Notification.Builder(this)
                 .setWhen(System.currentTimeMillis())
-                .setTicker("Titre")
-                .setSmallIcon(R.drawable.ic_launcher_transparent)
+                .setTicker(event.getTitle())
+                .setSmallIcon(R.drawable.fuego_notification_icon)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle("Nouvel évènement")
                 .setContentText(event.getTitle())
@@ -183,14 +197,18 @@ public class EventService extends Service {
                 .setOnlyAlertOnce(true)
                 .setAutoCancel(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setColor(getResources().getColor(R.color.colorPrimary));
-        }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 builder.setColor(getColor(R.color.colorPrimary));
         }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setColor(getResources().getColor(R.color.colorPrimary));
+        }
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(NOTIFICATION_CHANNEL_NAME);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             builder.setShowWhen(true);
         }
 
@@ -198,5 +216,21 @@ public class EventService extends Service {
 
         event.setNotified(true);
         cupboard().withDatabase(database).put(event);
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = NOTIFICATION_CHANNEL_NAME;
+            String description = NOTIFICATION_CHANNEL_DESCRIPTION;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_NAME, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

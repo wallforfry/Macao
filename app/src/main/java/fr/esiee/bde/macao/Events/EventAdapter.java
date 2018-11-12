@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import java.util.Objects;
 
 import fr.esiee.bde.macao.R;
 
@@ -38,15 +37,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder
 
         public MyViewHolder(View view) {
             super(view);
-            day = (TextView) view.findViewById(R.id.event_day);
-            date = (TextView) view.findViewById(R.id.event_date);
-            month = (TextView) view.findViewById(R.id.event_month);
-            title = (TextView) view.findViewById(R.id.event_title);
-            time = (TextView) view.findViewById(R.id.event_time);
-            place = (TextView) view.findViewById(R.id.event_place);
-            image = (ImageView) view.findViewById(R.id.event_image);
-            place_layout = (RelativeLayout) view.findViewById(R.id.event_place_layout);
-            link = (Button) view.findViewById(R.id.event_link);
+            day = view.findViewById(R.id.event_day);
+            date = view.findViewById(R.id.event_date);
+            month = view.findViewById(R.id.event_month);
+            title = view.findViewById(R.id.event_title);
+            time = view.findViewById(R.id.event_time);
+            place = view.findViewById(R.id.event_place);
+            image = view.findViewById(R.id.event_image);
+            place_layout = view.findViewById(R.id.event_place_layout);
+            link = view.findViewById(R.id.event_link);
 
             link.setOnClickListener(this);
         }
@@ -82,7 +81,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.MyViewHolder
         Event event = eventsList.get(position);
         holder.day.setText(event.getDayStart());
         holder.date.setText(event.getDateStart());
-        holder.month.setText(event.getMonthStart());
+        holder.month.setText(event.getMonthStartShort());
         holder.title.setText(event.getTitle());
         holder.time.setText(event.getTimeString());
         if(!event.getPlace().equals("")) {

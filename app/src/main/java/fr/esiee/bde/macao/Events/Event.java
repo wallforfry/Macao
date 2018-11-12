@@ -69,6 +69,19 @@ public class Event {
         }
     }
 
+    public String getMonthStartShort(){
+        GregorianCalendar calendar = new GregorianCalendar();
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
+        SimpleDateFormat monthformat = new SimpleDateFormat("MMM", Locale.FRANCE);
+        try {
+            calendar.setTime(dateformat.parse(this.start));
+            return monthformat.format(calendar.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public String getMonthStart(){
         GregorianCalendar calendar = new GregorianCalendar();
         SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);

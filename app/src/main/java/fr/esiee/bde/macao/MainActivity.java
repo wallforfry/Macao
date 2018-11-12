@@ -10,28 +10,27 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -42,17 +41,38 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
-import com.lusfold.spinnerloading.SpinnerLoading;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
-import cz.msebera.android.httpclient.client.cache.Resource;
+import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
+import fr.esiee.bde.macao.Fragments.AdministrationFragment;
 import fr.esiee.bde.macao.Fragments.AnnalesFragment;
 import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
@@ -60,14 +80,22 @@ import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.FairpayFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
-import fr.esiee.bde.macao.Fragments.SignInFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.Notifications.FirebaseService;
+import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.Settings.SettingsActivity;
 import fr.esiee.bde.macao.Widget.WidgetUpdateService;
 
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
+
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, OnFragmentInteractionListener{
+        implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, OnFragmentInteractionListener, Drawer.OnDrawerItemClickListener {
+
+    private static final int ADD_PROFILE = 100000;
+    private static final int REMOVE_PROFILE = 100001;
+    private AccountHeader headerResult = null;
+    private Drawer drawer = null;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -85,31 +113,30 @@ public class MainActivity extends AppCompatActivity
     private String id = "";
     private String authCode = "";
 
-    private NavigationView navigationView;
-    TextView nameDrawer;
-    TextView mailDrawer;
-    ImageView pictureDrawer;
-    ImageView backgroundDrawer;
-    private int selectedMenuItemId;
-
     private View mainView;
 
     private Fragment currentFragment = null;
 
     private SQLiteDatabase database;
 
+    private ProfileDrawerItem profileDrawerItemBDE;
+    private ProfileSettingDrawerItem profileSettingDrawerItemAdd;
+    private ProfileSettingDrawerItem profileSettingDrawerItemLogout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mainView = findViewById(R.id.drawer_layout);
+
         DataBaseHelper dbHelper= new DataBaseHelper(this);
         database = dbHelper.getWritableDatabase();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,23 +144,92 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
+        });*/
+
+
+        //initialize and create the image loader logic
+        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
+            @Override
+            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+                //Picasso.get().load(uri).placeholder(placeholder).into(imageView);
+                Picasso.with(MainActivity.this).load(uri).into(imageView);
+
+            }
+
+            @Override
+            public void cancel(ImageView imageView) {
+                Picasso.with(MainActivity.this).cancelRequest(imageView);
+            }
+
+            /*
+            @Override
+            public Drawable placeholder(Context ctx) {
+                return super.placeholder(ctx);
+            }
+
+            @Override
+            public Drawable placeholder(Context ctx, String tag) {
+                return super.placeholder(ctx, tag);
+            }
+            */
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        profileDrawerItemBDE = new ProfileDrawerItem().withName(getResources().getString(R.string.app_name)).withEmail("Pas d'utilisateur connecté").withIcon(getResources().getDrawable(R.mipmap.ic_launcher));
+        profileSettingDrawerItemAdd = new ProfileSettingDrawerItem().withName("Ajouter un compte").withDescription("Compte ESIEE Paris").withIcon(R.drawable.baseline_person_add_black_24dp).withIdentifier(ADD_PROFILE);
+        profileSettingDrawerItemLogout = new ProfileSettingDrawerItem().withName("Déconnexion").withIcon(R.drawable.baseline_delete_black_24dp).withIdentifier(REMOVE_PROFILE);
 
 
-        this.navigationView = (NavigationView) findViewById(R.id.nav_view);
-        View headerView = navigationView.getHeaderView(0);
-        nameDrawer = (TextView) headerView.findViewById(R.id.nameDrawer);
-        mailDrawer = (TextView) headerView.findViewById(R.id.mailDrawer);
-        pictureDrawer = (ImageView) headerView.findViewById(R.id.imageDrawer);
-        backgroundDrawer = (ImageView) headerView.findViewById(R.id.backgroundDrawer);
+        headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.couverture)
+                .addProfiles(
+                        profileDrawerItemBDE,
+                        profileSettingDrawerItemAdd
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        if (profile instanceof IDrawerItem && profile.getIdentifier() == ADD_PROFILE) {
+                            signIn();
+                        }
+                        else if (profile instanceof IDrawerItem && profile.getIdentifier() == REMOVE_PROFILE) {
+                            signOut();
+                        }
+                        return false;
+                    }
+                })
+                .build();
 
-        navigationView.setNavigationItemSelectedListener(this);
+
+        drawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        new SectionDrawerItem().withName(R.string.bde).withDivider(false),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_rooms).withName(R.string.rooms).withIcon(R.drawable.baseline_room_black_24dp),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_events).withName(R.string.evenements).withIcon(R.drawable.baseline_event_black_24dp),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_jobs).withName(R.string.jobs).withIcon(R.drawable.ic_work_black_24dp),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_clubs).withName(R.string.les_clubs).withIcon(R.drawable.baseline_group_black_24dp),
+                        new SectionDrawerItem().withName(R.string.mon_espace),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_calendar).withName(R.string.agenda).withIcon(R.drawable.baseline_date_range_black_24dp),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_fairpay).withName(R.string.fairpay).withIcon(R.drawable.ic_payment_black_24dp),
+                        new PrimaryDrawerItem().withIdentifier(R.id.nav_annales).withName(R.string.annales).withIcon(R.drawable.baseline_book_black_24dp),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withIdentifier(R.id.nav_settings).withName(R.string.settings).withIcon(R.drawable.baseline_settings_black_24dp),
+                        new SecondaryDrawerItem().withIdentifier(R.id.nav_send).withName(R.string.rapport_de_bug).withIcon(R.drawable.ic_menu_send)
+                )
+                .withStickyFooter(R.layout.drawer_footer)
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .withOnDrawerItemClickListener(this)
+                .withAccountHeader(headerResult)
+                .build();
+
+
+        if (savedInstanceState == null) {
+            drawer.setSelection(R.id.nav_calendar, true);
+        }
+
 
         mainView = findViewById(R.id.content_main);
 
@@ -161,54 +257,43 @@ public class MainActivity extends AppCompatActivity
             }
 
             @Override
-            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                //close the app or do whatever you want
-                makeSnackBar("Permissions manquantes..");
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Snackbar.make(mainView, "Permissions manquantes..", Snackbar.LENGTH_LONG);
             }
         };
 
         TedPermission.with(this)
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage(R.string.close)
-                .setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS)
+                .setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.VIBRATE, Manifest.permission.INTERNET)
                 .setGotoSettingButtonText(R.string.settings)
-                .setDeniedCloseButtonText(R.string.permissionDeniedMessage)
+                .setDeniedCloseButtonText(R.string.close)
+                .setDeniedMessage(R.string.permissionDeniedMessage)
                 .check();
 
-        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        ProgressBar loader = findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         if(savedInstanceState == null) {
-            //startService(new Intent(this, AutoStart.class));
+            sendBroadcast(new Intent(this, AutoStart.class));
             startService(new Intent(this, CalendarService.class));
             startService(new Intent(this, EventService.class));
             //startService(new Intent(this, NotificationService.class));
             startService(new Intent(this, WidgetUpdateService.class));
-
-            onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
         }
-        else {
-            //onNavigationItemSelected(navigationView.getMenu().getItem(1).getSubMenu().getItem(0));
-            // Todo: select item in drawer when orientation change
-        }
-
-        if(getIntent() != null) {
-            int menuItem = getIntent().getIntExtra("SelectedMenuItem", 1);
-            int subMenuItem = getIntent().getIntExtra("SelectedSubMenuItem", 0);
-            onNavigationItemSelected(navigationView.getMenu().getItem(menuItem).getSubMenu().getItem(subMenuItem));
-        }
+        Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());
+        firebase();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState = drawer.saveInstanceState(outState);
         super.onSaveInstanceState(outState);
-        //outState.putInt("SelectedMenuItemId", selectedMenuItemId);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        //selectedMenuItemId = savedInstanceState.getInt("SelectedMenuItemId");
     }
 
     @Override
@@ -236,7 +321,7 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
-        SpinnerLoading loader = (SpinnerLoading) findViewById(R.id.loader_view);
+        ProgressBar loader = findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
     }
@@ -244,9 +329,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop(){
         super.onStop();
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
+        hideProgressDialog();
     }
 
     @Override
@@ -257,9 +340,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        //handle the back press :D close the drawer first and if the drawer is closed close the activity
+        if (drawer != null && drawer.isDrawerOpen()) {
+            drawer.closeDrawer();
         } else {
             super.onBackPressed();
         }
@@ -287,22 +370,145 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public void onClick(View v) {
+        switch (v.getId()){
+            default:
+                break;
+        }
+    }
+
+    public void signIn() {
+        showProgressDialog();
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+        drawer.setSelection(R.id.nav_calendar, true);
+    }
+
+    private void signOut() {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        username = "";
+                        firstname = "";
+                        lastname = "";
+                        mail = "";
+                        id = "";
+                        idToken = "";
+                        authCode = "";
+
+
+                        SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("mail", "");
+                        editor.apply();
+                        headerResult.clear();
+                        headerResult.addProfiles(
+                                profileDrawerItemBDE,
+                                profileSettingDrawerItemAdd
+                        );
+                        cupboard().withDatabase(database).delete(CalendarEvent.class, null);
+                        drawer.setSelection(R.id.nav_calendar, true);
+                        drawer.removeItem(R.id.nav_administration);
+                    }
+                });
+    }
+
+    public void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getEmail()));
+
+            String email = acct.getEmail();
+
+                this.idToken = acct.getIdToken();
+                this.id = acct.getId();
+                //this.authCode = acct.getServerAuthCode();
+
+                AccountManager am = AccountManager.get(this);
+                Bundle options = new Bundle();
+
+                am.getAuthToken(
+                        acct.getAccount(),                     // Account retrieved using getAccountsByType()
+                        "Manage your tasks",            // Auth scope
+                        options,                        // Authenticator-specific options
+                        this,                           // Your activity
+                        new OnTokenAcquired(),          // Callback called when a token is successfully acquired
+                        null);    // Callback called if an error occurs
+
+            if (email.substring(email.indexOf("@")).equals("@edu.esiee.fr")) {
+
+                String firstname = email.substring(0, email.indexOf("."));
+                String lastname = email.substring(email.indexOf(".") + 1, email.indexOf("@"));
+                String username;
+                if (lastname.length() >= 7) {
+                    username = lastname.substring(0, 7) + firstname.substring(0, 1);
+                } else {
+                    username = lastname + firstname.substring(0, 1);
+                }
+                this.username = username;
+                this.firstname = firstname;
+                this.lastname = lastname;
+                mail = email;
+                isSignedIn = true;
+
+                Uri uri = acct.getPhotoUrl();
+                String pictureUrl = null;
+                if (uri != null) {
+                    pictureUrl = uri.toString();
+                }
+
+                headerResult.clear();
+                if (pictureUrl != null) {
+                    headerResult.addProfiles(
+                            new ProfileDrawerItem().withName(username).withEmail(mail).withIcon(pictureUrl),
+                            profileSettingDrawerItemLogout
+                    );
+                }
+                else {
+                    headerResult.addProfiles(
+                            new ProfileDrawerItem().withName(username).withEmail(mail).withIcon(R.mipmap.ic_launcher),
+                            profileSettingDrawerItemLogout
+                    );
+                }
+
+                //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("mail", email);
+                editor.apply();
+
+                if(Arrays.asList(getResources().getStringArray(R.array.administrator)).contains(mail)){
+                    if(drawer.getDrawerItem(R.id.nav_administration) == null) {
+                        drawer.addItemAtPosition(
+                                new SecondaryDrawerItem().withIdentifier(R.id.nav_administration).withName(R.string.administration).withIcon(R.drawable.baseline_developer_board_black_24dp)
+                                , drawer.getPosition(R.id.nav_settings));
+                    }
+                }
+
+                startService(new Intent(this, CalendarService.class));
+            } else {
+                Snackbar.make(mainView, "Veuillez vous connecter avec un compte ESIEE", Snackbar.LENGTH_LONG).show();
+                signOut();
+            }
+        }
+    }
+
+    @Override
+    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
         Fragment fragment = null;
 
         // Handle navigation view item clicks here.
-        switch(item.getItemId()){
+        switch((int) drawerItem.getIdentifier()){
 
-            case R.id.nav_calendar:
-                fragment = new CalendarFragment();
-                break;
-            case R.id.nav_signin:
-                fragment = new SignInFragment();
-                break;
             case R.id.nav_rooms:
                 fragment = new RoomsFragment();
+                break;
+            case R.id.nav_calendar:
+                fragment = new CalendarFragment();
                 break;
             case R.id.nav_jobs:
                 fragment = new JobsFragment();
@@ -318,6 +524,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_fairpay:
                 fragment = new FairpayFragment();
+                break;
+            case R.id.nav_administration:
+                fragment = new AdministrationFragment();
                 break;
             case R.id.nav_send:
                 /*Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
@@ -347,154 +556,17 @@ public class MainActivity extends AppCompatActivity
             transaction.replace(R.id.content_main, fragment, "FragmentSaved");
             transaction.commit();
 
-            // Unchecked all items
-            int size = navigationView.getMenu().size();
-            for (int i = 0; i < size; i++) {
-                if(navigationView.getMenu().getItem(i).getSubMenu() != null) {
-                    int subSize = navigationView.getMenu().getItem(i).getSubMenu().size();
-                    for (int j = 0; j < subSize; j++) {
-                        navigationView.getMenu().getItem(i).getSubMenu().getItem(j).setChecked(false);
-                    }
-                }
-                navigationView.getMenu().getItem(i).setChecked(false);
+            if(drawerItem instanceof PrimaryDrawerItem) {
+                setTitle(getResources().getString(((PrimaryDrawerItem) drawerItem).getName().getTextRes()));
             }
-
-            item.setChecked(true);
-            setTitle(item.getTitle());
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+            else if(drawerItem instanceof SecondaryDrawerItem){
+                setTitle(getResources().getString(((SecondaryDrawerItem) drawerItem).getName().getTextRes()));
+            }
+            else {
+                setTitle(getResources().getString(R.string.app_name));
+            }
         }
-
         return false;
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            default:
-                break;
-        }
-    }
-
-    public void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    public void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // [START_EXCLUDE]
-                        nameDrawer.setText(R.string.app_name);
-                        mailDrawer.setText("");
-                        username = "";
-                        firstname = "";
-                        lastname = "";
-                        mail = "";
-                        id = "";
-                        idToken = "";
-                        authCode = "";
-                        updateUI(false);
-
-                        SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("mail", "");
-                        editor.commit();
-
-                        // [END_EXCLUDE]
-                    }
-                });
-    }
-
-    private void revokeAccess() {
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // [START_EXCLUDE]
-                        updateUI(false);
-                        // [END_EXCLUDE]
-                    }
-                });
-    }
-
-    public void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getEmail()));
-
-            String email = acct.getEmail();
-            //Log.d("MAIN", acct.getServerAuthCode());
-            //String token = acct.getIdToken();
-            //Log.d("MAIN", token);
-            this.idToken = acct.getIdToken();
-            this.id = acct.getId();
-            //this.authCode = acct.getServerAuthCode();
-
-            AccountManager am = AccountManager.get(this);
-            Bundle options = new Bundle();
-
-            am.getAuthToken(
-                    acct.getAccount(),                     // Account retrieved using getAccountsByType()
-                    "Manage your tasks",            // Auth scope
-                    options,                        // Authenticator-specific options
-                    this,                           // Your activity
-                    new OnTokenAcquired(),          // Callback called when a token is successfully acquired
-                    null);    // Callback called if an error occurs
-
-
-            if (email.substring(email.indexOf("@")).equals("@edu.esiee.fr")) {
-                String firstname = email.substring(0, email.indexOf("."));
-                String lastname = email.substring(email.indexOf(".") + 1, email.indexOf("@"));
-                String username;
-                if (lastname.length() >= 7) {
-                    username = lastname.substring(0, 7) + firstname.substring(0, 1);
-                } else {
-                    username = lastname + firstname.substring(0, 1);
-                }
-                this.username = username;
-                this.firstname = firstname;
-                this.lastname = lastname;
-                mail = email;
-                isSignedIn = true;
-
-                this.nameDrawer.setText(username);
-                this.mailDrawer.setText(mail);
-                Uri uri = acct.getPhotoUrl();
-                String pictureUrl = null;
-                if (uri != null) {
-                    pictureUrl = uri.toString();
-                }
-                if (pictureUrl != null) {
-                    Picasso.with(this).load(pictureUrl).into(pictureDrawer);
-                } else {
-                    pictureDrawer.setImageResource(R.mipmap.ic_launcher);
-                }
-
-                //mStatusTextView.setText(username);
-
-                //SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences sharedPref = getSharedPreferences("UserData", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("mail", email);
-                editor.commit();
-
-                startService(new Intent(this, CalendarService.class));
-
-                updateUI(true);
-            } else {
-                signOut();
-                makeSnackBar("Veuillez vous connecter avec un compte ESIEE");
-            }
-        } else {
-            // Signed out, show unauthenticated UI.
-            updateUI(false);
-        }
     }
 
     private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
@@ -507,7 +579,6 @@ public class MainActivity extends AppCompatActivity
                 // The token is a named value in the bundle. The name of the value
                 // is stored in the constant AccountManager.KEY_AUTHTOKEN.
                 idToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-                Log.d("IDDDD", idToken);
             } catch (OperationCanceledException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -546,14 +617,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void updateUI(boolean signedIn) {
-        this.isSignedIn = signedIn;
-
-        if(currentFragment instanceof SignInFragment) {
-            ((SignInFragment) currentFragment).connectUser(signedIn);
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -568,6 +631,7 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
+        Snackbar.make(mainView, "Connexion impossible", Snackbar.LENGTH_LONG);
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
@@ -577,46 +641,101 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void makeSnackBar(String text){
-        Snackbar snackbar = Snackbar
-                .make(mainView, text, Snackbar.LENGTH_LONG);
-
-        if(text.equals("Connectez vous d'abord sur le site")){
-            snackbar.setAction("Ici", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bde.esiee.fr/aurion/agenda"));
-                    startActivity(browserIntent);
-                }
-            });
-        }
-
-        snackbar.show();
+    public void makeSnackBar(String text) {
+        Snackbar.make(mainView, text, Snackbar.LENGTH_SHORT);
     }
+
 
     public static boolean isSignedIn() {
         return isSignedIn;
     }
 
-    public void setSignedIn(boolean signedIn) {
-        isSignedIn = signedIn;
-    }
-
-    public String getUsername() {
-        return username;
-    }
 
     public String getIdToken() {
         return idToken;
     }
 
-    public static String getMail() {
-        return mail;
+    public boolean isNetworkAvailable() {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) this
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            boolean connected = networkInfo != null && networkInfo.isAvailable() &&
+                    networkInfo.isConnected();
+            return connected;
+
+        } catch (Exception e) {
+            System.out.println("CheckConnectivity Exception: " + e.getMessage());
+            Log.v("connectivity", e.toString());
+        }
+        return false;
     }
 
-    public SQLiteDatabase getDatabase(){
-        return this.database;
+    private void firebase(){
+
+        FirebaseMessaging.getInstance().subscribeToTopic("news")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "Subcribe to \"news\" topic";
+                        if (!task.isSuccessful()) {
+                            msg = "Error..";
+                        }
+                        Log.d("Firebase", msg);
+                    }
+                });
+
+            if(BuildConfig.VERSION_NAME.contains("a")) {
+
+                FirebaseMessaging.getInstance().subscribeToTopic("alpha")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                String msg = "Subcribe to \"alpha\" topic";
+                                if (!task.isSuccessful()) {
+                                    msg = "Error..";
+                                }
+                                Log.d("Firebase", msg);
+                            }
+                        });
+            }
+
+            if(BuildConfig.VERSION_NAME.contains("b")) {
+
+                FirebaseMessaging.getInstance().subscribeToTopic("beta")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                String msg = "Subcribe to \"beta\" topic";
+                                if (!task.isSuccessful()) {
+                                    msg = "Error..";
+                                }
+                                Log.d("Firebase", msg);
+                            }
+                        });
+            }
+
+            if(BuildConfig.VERSION_NAME.contains("d")) {
+
+                FirebaseMessaging.getInstance().subscribeToTopic("dev")
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                String msg = "Subcribe to \"dev\" topic";
+                                if (!task.isSuccessful()) {
+                                    msg = "Error..";
+                                }
+                                Log.d("Firebase", msg);
+                            }
+                        });
+            }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        database.close();
+    }
 }
 

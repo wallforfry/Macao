@@ -8,41 +8,29 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
-import com.alamkanak.weekview.WeekViewEvent;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
-import cz.msebera.android.httpclient.Header;
-import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
-import fr.esiee.bde.macao.DividerItemDecoration;
-import fr.esiee.bde.macao.HttpUtils;
-import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.R;
 import fr.esiee.bde.macao.Events.Event;
 import fr.esiee.bde.macao.Events.EventAdapter;
+import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.R;
 
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -69,7 +57,7 @@ public class EventsFragment extends Fragment {
     private RecyclerView recyclerView;
     private EventAdapter mAdapter;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
@@ -114,7 +102,7 @@ public class EventsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_events, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_events);
+        recyclerView = view.findViewById(R.id.recycler_view_events);
 
         mAdapter = new EventAdapter(eventsList, this.getContext());
         //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -134,10 +122,7 @@ public class EventsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         retrieveEvents();
@@ -177,10 +162,26 @@ public class EventsFragment extends Fragment {
         Iterable<Event> itr = cupboard().withCursor(cursor).iterate(Event.class);
         for (Event event: itr) {
             // do something with book
-            //WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
             eventsList.add(event);
             Log.i("Event", event.getTitle());
         }
+
+        Collections.sort(eventsList, new Comparator<Event>() {
+            @Override
+            public int compare(Event o1, Event o2) {
+                Calendar cal1 = Calendar.getInstance();
+                Calendar cal2 = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.FRANCE);
+                try {
+                    cal1.setTime(sdf.parse(o1.getStart()));
+                    cal2.setTime(sdf.parse(o2.getStart()));
+                    return -cal1.compareTo(cal2);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return 0;
+            }
+        });
 
         loader.setVisibility(View.GONE);
         mAdapter.notifyDataSetChanged();

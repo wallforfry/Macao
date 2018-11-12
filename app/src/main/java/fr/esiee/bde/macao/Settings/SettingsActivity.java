@@ -1,12 +1,18 @@
 package fr.esiee.bde.macao.Settings;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 /**
@@ -40,15 +46,4 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public static class SettingsFragment extends PreferenceFragment
-    {
-        @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
-        }
-    }
-
 }

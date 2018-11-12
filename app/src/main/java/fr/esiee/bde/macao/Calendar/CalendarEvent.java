@@ -1,12 +1,22 @@
 package fr.esiee.bde.macao.Calendar;
 
+import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.model.WeekViewEvent;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import static android.graphics.Color.parseColor;
 
 /**
  * Created by Wallerand on 06/06/2017.
  */
 
-public class CalendarEvent {
+public class CalendarEvent implements WeekViewDisplayable<CalendarEvent> {
     private Long _id;
     private int eventId;
     private String title, startString,endString, name, rooms, prof, unite;
@@ -18,6 +28,7 @@ public class CalendarEvent {
     }
 
     public CalendarEvent(int eventId, String title, String startString, String endString, String name){
+        this._id = (long) eventId;
         this.eventId = eventId;
         this.title = title;
         this.startString = startString;
@@ -118,5 +129,49 @@ public class CalendarEvent {
 
     public void setNotified(boolean notified) {
         this.notified = notified;
+    }
+
+    @Override
+    public WeekViewEvent<CalendarEvent> toWeekViewEvent() {
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.FRANCE);
+        dateformat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date start = null;
+        Date end = null;
+        try {
+            start = dateformat.parse(startString);
+            end = dateformat.parse(endString);
+            Calendar startTime = Calendar.getInstance();
+            startTime.set(Calendar.DAY_OF_MONTH, start.getDate());
+            startTime.set(Calendar.HOUR_OF_DAY, start.getHours());
+            startTime.set(Calendar.MINUTE, start.getMinutes());
+            startTime.set(Calendar.MONTH, start.getMonth());
+            startTime.set(Calendar.YEAR, start.getYear()+1900);
+            Calendar endTime = (Calendar) startTime.clone();
+            endTime.set(Calendar.HOUR_OF_DAY, end.getHours());
+            endTime.set(Calendar.MINUTE, end.getMinutes()-1);
+            endTime.set(Calendar.MONTH, end.getMonth());
+            endTime.set(Calendar.YEAR, start.getYear()+1900);
+            WeekViewEvent event = new WeekViewEvent<>(_id,title,startTime,endTime,"",0,false,this);
+            //WeekViewEvent event = new WeekViewEvent<>(_id, title, startTime, endTime);
+            if(name.contains("CTRL")){
+                event.setColor(parseColor("#e74c3c"));
+            }
+            else if(name.contains("TD")){
+                event.setColor(parseColor("#f39c12"));
+            }
+            else if(name.contains("PERS")){
+                event.setColor(parseColor("#95a5a6"));
+            }
+            else if(name.contains("TP")){
+                event.setColor(parseColor("#27ae60"));
+            }
+            else {
+                event.setColor(parseColor("#35a9fb"));
+            }
+            return event;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -4,19 +4,19 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,11 +28,9 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Clubs.Club;
 import fr.esiee.bde.macao.Clubs.ClubAdapter;
-import fr.esiee.bde.macao.DividerItemDecoration;
-import fr.esiee.bde.macao.Events.Event;
-import fr.esiee.bde.macao.Events.EventAdapter;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
 
 /**
@@ -58,8 +56,9 @@ public class ClubsFragment extends Fragment {
     private List<Club> clubsList = new ArrayList<Club>();
     private RecyclerView recyclerView;
     private ClubAdapter mAdapter;
+    private View view;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     public ClubsFragment() {
         // Required empty public constructor
@@ -96,9 +95,9 @@ public class ClubsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_clubs, container, false);
+        view = inflater.inflate(R.layout.fragment_clubs, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_clubs);
+        recyclerView = view.findViewById(R.id.recycler_view_clubs);
 
         mAdapter = new ClubAdapter(clubsList, this.getContext());
         //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -118,10 +117,7 @@ public class ClubsFragment extends Fragment {
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         getEvents();

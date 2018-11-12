@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,31 +16,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-
-import com.alamkanak.weekview.DateTimeInterpreter;
-import com.alamkanak.weekview.MonthLoader;
-import com.alamkanak.weekview.WeekView;
-import com.alamkanak.weekview.WeekViewEvent;
-import com.lusfold.spinnerloading.SpinnerLoading;
+import com.alamkanak.weekview.data.MonthLoader;
+import com.alamkanak.weekview.listeners.EmptyViewLongPressListener;
+import com.alamkanak.weekview.listeners.EventClickListener;
+import com.alamkanak.weekview.listeners.EventLongPressListener;
+import com.alamkanak.weekview.model.WeekViewDisplayable;
+import com.alamkanak.weekview.model.WeekViewEvent;
+import com.alamkanak.weekview.ui.WeekView;
+import com.alamkanak.weekview.utils.DateTimeInterpreter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
-import fr.esiee.bde.macao.Notifications.NotificationService;
 import fr.esiee.bde.macao.R;
 import me.drakeet.materialdialog.MaterialDialog;
 
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -51,7 +51,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
  * Use the {@link CalendarFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CalendarFragment extends Fragment implements WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
+public class CalendarFragment extends Fragment implements EventClickListener<CalendarEvent>, MonthLoader.MonthChangeListener, EventLongPressListener<CalendarEvent>, EmptyViewLongPressListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -70,12 +70,16 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     private WeekView mWeekView;
 
     private View view;
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
-    private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+    private List<WeekViewDisplayable> events = new ArrayList<WeekViewDisplayable>();
 
     private DataBaseHelper dbHelper;
     private SQLiteDatabase database;
+
+    private Calendar mCalendar;
+
+    private static int monthTriggered = 0;
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -109,6 +113,8 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         setHasOptionsMenu(true);
         dbHelper =  new DataBaseHelper(this.getContext());
         database = dbHelper.getWritableDatabase();
+
+        mCalendar = Calendar.getInstance();
     }
 
     @Override
@@ -117,7 +123,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_calendar, container, false);
         // Get a reference for the week view in the layout.
-        mWeekView = (WeekView) view.findViewById(R.id.weekView);
+        mWeekView = view.findViewById(R.id.weekView);
 
         // Show a toast message about the touched event.
         mWeekView.setOnEventClickListener(this);
@@ -138,15 +144,18 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         // the week view. This is optional.
         setupDateTimeInterpreter(true);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         //getGroups();
-        retrieveEvents();
+        //retrieveEvents(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH));
         //getEvents();
+
+        monthTriggered = 0;
+        events.clear();
+        mWeekView.goToToday();
+        mWeekView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        getActivity().startService(new Intent(this.getContext(), CalendarService.class));
 
         return view;
     }
@@ -187,7 +196,10 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
         setupDateTimeInterpreter(id == R.id.action_week_view);
         switch (id){
             case R.id.action_today:
+                monthTriggered = 0;
+                events.clear();
                 mWeekView.goToToday();
+                mWeekView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
                 return true;
             case R.id.action_day_view:
                 if (mWeekViewType != TYPE_DAY_VIEW) {
@@ -217,7 +229,7 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 if (mWeekViewType != TYPE_WEEK_VIEW) {
                     item.setChecked(!item.isChecked());
                     mWeekViewType = TYPE_WEEK_VIEW;
-                    mWeekView.setNumberOfVisibleDays(7);
+                    mWeekView.setNumberOfVisibleDays(6);
 
                     // Lets change some dimensions to best fit the view.
                     mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
@@ -226,7 +238,11 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 }
                 return true;
             case R.id.action_update_events:
-                this.retrieveEvents();
+                monthTriggered = 0;
+                events.clear();
+                //retrieveEvents(mCalendar, mCalendar);
+                mWeekView.goToToday();
+                mWeekView.goToHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
                 getActivity().startService(new Intent(this.getContext(), CalendarService.class));
                 return true;
             default:
@@ -246,19 +262,16 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                 SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
                 String weekday = weekdayNameFormat.format(date.getTime());
                 SimpleDateFormat format = new SimpleDateFormat(" d/M", Locale.getDefault());
-
-                // All android api level do not have a standard way of getting the first letter of
-                // the week day name. Hence we get the first char programmatically.
-                // Details: http://stackoverflow.com/questions/16959502/get-one-letter-abbreviation-of-week-day-of-a-date-in-java#answer-16959657
-                if (shortDate)
-                    weekday = String.valueOf(weekday.charAt(0));
+                //if (shortDate)
+                //    weekday = String.valueOf(weekday.charAt(0));
                 return weekday.toUpperCase() + format.format(date.getTime());
             }
+
             @Override
-            public String interpretTime(int hour, int minute) {
-                //return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
-                return hour +"h";
+            public String interpretTime(int hour) {
+                return hour + "h";
             }
+
         });
     }
 
@@ -267,91 +280,77 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
     }
 
     @Override
-    public void onEventClick(WeekViewEvent event, RectF eventRect) {
+    public void onEventClick(CalendarEvent event, RectF eventRect) {
         //Toast.makeText(this.getActivity().getApplicationContext(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
         openDialog(event);
     }
 
     @Override
-    public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(this.getActivity().getApplicationContext(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+    public void onEventLongPress(CalendarEvent event, RectF eventRect) {
+        //Toast.makeText(this.getActivity().getApplicationContext(), "Long pressed event: " + event.toWeekViewEvent().getData().getName(), Toast.LENGTH_SHORT).show();
+        final Snackbar snack = Snackbar.make(view.getRootView(), "Merci d'avoir demandé à la planif de retirer ce cours. Ils vous recontacteront ultérieurement", Snackbar.LENGTH_INDEFINITE);
+        snack.setAction("Cacher", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snack.dismiss();
+                }
+            });
+        ((TextView) snack.getView().findViewById(android.support.design.R.id.snackbar_text)).setMaxLines(5);
+        snack.show();
     }
 
     @Override
     public void onEmptyViewLongPress(Calendar time) {
-        Toast.makeText(this.getActivity().getApplicationContext(), "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.getActivity().getApplicationContext(), "Empty view long pressed: " + getEventTitle(time), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this.getActivity().getApplicationContext(), "Ceci n'est pas un EasterEgg", Toast.LENGTH_SHORT).show();
     }
 
     public WeekView getWeekView() {
         return mWeekView;
     }
 
-    @Override
-    public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
-
-        // Populate the week view with some events.
-
-    /*
-        startTime = Calendar.getInstance();
-        startTime.set(Calendar.DAY_OF_MONTH, startTime.getActualMaximum(Calendar.DAY_OF_MONTH));
-        startTime.set(Calendar.HOUR_OF_DAY, 15);
-        startTime.set(Calendar.MINUTE, 0);
-        startTime.set(Calendar.MONTH, newMonth-1);
-        startTime.set(Calendar.YEAR, newYear);
-        endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR_OF_DAY, 3);
-        event = new WeekViewEvent(5, getEventTitle(startTime), startTime, endTime);
-        event.setColor(getResources().getColor(R.color.colorPrimary));
-        events.add(event);
-     */
-
-        /*List<WeekViewEvent> matchedEvents = new ArrayList<WeekViewEvent>();
-        for (WeekViewEvent event : events) {
-            if (eventMatches(event, newYear, newMonth)) {
-                matchedEvents.add(event);
-            }
-        }*/
-        retrieveEvents();
-
-        return events;
-
-    }
-
-    private void retrieveEvents(){
-        events.clear();
+    private List<WeekViewDisplayable> retrieveEvents(Calendar startDate, Calendar endDate){
+        List<WeekViewDisplayable> matchedEvents = new ArrayList<WeekViewDisplayable>();
         //CalendarEvent calendarEvent = cupboard().withDatabase(database).query(CalendarEvent.class).get();
         Cursor cursor = cupboard().withDatabase(database).query(CalendarEvent.class).getCursor();
         // or we can iterate all results
         Iterable<CalendarEvent> itr = cupboard().withCursor(cursor).iterate(CalendarEvent.class);
         for (CalendarEvent calendarEvent: itr) {
             // do something with book
-            WeekViewEvent event = createWeekViewEvent(calendarEvent.getId(), calendarEvent.getTitle(), calendarEvent.getStartString(), calendarEvent.getEndString(), calendarEvent.getName());
-            events.add(event);
+            //if (eventMatches(calendarEvent.toWeekViewEvent(), startDate, endDate)) {
+                WeekViewEvent event = calendarEvent.toWeekViewEvent();
+                matchedEvents.add(event);
+            //}
         }
-        mWeekView.notifyDatasetChanged();
+        return matchedEvents;
     }
 
-    private boolean eventMatches(WeekViewEvent event, int year, int month) {
+    private boolean eventMatches(WeekViewEvent event, Calendar startDate, Calendar endDate) {
         //noinspection WrongConstant
-        return event != null && ((event.getStartTime().get(Calendar.YEAR) == year && event.getStartTime().get(Calendar.MONTH) == month - 1) || (event.getEndTime().get(Calendar.YEAR) == year && event.getEndTime().get(Calendar.MONTH) == month - 1));
+
+        return (event.getStartTime().get(Calendar.YEAR) == startDate.get(Calendar.YEAR)
+                && event.getStartTime().get(Calendar.MONTH) == startDate.get(Calendar.MONTH))
+                && (event.getStartTime().get(Calendar.DAY_OF_MONTH) >= startDate.get(Calendar.DAY_OF_MONTH)
+                || event.getStartTime().get(Calendar.DAY_OF_MONTH) <= endDate.get(Calendar.DAY_OF_MONTH));
     }
 
-    private void openDialog(WeekViewEvent event){
-
-        int startMinuteValue = event.getStartTime().get(Calendar.MINUTE);
+    private void openDialog(CalendarEvent event){
+        int startMinuteValue = event.toWeekViewEvent().getStartTime().get(Calendar.MINUTE);
         String startMinute = String.valueOf(startMinuteValue);
         if(startMinuteValue < 10)
             startMinute = "0"+startMinuteValue;
 
-        int endMinuteValue = event.getEndTime().get(Calendar.MINUTE);
+        int endMinuteValue = event.toWeekViewEvent().getEndTime().get(Calendar.MINUTE);
         String endMinute = String.valueOf(endMinuteValue);
         if(endMinuteValue < 10)
             endMinute = "0"+endMinuteValue;
-
+        else if (endMinuteValue == 59){
+            endMinute = "00";
+        }
         final MaterialDialog mMaterialDialog = new MaterialDialog(this.getContext());
                 mMaterialDialog
-                        .setTitle("De "+event.getStartTime().get(Calendar.HOUR_OF_DAY)+"h"+startMinute+" à "+event.getEndTime().get(Calendar.HOUR_OF_DAY)+"h"+endMinute)
-                        .setMessage(event.getName())
+                        .setTitle("De "+event.toWeekViewEvent().getStartTime().get(Calendar.HOUR_OF_DAY)+"h"+startMinute+" à "+event.toWeekViewEvent().getEndTime().get(Calendar.HOUR_OF_DAY)+"h"+endMinute)
+                        .setMessage(event.getName()+"\n"+event.getRooms()+"\n"+event.getProf()+"\n"+event.getUnite())
                         .setPositiveButton("OK", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -366,6 +365,19 @@ public class CalendarFragment extends Fragment implements WeekView.EventClickLis
                         });
 
         mMaterialDialog.show();
+    }
+
+    @Override
+    public List<WeekViewDisplayable> onMonthChange(Calendar startDate, Calendar endDate) {
+        List<WeekViewDisplayable> e = retrieveEvents(startDate, endDate);
+
+        if(monthTriggered == 0){
+            events.addAll(e);
+            monthTriggered++;
+            return events;
+        }
+
+        return new ArrayList<WeekViewDisplayable>();
     }
 }
 

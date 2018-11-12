@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -20,7 +21,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -60,7 +60,7 @@ public class FairpayFragment extends Fragment {
     private TextView id;
 
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private String pictureBaseUrl = "https://bde.esiee.fr/fairpay/api/students/photo/by-email/";
 
@@ -101,16 +101,13 @@ public class FairpayFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fairpay, container, false);
 
-        name = (TextView) view.findViewById(R.id.fairpayUserName);
-        balance = (TextView) view.findViewById(R.id.fairpayUserBalance);
-        pictureStudent = (ImageView) view.findViewById(R.id.fairpayUserImage);
-        barcodeImage = (ImageView) view.findViewById(R.id.fairpayBarcode);
-        id = (TextView) view.findViewById(R.id.fairpayUserId);
+        name = view.findViewById(R.id.fairpayUserName);
+        balance = view.findViewById(R.id.fairpayUserBalance);
+        pictureStudent = view.findViewById(R.id.fairpayUserImage);
+        barcodeImage = view.findViewById(R.id.fairpayBarcode);
+        id = view.findViewById(R.id.fairpayUserId);
 
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
 
         getStudentInfo();

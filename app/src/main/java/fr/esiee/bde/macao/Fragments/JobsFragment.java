@@ -2,22 +2,21 @@ package fr.esiee.bde.macao.Fragments;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,15 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
-import fr.esiee.bde.macao.DividerItemDecoration;
-import fr.esiee.bde.macao.Events.Event;
-import fr.esiee.bde.macao.Events.EventAdapter;
 import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.Jobs.Jobs;
 import fr.esiee.bde.macao.Jobs.JobsAdapter;
+import fr.esiee.bde.macao.MainActivity;
 import fr.esiee.bde.macao.R;
-import fr.esiee.bde.macao.Rooms.Room;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,8 +54,9 @@ public class JobsFragment extends Fragment {
     private List<Jobs> jobsList = new ArrayList<Jobs>();
     private RecyclerView recyclerView;
     private JobsAdapter mAdapter;
+    private View view;
 
-    private SpinnerLoading loader;
+    private ProgressBar loader;
 
     private OnFragmentInteractionListener mListener;
 
@@ -98,9 +95,9 @@ public class JobsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_jobs, container, false);
+        view = inflater.inflate(R.layout.fragment_jobs, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_jobs);
+        recyclerView = view.findViewById(R.id.recycler_view_jobs);
 
         mAdapter = new JobsAdapter(jobsList, this.getContext());
         //RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -119,10 +116,7 @@ public class JobsFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //recyclerView.addItemDecoration(new DividerItemDecoration(this.getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
-        loader = (SpinnerLoading) getActivity().findViewById(R.id.loader_view);
-        loader.setPaintMode(1);
-        loader.setCircleRadius(20);
-        loader.setItemCount(8);
+        loader = getActivity().findViewById(R.id.loader_view);
         loader.setVisibility(View.VISIBLE);
 
         getJobs();
@@ -183,6 +177,7 @@ public class JobsFragment extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 mListener.makeSnackBar("Oups...");
+                loader.setVisibility(View.GONE);
             }
         });
     }

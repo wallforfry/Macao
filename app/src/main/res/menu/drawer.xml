@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="BDE">
+    <item android:title="@string/bde">
         <menu>
             <group android:checkableBehavior="single">
                 <item
@@ -23,7 +23,7 @@
             </group>
         </menu>
     </item>
-    <item android:title="Mon Espace">
+    <item android:title="@string/mon_espace">
         <menu>
             <group android:checkableBehavior="single">
                 <item
@@ -47,8 +47,13 @@
         </menu>
     </item>
     <item
+        android:id="@+id/nav_administration"
+        android:visible="true"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="@string/administration" />
+    <item
         android:id="@+id/nav_settings"
-        android:visible="false"
+        android:visible="true"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/settings" />
     <item

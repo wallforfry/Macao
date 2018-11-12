@@ -9,20 +9,17 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.alamkanak.weekview.WeekViewEvent;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.TimeZone;
 
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.DataBaseHelper;
 import fr.esiee.bde.macao.R;
 
-import static fr.esiee.bde.macao.Calendar.WeekViewEvent.createWeekViewEvent;
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 /**
@@ -80,13 +77,16 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
             String endTime = events.get(position).getEndString();
             String prof = events.get(position).getProf();
 
+            TimeZone timezone = TimeZone.getTimeZone("CET");
+
             try {
                 calendar.setTime(sdf.parse(startTime));
-                calendar.add(Calendar.HOUR_OF_DAY, 2);
+                long offSet = timezone.getOffset(calendar.getTimeInMillis());
+                calendar.add(Calendar.MILLISECOND, (int) offSet);
                 startTime = hdf.format(calendar.getTime());
 
                 calendar.setTime(sdf.parse(endTime));
-                calendar.add(Calendar.HOUR_OF_DAY, 2);
+                calendar.add(Calendar.MILLISECOND, (int) offSet);
                 endTime = hdf.format(calendar.getTime());
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -149,7 +149,19 @@ class ListViewRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         }
 
     private void retrieveEvents(){
-        Calendar calendar = MacaoAppWidget.calendar;
+        Calendar calendar;
+        try {
+            calendar = MacaoAppWidget.calendar;
+        } catch (NullPointerException e) {
+            calendar = Calendar.getInstance();
+            MacaoAppWidget.calendar = calendar;
+        }
+
+        if(calendar == null){
+            calendar = Calendar.getInstance();
+            MacaoAppWidget.calendar = calendar;
+        }
+
         Log.d("RV", calendar.getTime().toString());
         //calendar.add(Calendar.DAY_OF_YEAR, -1);
         Date today = calendar.getTime();
