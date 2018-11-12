@@ -24,10 +24,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Settings.SettingsActivity"
             android:label="@string/settings"
@@ -36,7 +36,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
 
         <receiver
             android:name=".Widget.MacaoAppWidget"
@@ -65,25 +64,31 @@
         <service android:name=".Notifications.FirebaseService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
-        <service android:name=".Notifications.NotificationService" android:exported="false" android:permission="android.permission.BIND_JOB_SERVICE"/>
-        <service android:name=".Calendar.CalendarService" android:exported="false" android:permission="android.permission.BIND_JOB_SERVICE"/>
-        <service android:name=".Events.EventService" android:exported="false" android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service
+            android:name=".Notifications.NotificationService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".Calendar.CalendarService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".Events.EventService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="Notifications Push"/>
-
+            android:value="Notifications Push" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/fuego_notification_icon"/>
-
+            android:resource="@drawable/fuego_notification_icon" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorPrimary"/>
+            android:resource="@color/colorPrimary" />
 
     </application>
 
