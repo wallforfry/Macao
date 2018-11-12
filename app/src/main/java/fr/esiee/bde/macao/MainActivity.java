@@ -87,6 +87,7 @@ import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.FairpayFragment;
+import fr.esiee.bde.macao.Fragments.FoundObjectsFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
@@ -218,6 +219,7 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_rooms).withName(R.string.rooms).withIcon(R.drawable.baseline_room_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_events).withName(R.string.evenements).withIcon(R.drawable.baseline_event_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_jobs).withName(R.string.jobs).withIcon(R.drawable.ic_work_black_24dp),
+                        //new PrimaryDrawerItem().withIdentifier(R.id.nav_founded_objects).withName(R.string.founded_objects).withIcon(R.drawable.ic_work_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_clubs).withName(R.string.les_clubs).withIcon(R.drawable.baseline_group_black_24dp),
                         new SectionDrawerItem().withName(R.string.mon_espace),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_calendar).withName(R.string.agenda).withIcon(R.drawable.baseline_date_range_black_24dp),
@@ -521,6 +523,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_jobs:
                 fragment = new JobsFragment();
+                break;
+            case R.id.nav_founded_objects:
+                fragment = new FoundObjectsFragment();
                 break;
             case R.id.nav_events:
                 fragment = new EventsFragment();

@@ -64,6 +64,7 @@
     <string name="mon_espace">Mon Espace</string>
     <string name="bde_website">bde.esiee.fr</string>
     <string name="administration">Administration</string>
+    <string name="founded_objects">Objets trouvés</string>
 
     <string-array name="administrator">
         <item>wallerand.delevacq@edu.esiee.fr</item>
@@ -75,4 +76,9 @@
         <item>alpha</item>
         <item>beta</item>
     </string-array>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
