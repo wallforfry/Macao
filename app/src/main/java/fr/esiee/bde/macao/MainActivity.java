@@ -700,6 +700,9 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
             }
+            else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("alpha");
+            }
 
             if(BuildConfig.VERSION_NAME.contains("b")) {
 
@@ -715,6 +718,9 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
             }
+            else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("beta");
+            }
 
             if(BuildConfig.VERSION_NAME.contains("d")) {
 
@@ -729,6 +735,9 @@ public class MainActivity extends AppCompatActivity
                                 Log.d("Firebase", msg);
                             }
                         });
+            }
+            else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("dev");
             }
     }
 
