@@ -179,6 +179,7 @@ public class AdministrationFragment extends Fragment {
                 postToFCM(root.toString(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
+                        Snackbar.make(getView(), "L'envoi a échoué", Snackbar.LENGTH_SHORT).show();
                         Log.d(TAG, "Error");
                     }
 
