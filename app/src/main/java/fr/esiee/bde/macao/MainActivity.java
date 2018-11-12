@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity
             sendBroadcast(new Intent(this, AutoStart.class));
             startService(new Intent(this, CalendarService.class));
             startService(new Intent(this, EventService.class));
-            //startService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, NotificationService.class));
             startService(new Intent(this, WidgetUpdateService.class));
         }
         Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());

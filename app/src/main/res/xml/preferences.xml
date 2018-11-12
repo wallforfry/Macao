@@ -3,14 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:enabled="false"
         android:title="Notification de l'agenda">
 
         <CheckBoxPreference
-            android:defaultValue="false"
             android:key="enable_calendar_notification"
+            android:title="Activer les notifications"
             android:summary="Active les notifications de l'agenda"
-            android:title="Activer les notifications" />
+            android:defaultValue="true"/>
 
         <EditTextPreference
             android:defaultValue="30"
