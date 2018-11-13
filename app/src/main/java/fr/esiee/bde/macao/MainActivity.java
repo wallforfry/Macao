@@ -293,7 +293,6 @@ public class MainActivity extends AppCompatActivity
             startService(new Intent(this, WidgetUpdateService.class));
         }
         Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());
-        firebase();
     }
 
     @Override
@@ -491,6 +490,8 @@ public class MainActivity extends AppCompatActivity
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("mail", email);
                 editor.apply();
+
+                firebase();
 
                 if(Arrays.asList(getResources().getStringArray(R.array.administrator)).contains(mail)){
                     if(drawer.getDrawerItem(R.id.nav_administration) == null) {
