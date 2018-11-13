@@ -112,13 +112,14 @@
             android:src="@drawable/ic_email_black_24dp"/>
 
         <TextView
+            android:id="@+id/job_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="email"
-            android:textColor="#2196F3"
-            android:layout_toRightOf="@+id/job_image_email"
             android:layout_centerVertical="true"
-            android:id="@+id/job_email"/>
+            android:layout_toRightOf="@+id/job_image_email"
+            android:autoLink="email"
+            android:text="email"
+            android:textColor="#2196F3" />
 
     </RelativeLayout>
 
@@ -139,12 +140,13 @@
             android:src="@drawable/ic_phone_black_24dp"/>
 
         <TextView
+            android:id="@+id/job_telephone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="06666666666"
-            android:textColor="#2196F3"
             android:layout_toRightOf="@+id/job_image_telephone"
-            android:id="@+id/job_telephone"/>
+            android:autoLink="phone"
+            android:text="06666666666"
+            android:textColor="#2196F3" />
     </RelativeLayout>
 
     </RelativeLayout>

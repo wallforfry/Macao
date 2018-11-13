@@ -279,11 +279,12 @@ public class MainActivity extends AppCompatActivity
         TedPermission.with(this)
                 .setPermissionListener(permissionlistener)
                 .setDeniedMessage(R.string.close)
-                .setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.VIBRATE, Manifest.permission.INTERNET)
+                //.setPermissions(Manifest.permission.CALL_PHONE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.VIBRATE, Manifest.permission.INTERNET)
+                .setPermissions(Manifest.permission.CALL_PHONE)
                 .setGotoSettingButtonText(R.string.settings)
                 .setDeniedCloseButtonText(R.string.close)
-                .setDeniedMessage(R.string.permissionDeniedMessage)
-                .check();
+                .setDeniedMessage(R.string.permissionDeniedMessage);
+                //.check();
 
         ProgressBar loader = findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);

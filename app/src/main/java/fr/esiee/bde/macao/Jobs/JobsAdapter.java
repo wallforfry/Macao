@@ -107,18 +107,13 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
         contentTelephone.setSpan(new UnderlineSpan(), 0, job.getTelephone().length(), 0);
         holder.telephone.setText(contentTelephone);
 
-        holder.layout_telephone.setOnClickListener(new View.OnClickListener() {
+        /*holder.layout_telephone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String number = job.getTelephone();
-                Intent intent = new Intent(Intent.ACTION_CALL);
+                Intent intent = new Intent(Intent.ACTION_DIAL);
                 intent.setData(Uri.parse("tel:" + number));
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-
-                }
-                else {
-                    context.startActivity(intent);
-                }
+                context.startActivity(intent);
             }
         });
 
@@ -130,7 +125,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.MyViewHolder> 
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, job.getName());
                 context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
             }
-        });
+        });*/
 
 
 
