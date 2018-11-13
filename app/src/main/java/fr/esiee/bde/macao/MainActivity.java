@@ -6,6 +6,8 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -293,6 +296,7 @@ public class MainActivity extends AppCompatActivity
             startService(new Intent(this, WidgetUpdateService.class));
         }
         Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());
+        firebase();
     }
 
     @Override
@@ -491,8 +495,6 @@ public class MainActivity extends AppCompatActivity
                 editor.putString("mail", email);
                 editor.apply();
 
-                firebase();
-
                 if(Arrays.asList(getResources().getStringArray(R.array.administrator)).contains(mail)){
                     if(drawer.getDrawerItem(R.id.nav_administration) == null) {
                         drawer.addItemAtPosition(
@@ -687,13 +689,23 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
+    private void createFirebaseNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(FirebaseService.NOTIFICATION_CHANNEL_NAME, FirebaseService.NOTIFICATION_CHANNEL_NAME, importance);
+            channel.setDescription(FirebaseService.NOTIFICATION_CHANNEL_DESCRIPTION);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
     private void firebase(){
+        createFirebaseNotificationChannel();
 
         HttpUtils.getByUrl("https://bde.esiee.fr/aurion-files/app_users.json", null, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 //super.onSuccess(statusCode, headers, response);
-                HashMap<String, List<String>> users = new HashMap<String, List<String>>();
                 try {
 
                     JSONArray all_topics = response.getJSONArray("topics");
