@@ -6,6 +6,8 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -48,6 +51,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -63,12 +67,20 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Request;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
+import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.Calendar.CalendarEvent;
 import fr.esiee.bde.macao.Calendar.CalendarService;
 import fr.esiee.bde.macao.Events.EventService;
@@ -78,6 +90,7 @@ import fr.esiee.bde.macao.Fragments.CalendarFragment;
 import fr.esiee.bde.macao.Fragments.ClubsFragment;
 import fr.esiee.bde.macao.Fragments.EventsFragment;
 import fr.esiee.bde.macao.Fragments.FairpayFragment;
+import fr.esiee.bde.macao.Fragments.FoundObjectsFragment;
 import fr.esiee.bde.macao.Fragments.JobsFragment;
 import fr.esiee.bde.macao.Fragments.RoomsFragment;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
@@ -209,6 +222,7 @@ public class MainActivity extends AppCompatActivity
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_rooms).withName(R.string.rooms).withIcon(R.drawable.baseline_room_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_events).withName(R.string.evenements).withIcon(R.drawable.baseline_event_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_jobs).withName(R.string.jobs).withIcon(R.drawable.ic_work_black_24dp),
+                        //new PrimaryDrawerItem().withIdentifier(R.id.nav_founded_objects).withName(R.string.founded_objects).withIcon(R.drawable.ic_work_black_24dp),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_clubs).withName(R.string.les_clubs).withIcon(R.drawable.baseline_group_black_24dp),
                         new SectionDrawerItem().withName(R.string.mon_espace),
                         new PrimaryDrawerItem().withIdentifier(R.id.nav_calendar).withName(R.string.agenda).withIcon(R.drawable.baseline_date_range_black_24dp),
@@ -278,7 +292,7 @@ public class MainActivity extends AppCompatActivity
             sendBroadcast(new Intent(this, AutoStart.class));
             startService(new Intent(this, CalendarService.class));
             startService(new Intent(this, EventService.class));
-            //startService(new Intent(this, NotificationService.class));
+            startService(new Intent(this, NotificationService.class));
             startService(new Intent(this, WidgetUpdateService.class));
         }
         Log.d("Firebase", FirebaseInstanceId.getInstance().getInstanceId().toString());
@@ -513,6 +527,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_jobs:
                 fragment = new JobsFragment();
                 break;
+            case R.id.nav_founded_objects:
+                fragment = new FoundObjectsFragment();
+                break;
             case R.id.nav_events:
                 fragment = new EventsFragment();
                 break;
@@ -672,8 +689,86 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-    private void firebase(){
+    private void createFirebaseNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(FirebaseService.NOTIFICATION_CHANNEL_NAME, FirebaseService.NOTIFICATION_CHANNEL_NAME, importance);
+            channel.setDescription(FirebaseService.NOTIFICATION_CHANNEL_DESCRIPTION);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
 
+    private void firebase(){
+        createFirebaseNotificationChannel();
+
+        HttpUtils.getByUrl("https://bde.esiee.fr/aurion-files/app_users.json", null, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                //super.onSuccess(statusCode, headers, response);
+                try {
+
+                    JSONArray all_topics = response.getJSONArray("topics");
+                    for(int i = 0; i < all_topics.length(); i++){
+                        final String topic = all_topics.getString(i);
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d("Firebase", "Unsubscribe to : "+topic);
+                                } else {
+                                    Log.d("Firebase", "Can't unsubscribe to : "+topic);
+                                }
+                            }
+                        });
+                    }
+
+                    final JSONArray defaults = response.getJSONArray("defaults");
+                    for(int i = 0; i < defaults.length(); i++){
+                        final String topic = defaults.getString(i);
+                        FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.d("Firebase", "Subscribe to default : "+topic);
+                                } else {
+                                    Log.d("Firebase", "Can't subscribe to default : "+topic);
+                                }
+                            }
+                        });
+                    }
+
+                    JSONArray versions = response.getJSONArray("firebase");
+                    for(int i = 0; i < versions.length(); i++){
+                        JSONObject user = versions.getJSONObject(i);
+                        String mail = user.getString("mail");
+                        if(MainActivity.mail.equals(mail)){
+                            JSONArray topics = user.getJSONArray("topics");
+                            for(int j = 0; j < topics.length(); j++) {
+                                final String topic = topics.getString(j);
+                                FirebaseMessaging.getInstance().subscribeToTopic(topic)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                String msg = "Subcribe to specific \""+topic+"\" topic";
+                                                if (!task.isSuccessful()) {
+                                                    msg = "Error : can't subscribe to "+topic;
+                                                }
+                                                Log.d("Firebase", msg);
+                                            }
+                                        });
+                            }
+                            return;
+                        }
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        /*
         FirebaseMessaging.getInstance().subscribeToTopic("news")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -700,6 +795,9 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
             }
+            else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("alpha");
+            }
 
             if(BuildConfig.VERSION_NAME.contains("b")) {
 
@@ -714,6 +812,9 @@ public class MainActivity extends AppCompatActivity
                                 Log.d("Firebase", msg);
                             }
                         });
+            }
+            else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("beta");
             }
 
             if(BuildConfig.VERSION_NAME.contains("d")) {
@@ -730,6 +831,9 @@ public class MainActivity extends AppCompatActivity
                             }
                         });
             }
+            else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("dev");
+            }*/
     }
 
     @Override

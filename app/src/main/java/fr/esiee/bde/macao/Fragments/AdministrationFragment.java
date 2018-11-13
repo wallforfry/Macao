@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -13,8 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +30,12 @@ import org.json.JSONObject;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import cz.msebera.android.httpclient.Header;
 import fr.esiee.bde.macao.BuildConfig;
+import fr.esiee.bde.macao.HttpUtils;
 import fr.esiee.bde.macao.Interfaces.OnFragmentInteractionListener;
 import fr.esiee.bde.macao.R;
 import okhttp3.Call;
@@ -53,6 +64,8 @@ public class AdministrationFragment extends Fragment {
 
     public static final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    private List<String> topics;
 
     public AdministrationFragment() {
         // Required empty public constructor
@@ -85,6 +98,7 @@ public class AdministrationFragment extends Fragment {
         }
 
         client = new OkHttpClient();
+        topics = retrieveTopics();
 
     }
 
@@ -133,6 +147,7 @@ public class AdministrationFragment extends Fragment {
         final LayoutInflater factory = LayoutInflater.from(getContext());
         final View dialogView = factory.inflate(R.layout.notification_dialog, null);
 
+        ((Spinner) dialogView.findViewById(R.id.administration_notification_dialog_topic)).setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, topics));
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Nouvelle notification");
         builder.setView(dialogView);
@@ -179,6 +194,7 @@ public class AdministrationFragment extends Fragment {
                 postToFCM(root.toString(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
+                        Snackbar.make(getView(), "L'envoi a échoué", Snackbar.LENGTH_SHORT).show();
                         Log.d(TAG, "Error");
                     }
 
@@ -207,5 +223,26 @@ public class AdministrationFragment extends Fragment {
         Call call = client.newCall(request);
         call.enqueue(callback);
         return call;
+    }
+
+    private List<String> retrieveTopics(){
+        final List<String> topics = new ArrayList<>();
+        HttpUtils.getByUrl("https://bde.esiee.fr/aurion-files/app_users.json", null, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                //super.onSuccess(statusCode, headers, response);
+                try {
+
+                    JSONArray all_topics = response.getJSONArray("topics");
+                    for (int i = 0; i < all_topics.length(); i++) {
+                        final String topic = all_topics.getString(i);
+                        topics.add(topic);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+        return topics;
     }
 }
