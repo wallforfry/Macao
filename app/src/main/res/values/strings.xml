@@ -70,12 +70,6 @@
         <item>wallerand.delevacq@edu.esiee.fr</item>
     </string-array>
 
-    <string-array name="topics">
-        <item>dev</item>
-        <item>news</item>
-        <item>alpha</item>
-        <item>beta</item>
-    </string-array>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>

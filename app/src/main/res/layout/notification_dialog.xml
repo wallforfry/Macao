@@ -33,7 +33,6 @@
         android:id="@+id/administration_notification_dialog_topic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:entries="@array/topics" />
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>
