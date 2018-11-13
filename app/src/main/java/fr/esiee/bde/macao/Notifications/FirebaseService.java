@@ -24,8 +24,8 @@ import fr.esiee.bde.macao.R;
 public class FirebaseService extends FirebaseMessagingService {
 
     private static final String TAG = "Firebase";
-    private static final String NOTIFICATION_CHANNEL_NAME = "Notifications Push";
-    private static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Notifications push";
+    public static final String NOTIFICATION_CHANNEL_NAME = "Notifications Push";
+    public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Notifications push";
 
 
     @Override
@@ -99,7 +99,6 @@ public class FirebaseService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String messageTitle, String messageBody, String messageColor, String messageIcon) {
-        createNotificationChannel();
         final NotificationManager mNotification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         final Intent launchNotifiactionIntent = new Intent(this, MainActivity.class);
@@ -151,16 +150,6 @@ public class FirebaseService extends FirebaseMessagingService {
         }*/
 
         mNotification.notify(0, builder.build());
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_NAME, NOTIFICATION_CHANNEL_NAME, importance);
-            channel.setDescription(NOTIFICATION_CHANNEL_DESCRIPTION);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
     }
 
     private int getNotificationIcon(String messageIcon) {
