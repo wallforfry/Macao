@@ -35,7 +35,7 @@ public class AutoStart extends BroadcastReceiver {
                     .setOverrideDeadline(3 * 60 * 1000) // maximum delay
                     .build();
 
-            jobScheduler.schedule(jobInfo);
+            //jobScheduler.schedule(jobInfo);
             //context.getApplicationContext().startService(new Intent(context.getApplicationContext(), NotificationService.class));
 
             JobInfo jobInfoCalendar = new JobInfo.Builder(12, new ComponentName(context, CalendarService.class))
