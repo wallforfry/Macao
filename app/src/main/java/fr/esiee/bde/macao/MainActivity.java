@@ -20,6 +20,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -288,6 +289,8 @@ public class MainActivity extends AppCompatActivity
 
         ProgressBar loader = findViewById(R.id.loader_view);
         loader.setVisibility(View.GONE);
+
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("enable_calendar_notification", false).apply();
 
         if(savedInstanceState == null) {
             sendBroadcast(new Intent(this, AutoStart.class));
