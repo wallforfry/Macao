@@ -113,7 +113,7 @@ public class CalendarService extends JobService {
                     // Pull out the first event on the public timeline
                     try {
                         if(!((JSONObject) timeline.get(0)).has("error")) {
-                            //cupboard().withDatabase(database).delete(CalendarEvent.class, null);
+                            cupboard().withDatabase(database).delete(CalendarEvent.class, null);
                             //Log.i("Agenda", timeline.get(0).toString());
                             for (int i = 0; i < timeline.length(); i++) {
                                 JSONObject obj = (JSONObject) timeline.get(i);
