@@ -28,7 +28,9 @@ public class AutoStart extends BroadcastReceiver {
             Log.d("AutoStart", "Start Services");
             JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
-            JobInfo jobInfo = new JobInfo.Builder(11, new ComponentName(context, NotificationService.class))
+            jobScheduler.cancelAll();
+
+            /*JobInfo jobInfo = new JobInfo.Builder(11, new ComponentName(context, NotificationService.class))
                     // only add if network access is required
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setMinimumLatency(30 * 1000) // wait at least
@@ -36,7 +38,7 @@ public class AutoStart extends BroadcastReceiver {
                     .build();
 
             //jobScheduler.schedule(jobInfo);
-            //context.getApplicationContext().startService(new Intent(context.getApplicationContext(), NotificationService.class));
+            //context.getApplicationContext().startService(new Intent(context.getApplicationContext(), NotificationService.class));*/
 
             JobInfo jobInfoCalendar = new JobInfo.Builder(12, new ComponentName(context, CalendarService.class))
                     // only add if network access is required

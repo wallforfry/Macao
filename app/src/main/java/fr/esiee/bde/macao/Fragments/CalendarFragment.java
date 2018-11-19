@@ -335,22 +335,14 @@ public class CalendarFragment extends Fragment implements EventClickListener<Cal
     }
 
     private void openDialog(CalendarEvent event){
-        int startMinuteValue = event.toWeekViewEvent().getStartTime().get(Calendar.MINUTE);
-        String startMinute = String.valueOf(startMinuteValue);
-        if(startMinuteValue < 10)
-            startMinute = "0"+startMinuteValue;
+        SimpleDateFormat format = new SimpleDateFormat("HH'h'mm");
+        Calendar endTime = event.toWeekViewEvent().getEndTime();
+        endTime.add(Calendar.MINUTE, 1);
 
-        int endMinuteValue = event.toWeekViewEvent().getEndTime().get(Calendar.MINUTE);
-        String endMinute = String.valueOf(endMinuteValue);
-        if(endMinuteValue < 10)
-            endMinute = "0"+endMinuteValue;
-        else if (endMinuteValue == 59){
-            endMinute = "00";
-        }
         final MaterialDialog mMaterialDialog = new MaterialDialog(this.getContext());
                 mMaterialDialog
-                        .setTitle("De "+event.toWeekViewEvent().getStartTime().get(Calendar.HOUR_OF_DAY)+"h"+startMinute+" à "+event.toWeekViewEvent().getEndTime().get(Calendar.HOUR_OF_DAY)+"h"+endMinute)
-                        .setMessage(event.getName()+"\n"+event.getRooms()+"\n"+event.getProf()+"\n"+event.getUnite())
+                        .setTitle("De "+format.format(event.toWeekViewEvent().getStartTime().getTime())+" à "+format.format(endTime.getTime()))
+                        .setMessage(event.getName()+"\n"+event.getRooms()+"\n"+event.getProf()+"\n"+event.getUnite()+"\n"+event.isNotified())
                         .setPositiveButton("OK", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
